@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
+  <div>
+    这里是主页
   </div>
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "oj-Home"
 }
 </script>
 
 <style>
+
 </style>
