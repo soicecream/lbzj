@@ -10,6 +10,22 @@ export function fetchProblemsList(page, limit, listQuery) {
   })
 }
 
+export function getAdminprolist(page, limit, listQuery) {
+  return request({
+    url: `/problem/adminprolist/${page}/${limit}`,
+    method: 'post',
+    data : listQuery
+  })
+}
+
+export function getFile(id) {
+  return request({
+    url: `/problem/getFile/${id}`,
+    method: 'get',
+  })
+}
+
+
 export function fetchProblem(id) {
   return request({
     url: `/problem/getProblemById/${id}`,

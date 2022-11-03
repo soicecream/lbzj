@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import {login} from '@/api/user'
-import {setToken,getToken} from "@/utils/auth";
+import {login,logout} from '@/api/user'
+import {setToken, getToken, removeToken} from "@/utils/auth";
 
 export default {
   data() {
@@ -111,7 +111,10 @@ export default {
          this.$router.push('/admin')
          break
       case 'logOut':
-        this.loginState=false;
+          logout().then(res=>{
+            removeToken()
+            this.loginState=false;
+          })
         break
        case 'page':
        this.$router.push('/user/null')
