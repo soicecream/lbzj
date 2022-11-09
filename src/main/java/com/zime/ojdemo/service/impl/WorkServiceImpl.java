@@ -7,8 +7,8 @@ import com.zime.ojdemo.entity.Solution;
 import com.zime.ojdemo.entity.Work;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.mapper.WorkMapper;
-import com.zime.ojdemo.modle.vo.WorkListResult;
-import com.zime.ojdemo.modle.vo.WorkRankresult;
+import com.zime.ojdemo.modle.vo.result.WorkListResult;
+import com.zime.ojdemo.modle.vo.result.WorkRankresult;
 import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +93,6 @@ public class WorkServiceImpl extends ServiceImpl<WorkMapper, Work> implements Wo
             workRankresult.setIntrgeral(intrgeral.get(i));
             rankresults.add(workRankresult);
         }
-        System.out.println("6666666666666666666666666");
         System.out.println(rankresults);
         return rankresults;
     }

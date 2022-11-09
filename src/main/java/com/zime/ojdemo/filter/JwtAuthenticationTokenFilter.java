@@ -1,8 +1,8 @@
 package com.zime.ojdemo.filter;
 
 
-import com.zime.ojdemo.modle.vo.LoginUser;
-import com.zime.ojdemo.service.TokenServie;
+import com.zime.ojdemo.modle.vo.core.security.LoginUser;
+import com.zime.ojdemo.untils.TokenServie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

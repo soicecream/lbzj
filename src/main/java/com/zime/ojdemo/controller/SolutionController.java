@@ -3,7 +3,7 @@ package com.zime.ojdemo.controller;
 
 import com.zime.ojdemo.entity.SolutionAndSourceCode;
 import com.zime.ojdemo.modle.vo.PageList;
-import com.zime.ojdemo.modle.vo.SolutionQuery;
+import com.zime.ojdemo.modle.vo.query.SolutionQuery;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.service.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,21 +2,16 @@ package com.zime.ojdemo.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.zime.ojdemo.entity.Problem;
-import com.zime.ojdemo.entity.Solution;
 import com.zime.ojdemo.entity.Users;
 import com.zime.ojdemo.modle.vo.*;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
-import com.zime.ojdemo.service.SolutionService;
-import com.zime.ojdemo.service.TokenServie;
+import com.zime.ojdemo.modle.vo.query.UserQuery;
 import com.zime.ojdemo.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")

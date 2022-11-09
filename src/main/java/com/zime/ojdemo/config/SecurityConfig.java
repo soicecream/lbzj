@@ -3,7 +3,7 @@ package com.zime.ojdemo.config;
 
 import com.zime.ojdemo.filter.JwtAuthenticationTokenFilter;
 import com.zime.ojdemo.filter.LogoutSuccessHandlerImpl;
-import com.zime.ojdemo.service.UserDetailsServiceImpl;
+import com.zime.ojdemo.untils.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;

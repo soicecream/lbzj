@@ -4,7 +4,7 @@ import com.zime.ojdemo.entity.Solution;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.entity.SolutionAndSourceCode;
 import com.zime.ojdemo.modle.vo.PageList;
-import com.zime.ojdemo.modle.vo.SolutionQuery;
+import com.zime.ojdemo.modle.vo.query.SolutionQuery;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;

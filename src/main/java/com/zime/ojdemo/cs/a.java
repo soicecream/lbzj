@@ -7,29 +7,38 @@ import java.util.*;
 
 public class a{
     public static void main(String[] args) {
-        BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
-        System.out.println(bCryptPasswordEncoder.encode("123456"));
+    parseBoolExpr(
+            "!(f)");
     }
 
-    public boolean arrayStringsAreEqual(String[] word1, String[] word2) {
-    int left=0,right=0,lwz=0,rwz=0;
-    int n=word1.length;
-    int n1=word2.length;
-    while (true){
-        if(lwz>=word1[left].length()){
-            left++;
-            lwz=0;
+    public static boolean parseBoolExpr(String expression) {
+    int n=expression.length();
+    Stack<Character> zhi=new Stack<>();
+    for(int i=0;i<n;i++){
+            if(expression.charAt(i)==')'){
+            int[] pd=new int[2];
+            while (zhi.peek()!='('){
+                Character pd1=zhi.pop();
+                if(pd1=='t') pd[1]=1;
+                else pd[0]=1;
+            }
+            zhi.pop();
+            Character pd1=zhi.pop();
+            if(pd1=='&') {
+                if(pd[0]==1) zhi.push('f');
+                else  zhi.push('t');
+            }
+            else if(pd1=='|'){
+                if(pd[1]==1) zhi.push('t');
+                else  zhi.push('f');
+            }
+            else if(pd1=='!'){
+                if(pd[1]==1) zhi.push('f');
+                else  zhi.push('t');
+            }
         }
-        if(rwz>=word2[right].length()){
-            right++;
-            rwz=0;
-        }
-        if(left>=n||right>=n1) break;
-        if(word1[left].charAt(lwz)!=word2[right].charAt(rwz)) return false;
-        lwz++;
-        rwz++;
+        else if(expression.charAt(i)!=',') zhi.push(expression.charAt(i));
     }
-    if(left==n&&right==n1) return true;
-    else return false;
+    return zhi.pop()=='t'?true:false;
     }
 }

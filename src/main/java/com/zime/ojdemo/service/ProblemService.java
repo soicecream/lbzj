@@ -2,9 +2,8 @@ package com.zime.ojdemo.service;
 
 import com.zime.ojdemo.entity.Problem;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.zime.ojdemo.modle.vo.AddProblem;
 import com.zime.ojdemo.modle.vo.PageList;
-import com.zime.ojdemo.modle.vo.ProblemQuery;
+import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 
 import java.io.IOException;

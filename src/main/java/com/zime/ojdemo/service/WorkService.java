@@ -2,8 +2,8 @@ package com.zime.ojdemo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.entity.Work;
-import com.zime.ojdemo.modle.vo.WorkListResult;
-import com.zime.ojdemo.modle.vo.WorkRankresult;
+import com.zime.ojdemo.modle.vo.result.WorkListResult;
+import com.zime.ojdemo.modle.vo.result.WorkRankresult;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

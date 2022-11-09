@@ -1,11 +1,9 @@
 package com.zime.ojdemo.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zime.ojdemo.entity.Problem;
-import com.zime.ojdemo.modle.vo.AddProblem;
 import com.zime.ojdemo.modle.vo.PageList;
-import com.zime.ojdemo.modle.vo.ProblemQuery;
+import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 import com.zime.ojdemo.service.ProblemService;

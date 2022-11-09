@@ -3,10 +3,10 @@ package com.zime.ojdemo.service;
 import com.zime.ojdemo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.modle.vo.*;
+import com.zime.ojdemo.modle.vo.query.UserQuery;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * <p>
