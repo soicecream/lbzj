@@ -25,8 +25,9 @@
             <el-card class="box-card">
               <div slot="header" class="clearfix">
                 <span>代码提交</span>
-<!--                <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-refresh">重置内容</el-button>-->
-                <el-select v-model="language" size="medium" class="filter-item" style="width: 100px;height:30px;float: right">
+                <!--                <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-refresh">重置内容</el-button>-->
+                <el-select v-model="language" size="medium" class="filter-item"
+                           style="width: 100px;height:30px;float: right">
                   <el-option v-for="item in LanguageList" :key="item" :label="item"
                              :value="item"/>
                 </el-select>
@@ -42,8 +43,8 @@
               </div>
             </el-card>
             <div class="submit">
-            <el-button type="success" icon="el-icon-upload" @click="submit()">提交</el-button>
-          </div>
+              <el-button type="success" icon="el-icon-upload" @click="submit()">提交</el-button>
+            </div>
           </el-card>
         </div>
       </el-col>
@@ -76,7 +77,7 @@
               <h3>视频详解</h3>
             </div>
             <div>
-              <a target="_blank" v-bind:href="videoHref" >点击此处打开视频</a>
+              <a target="_blank" v-bind:href="videoHref">点击此处打开视频</a>
             </div>
           </el-card>
         </div>
@@ -91,9 +92,10 @@ import {fetchProblem} from "@/api/problem";
 import {Languages} from "@/utils/constants";
 import {saveSubmission} from "@/api/submission";
 import {getWorkid} from "@/utils/auth";
+
 export default {
   name: 'Problem',
-  components:{CodeMirror},
+  components: {CodeMirror},
   data() {
     return {
       problemID: '',
@@ -121,31 +123,31 @@ export default {
       },
       language: 'c++',
       theme: 'solarized',
-      LanguageList:[],
+      LanguageList: [],
       code: '',
-      solutionAndSourceCode:{
+      solutionAndSourceCode: {
         solution_id: null,
-        problemId : '',
-        userId:'zwj',
-        nick:'zwj',
+        problemId: '',
+        userId: 'zwj',
+        nick: 'zwj',
         time: null,
-        memory:null,
-        inDate:null,
-        result:0,
-        language:0,
-        ip:null,
-        contestId:getWorkid(),
-        valid:1,
-        num:1,
-        codeLength:null,
-        judgetime:null,
-        pass_rate:null,
-        lint_error:null,
-        judger:'admin',
-        courseId:0,
-        source:this.code
+        memory: null,
+        inDate: null,
+        result: 0,
+        language: 0,
+        ip: null,
+        contestId: getWorkid(),
+        valid: 1,
+        num: 1,
+        codeLength: null,
+        judgetime: null,
+        pass_rate: null,
+        lint_error: null,
+        judger: 'admin',
+        courseId: 0,
+        source: this.code
       },
-      videoHref:''
+      videoHref: ''
     }
   },
   created() {
@@ -162,25 +164,25 @@ export default {
   methods: {
     init() {
       this.problemID = this.$route.params.id.toString()
-      this.videoHref = '/problem/video/'+this.problemID
+      this.videoHref = '/problem/video/' + this.problemID
       this.solutionAndSourceCode.problemId = this.problemID
-      fetchProblem(this.problemID).then(response=>{
+      fetchProblem(this.problemID).then(response => {
         this.problem = response.data
       })
     },
-    getLang(){
+    getLang() {
       for (let lang in Languages) {
         this.LanguageList.push(Languages[lang].lang)
       }
     },
-    submit(){
+    submit() {
       this.solutionAndSourceCode.source = this.code;
-      if(this.language=="java")  this.solutionAndSourceCode.language=3;
-      else this.solutionAndSourceCode.language=1;
-      this.solutionAndSourceCode.contestId=getWorkid();
+      if (this.language == "java") this.solutionAndSourceCode.language = 3;
+      else this.solutionAndSourceCode.language = 1;
+      this.solutionAndSourceCode.contestId = getWorkid();
       console.log(getWorkid());
-      saveSubmission(this.solutionAndSourceCode).then(response=>{
-        if(response.data){
+      saveSubmission(this.solutionAndSourceCode).then(response => {
+        if (response.data) {
           this.$router.push('/state')
         }
       })
