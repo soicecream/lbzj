@@ -1,9 +1,7 @@
 <template>
-  <el-menu :default-active="activeIndex" class="el-menu-demo"  @select="handleSelect"
-           style="height: 100%"
-           background-color="#545c64"
-           text-color="#fff"
-           active-text-color="#ffd04b">
+  <el-menu :default-active="activeIndex" @select="handleSelect"
+           style="height: 100%" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b"
+           class="el-menu-demo">
     <el-menu-item>
       <div style="display:inline-block;font-size: 1.3rem">ZIME Online Judge</div>
     </el-menu-item>
@@ -37,20 +35,26 @@
 <script>
 export default {
   name: "adminNavBar",
+  data() {
+    return {
+      activeIndex: "",
+    }
+  },
+
   methods: {
     handleSelect(key) {
       switch (key) {
         case '1':
           this.$router.push('/')
-          breakW
+          break
         case '2-1':
-          this.$router.push('/adminProblem')
+          this.$router.push('/admin/problem')
           break
         case '3':
-          this.$router.push('/adminwork')
+          this.$router.push('/admin/work')
           break
         case '4-1':
-          this.$router.push('/adminuser')
+          this.$router.push('/admin/user')
           break
       }
     }

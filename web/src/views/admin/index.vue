@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import adminwork from "@/views/administration/adminwork";
-import adminNavBar from "@/views/administration/adminNavBar";
+import adminwork from "@/views/admin/work/work";
+import adminNavBar from "@/components/admin/NavBar";
 export default {
   name: "AdminIndex",
   components:{adminwork,adminNavBar},

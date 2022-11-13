@@ -79,7 +79,7 @@
 </template>
 
 <script>
-  import NavBar from '../components/NavBar'
+  import NavBar from '../../../components/oj/NavBar'
   import pagination from '@/components/Pagination'
   import { JUDGE_STATUS,Languages } from '@/utils/constants'
   import {mapGetters} from "vuex";

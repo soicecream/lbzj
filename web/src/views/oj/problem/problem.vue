@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import CodeMirror from "@/views/oj/components/CodeMirror";
+import CodeMirror from "@/components/oj/CodeMirror";
 import {fetchProblem} from "@/api/problem";
 import {Languages} from "@/utils/constants";
 import {saveSubmission} from "@/api/submission";

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import NavBar from '../components/NavBar'
+  import NavBar from '../../../components/oj/NavBar'
   export default {
     name: 'course',
     components: {
