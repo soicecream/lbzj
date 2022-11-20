@@ -89,7 +89,12 @@ export const constantRoutes = [
             }
         ]
     },
-    {path: '*', redirect: '/404'}
+
+    {path: '/login', name: 'login', component: () => import('@/views/share/loginRegister')},
+
+    {path: '*', redirect: '/404'},
+
+
 ]
 
 const createRouter = () => new Router({
