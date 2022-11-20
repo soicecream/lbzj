@@ -1,124 +1,81 @@
 <template>
   <div>
-  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-    <el-menu-item>
-      <div style="display:inline-block;font-size: 1.3rem">ZIME Online Judge</div>
-    </el-menu-item>
-    <el-menu-item index="1"><i class="el-icon-s-home"></i>主页</el-menu-item>
-    <el-menu-item index="2"><i class="el-icon-s-grid"></i>问题</el-menu-item>
-    <el-menu-item index="3"><i class="el-icon-s-order"></i>竞赛/作业</el-menu-item>
-    <el-menu-item index="4"><i class="el-icon-s-platform"></i>课程</el-menu-item>
-    <el-menu-item index="5"><i class="el-icon-s-marketing"></i>状态</el-menu-item>
-    <el-menu-item index="6"><i class="el-icon-s-data"></i>排名</el-menu-item>
-    <el-menu-item index="7"><i class="el-icon-question"></i>常见问题</el-menu-item>
-    <div v-show="!loginState" style="margin-top:10px;float:right;height: 100%">
-      <el-button round @click="dialogFormVisible=true">登录</el-button>
-      <el-button round @click="handleRegister">注册</el-button>
-    </div>
+    <el-menu :default-active="activeIndex" active-text-color="#ff5252cc" class="el-menu-demo" mode="horizontal" router>
+      <el-menu-item class="zimeLogo">ZIME Online Judge</el-menu-item>
+      <el-menu-item index="/home"><i class="el-icon-s-home"></i>主页</el-menu-item>
+      <el-menu-item index="/problem"><i class="el-icon-s-grid"></i>问题</el-menu-item>
+      <el-menu-item index="/work"><i class="el-icon-s-order"></i>竞赛/作业</el-menu-item>
+      <el-menu-item index="4"><i class="el-icon-s-platform"></i>课程</el-menu-item>
+      <el-menu-item index="/state"><i class="el-icon-s-marketing"></i>状态</el-menu-item>
+      <el-menu-item index="6"><i class="el-icon-s-data"></i>排名</el-menu-item>
+      <el-menu-item index="7"><i class="el-icon-question"></i>常见问题</el-menu-item>
 
-    <div v-show="loginState" style="margin-top:10px;float:right;height: 100%">
-      <span>
-        <el-avatar size="medium" :src="circleUrl"></el-avatar>
-      </span>
-      <span>
-        <el-dropdown style="height: 100%" @command="handleCommand">
-          <span class="el-dropdown-link" style="font-size: 1.5rem;color: black">
-          {{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="page">个人主页</el-dropdown-item>
-            <el-dropdown-item command="management" >后台管理</el-dropdown-item>
-            <el-dropdown-item command="logOut">退出登录</el-dropdown-item>
+      <!--      操作用户-->
+      <el-menu-item-group class="user-menus">
+        <el-dropdown trigger="click">
+          <el-button type="text" style="display: flex;">
+            <el-image v-if="user.headPortrait" :src="user.headPortrait" fit="cover" class="zimeUserImage"/>
+            <el-image v-else :src="require('@/assets/img/image/user.png')" class="zimeUserImage"/>
+            <i class="el-icon-caret-bottom"/>
+          </el-button>
+          <el-dropdown-menu>
+            <el-dropdown-item>
+              <el-link type="text" @click="to_user_information_page" :underline="false">个人主页</el-link>
+            </el-dropdown-item>
+
+            <el-dropdown-item v-if="isAdmin" divided>
+              <el-link type="text" @click="to_admin_page" :underline="false">后台管理</el-link>
+            </el-dropdown-item>
+
+            <el-dropdown-item divided>
+              <el-link type="text" @click="logout" :underline="false">退出登录</el-link>
+            </el-dropdown-item>
+
           </el-dropdown-menu>
         </el-dropdown>
-      </span>
-    </div>
-  </el-menu>
-
-    <el-dialog :visible.sync="dialogFormVisible" title="登录页面">
-      <el-form :model="loginform">
-        <el-form-item label="账号" label-width="200px">
-          <el-input v-model="loginform.username" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="密码" label-width="200px">
-          <el-input v-model="loginform.password" autocomplete="off" />
-        </el-form-item>
-        <el-form-item  label-width="200px">
-          <el-button>注册</el-button>
-          <el-button type="primary" @click="Login">登录</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
+      </el-menu-item-group>
+    </el-menu>
 
   </div>
 </template>
 
 <script>
-import {login,logout} from '@/api/user'
-import {setToken, getToken, removeToken} from "@/utils/auth";
 
 export default {
   data() {
     return {
-      activeIndex: '1',
-      loginform:{
-        username:'admin',
-        password:'123456',
+      activeIndex: this.$route.path,
+      user: {
+        username: 'admin',
+        password: '123456',
+        headPortrait: "", // 头像
       },
-      dialogFormVisible:false,
+      dialogFormVisible: false,
       circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-      userName:'admin',
-      loginState : getToken()==undefined?false:true
+      userName: 'admin',
+
+      isAdmin: true,
+
+
     }
   },
   methods: {
-    handleSelect(key) {
-      switch (key) {
-        case '1':
-          this.$router.push('/home')
-          break
-        case '2':
-          this.$router.push('/problem')
-          break
-        case '3':
-          this.$router.push('/work')
-          break
-        case '5':
-          this.$router.push('/state')
-          break
-        case '6':
-          this.$router.push('/ranking')
-          break
-        default:
-          this.$router.push('/home')
-          break
-      }
+
+    // 跳转到用户信息界面
+    to_user_information_page() {
+      this.$router.push('/user/' + this.user.id)
     },
-     Login(){
-      login(this.loginform).then(res=>{
-        this.dialogFormVisible=false;
-        this.loginState=true;
-        setToken(res.data);
-        this.$message('登录成功');
-      })
+
+    // 跳转到后台管理页面
+    to_admin_page() {
+      this.$router.push('/admin')
     },
-    handleRegister(){
-     this.$store.commit("changeSum",5);
-    },
-    handleCommand(c){
-     switch (c){
-       case 'management':
-         this.$router.push('/admin')
-         break
-      case 'logOut':
-          logout().then(res=>{
-            removeToken()
-            this.loginState=false;
-          })
-        break
-       case 'page':
-       this.$router.push('/user/null')
-     }
+
+    // 退出用户
+    logout() {
+      this.$store.commit('logout')
+
+      this.$message.success("退出成功")
     }
 
   }
@@ -126,5 +83,39 @@ export default {
 </script>
 
 <style>
+.zimeLogo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #303133;
+}
+
+/* 移动到字体上出现下划线 */
+.zimeLogo:after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0);
+  background-color: #000000;
+  transition-duration: 0.2s;
+}
+
+.zimeLogo:hover:after {
+  transform: scaleX(1);
+}
+
+.zimeUserImage {
+  height: 30px;
+  width: 30px;
+  margin-top: -25%;
+  border-radius: 50%;
+}
+
+.user-menus {
+  margin-right: 1%;
+  float: right;
+}
 
 </style>
