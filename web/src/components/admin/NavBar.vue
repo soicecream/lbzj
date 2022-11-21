@@ -5,7 +5,7 @@
     <el-menu-item>
       <div style="display:inline-block;font-size: 1.3rem">ZIME Online Judge</div>
     </el-menu-item>
-    <el-menu-item index="1"><i class="el-icon-s-home"/>主页</el-menu-item>
+    <el-menu-item index="/"><i class="el-icon-s-home"/>主页</el-menu-item>
     <el-submenu index="2">
       <template slot="title">
         <i class="el-icon-location"/><span>问题管理</span>
