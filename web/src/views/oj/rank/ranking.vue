@@ -55,7 +55,7 @@ import {getusers} from "@/api/user";
 
 
 export default {
-  name: 'ProblemList',
+  name: 'rank',
   components:{Pagination},
   created() {
     this.getList()

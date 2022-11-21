@@ -7,38 +7,15 @@ import java.util.*;
 
 public class a{
     public static void main(String[] args) {
-    parseBoolExpr(
-            "!(f)");
+        System.out.println(new Date().getTime());
     }
 
-    public static boolean parseBoolExpr(String expression) {
-    int n=expression.length();
-    Stack<Character> zhi=new Stack<>();
-    for(int i=0;i<n;i++){
-            if(expression.charAt(i)==')'){
-            int[] pd=new int[2];
-            while (zhi.peek()!='('){
-                Character pd1=zhi.pop();
-                if(pd1=='t') pd[1]=1;
-                else pd[0]=1;
-            }
-            zhi.pop();
-            Character pd1=zhi.pop();
-            if(pd1=='&') {
-                if(pd[0]==1) zhi.push('f');
-                else  zhi.push('t');
-            }
-            else if(pd1=='|'){
-                if(pd[1]==1) zhi.push('t');
-                else  zhi.push('f');
-            }
-            else if(pd1=='!'){
-                if(pd[1]==1) zhi.push('f');
-                else  zhi.push('t');
-            }
-        }
-        else if(expression.charAt(i)!=',') zhi.push(expression.charAt(i));
+    public int largestAltitude(int[] gain) {
+    int sum=0,max=0;
+    for(int i=0;i<gain.length;i++){
+        sum+=gain[i];
+        if(max<gain[i]) max=sum;
     }
-    return zhi.pop()=='t'?true:false;
+    return max;
     }
 }

@@ -12,6 +12,8 @@ import com.zime.ojdemo.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -42,6 +44,14 @@ public class WorkController {
     /*
     竞赛接口
      */
+    @GetMapping("/getwork/{id}")
+    public JsonResult<Work> pageWorkid(@PathVariable Integer id){
+        return JsonResult.success(workService.getWork(id));
+    }
+
+    /*
+    竞赛题目接口
+     */
     @GetMapping("/pageworkid/{problemid}")
     public JsonResult<List<WorkListResult>> pageWorkid(@PathVariable String problemid){
      return JsonResult.success(workService.pageWorkid(problemid));
@@ -51,8 +61,7 @@ public class WorkController {
     竞赛排名接口
      */
     @GetMapping("/getworkrank/{workid}")
-    public JsonResult<List<WorkRankresult>> getWork(@PathVariable Integer workid){
-        System.out.println(workService.getworkrank(workid));
+    public JsonResult<ArrayList<WorkRankresult>> getWorkrank(@PathVariable Integer workid){
         return JsonResult.success(workService.getworkrank(workid));
     }
 

@@ -7,6 +7,7 @@ import com.zime.ojdemo.modle.vo.result.WorkRankresult;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -14,4 +15,5 @@ public interface WorkService extends IService<Work> {
     ArrayList<WorkRankresult> getworkrank(Integer workid);
     String getProblem(Integer workid);
     List<WorkListResult> pageWorkid(String problemid);
+    Work getWork(Integer id);
 }

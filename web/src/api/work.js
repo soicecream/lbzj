@@ -6,6 +6,12 @@ export function getWorkList(page, limit) {
         method: 'post',
     })
 }
+export function getWork(id) {
+    return request({
+        url: `/work/getwork/${id}`,
+        method: 'get',
+    })
+}
 
 export function getWorkid(problemid) {
     return request({

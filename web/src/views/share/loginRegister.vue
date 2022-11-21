@@ -94,6 +94,8 @@
 <script>
 import VerificationCode from "@/components/share/verificationCode";
 // import {setRoutes} from "@/router";
+import {login} from "@/api/user";
+import {setToken} from "@/utils/auth";
 
 export default {
   name: 'loginRegister',
@@ -173,23 +175,10 @@ export default {
     submit_login_form() {
       this.$refs.login_user_form.validate((valid) => {
         if (valid) {
-          this.request.post("/user/login", this.login_form).then(res => {
-            if (res.code === "200") {
-              // 存储用户信息到浏览器中
-              localStorage.setItem("user", JSON.stringify(res.data))
-              // localStorage.setItem("user", '{"id":' + data.id + ',"headPortrait":' + data.headPortrait + ',"token":"' + data.token + '"}')
-
-              // 动态设置当前用户的路由
-              // if (res.data.menus) {
-              //   setRoutes()
-              // }
-
-              this.$router.push("/")
-              this.$message.success("登陆成功")
-            } else {
-              this.$message.error(res.message)
-            }
-          })
+        login(this.login_form).then(res=>{
+          setToken(res.data)
+          this.$router.push("/")
+        })
         }
       });
     },
