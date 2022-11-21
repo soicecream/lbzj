@@ -230,7 +230,7 @@ export default {
       },
       language: 'c++',
       theme: 'solarized',
-      LanguageList: [],
+      LanguageList: ['c++', 'java', 'python'],
       code: '',
       solutionAndSourceCode: {
         solution_id: null,
