@@ -112,7 +112,7 @@ export default {
 
       // 用户登录及注册的数据和判定规则
       // login_form: {username: "", password: "",},
-      login_form: {username: "admin", password: "admin",},
+      login_form: {username: "admin", password: "123456",},
       login_form_rules: {
         username: [{required: true, message: '请填写用户名', trigger: 'blur'},],
         password: [{required: true, message: '请填写密码', trigger: 'blur'},],
@@ -175,10 +175,10 @@ export default {
     submit_login_form() {
       this.$refs.login_user_form.validate((valid) => {
         if (valid) {
-        login(this.login_form).then(res=>{
-          setToken(res.data)
-          this.$router.push("/")
-        })
+          login(this.login_form).then(res => {
+            setToken(res.data)
+            this.$router.push("/")
+          })
         }
       });
     },

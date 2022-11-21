@@ -4,11 +4,7 @@
       <span style="font-size: 1.4rem">题目列表</span>
     </div>
 
-    <el-table
-        style="width: 100%;margin-top: -20px"
-        :data="list"
-        @row-click="ToPage"
-    >
+    <el-table style="width: 100%;margin-top: -20px" :data="list" @row-click="ToPage">
       <el-table-column label="名次" prop="index" align="center" width="50px">
         <template slot-scope="{row,$index}">
           <div>
@@ -18,7 +14,7 @@
       </el-table-column>
       <el-table-column label="用户" width="150px" align="center">
         <template slot-scope="{row}">
-          <div >{{ row.userId }}</div>
+          <div>{{ row.userId }}</div>
         </template>
       </el-table-column>
       <el-table-column label="昵称" min-width="150px" align="center">
@@ -28,23 +24,23 @@
       </el-table-column>
       <el-table-column label="解决" width="150px" align="center">
         <template slot-scope="{row}">
-          <div >{{ row.solved }}</div>
+          <div>{{ row.solved }}</div>
         </template>
       </el-table-column>
       <el-table-column label="提交" width="150px" align="center">
         <template slot-scope="{row}">
-          <div >{{ row.submit }}</div>
+          <div>{{ row.submit }}</div>
         </template>
       </el-table-column>
       <el-table-column label="通过率" width="150px" align="center">
         <template slot-scope="{row}">
-          <div >{{ row.solved,row.submit | acRate }}</div>
+          <div>{{ row.solved, row.submit | acRate }}</div>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="page" :limit.sync="limit" style="margin-top: -20px;float: right"
-                @pagination="getList"/>
+    <pagination v-show="total>0" :total="total" :page.sync="page" :limit.sync="limit"
+                style="margin-top: -20px;float: right" @pagination="getList"/>
   </el-card>
 
 </template>
@@ -56,40 +52,38 @@ import {getusers} from "@/api/user";
 
 export default {
   name: 'rank',
-  components:{Pagination},
+  components: {Pagination},
   created() {
     this.getList()
   },
-  data(){
+  data() {
     return {
-      list:null,
-      limit:10,
-      page:1,
-      total:10,
-      listQuery:{
-
-      },
+      list: null,
+      limit: 10,
+      page: 1,
+      total: 10,
+      listQuery: {},
       degreeOptions: [1, 2, 3, 4, 5],
     }
   },
   filters: {
-    acRate(solved,submit) {
-      if(submit!=0)
+    acRate(solved, submit) {
+      if (submit != 0)
         return (solved / submit * 100.0).toFixed(2) + "%"
-      return 0+"%";
+      return 0 + "%";
     },
   },
-  methods:{
-    getList(){
-       getusers(this.page,this.limit,this.listQuery).then(response=>{
+  methods: {
+    getList() {
+      getusers(this.page, this.limit, this.listQuery).then(response => {
         this.list = response.data.rows
         this.total = response.data.total
       })
     },
-    ToPage(row, column, event){
-      this.$router.push('/user/'+row.userId)
+    ToPage(row, column, event) {
+      this.$router.push('/user/' + row.userId)
     },
-    toCreate(){
+    toCreate() {
       this.$router.push('/problemCreate')
     }
   }
