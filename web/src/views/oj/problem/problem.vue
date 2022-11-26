@@ -213,7 +213,8 @@
 </template>
 
 <script>
-import CodeMirror from "@/components/share/CodeMirror";
+import CodeMirror from "@/components/oj/CodeMirror";
+import {fetchProblem} from "@/api/problem";
 
 export default {
   name: "problem",
@@ -301,7 +302,18 @@ export default {
 
   },
 
+  created() {
+    this.init();
+
+  },
+
   methods: {
+
+    init() {
+      fetchProblem(this.$route.params.id).then(res => {
+        this.problemData.problem = res.data
+      })
+    },
 
     // 题目统计
     problem_statistics() {
