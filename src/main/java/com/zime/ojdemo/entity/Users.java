@@ -41,8 +41,7 @@ public class Users implements Serializable {
 
     private String ip;
 
-    @TableField(fill = FieldFill.UPDATE)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:MM:SS")
+
     private Date accesstime;
 
 //    private Integer rating;
@@ -64,6 +63,8 @@ public class Users implements Serializable {
     private String avatar;
 
     private String introduce;
+
+    private String js;
 
 
 }

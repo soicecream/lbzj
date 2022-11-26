@@ -15,7 +15,16 @@
         <el-menu-item index="2-1">用户列表</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
-    <el-menu-item index="3"><i class="el-icon-s-order"></i>竞赛管理</el-menu-item>
+
+    <el-submenu index="3">
+      <template slot="title">
+        <i class="el-icon-s-order"></i>
+        <span>竞赛管理</span>
+      </template>
+      <el-menu-item-group>
+        <el-menu-item index="3-1">竞赛列表</el-menu-item>
+      </el-menu-item-group>
+    </el-submenu>
 
     <el-submenu index="4">
       <template slot="title">
@@ -50,7 +59,7 @@ export default {
         case '2-1':
           this.$router.push('/admin/problem')
           break
-        case '3':
+        case '3-1':
           this.$router.push('/admin/work')
           break
         case '4-1':

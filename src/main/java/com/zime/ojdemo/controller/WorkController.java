@@ -85,5 +85,8 @@ public class WorkController {
         wrapper.eq("workid",work.getWorkid());
         return JsonResult.success(workService.saveOrUpdate(work,wrapper));
     }
-
+    @PostMapping("/delwork")
+    public JsonResult<Boolean> delPro(@RequestBody ArrayList<Integer> ids){
+        return JsonResult.success(workService.removeByIds(ids));
+    }
 }

@@ -24,9 +24,9 @@ export function getusers( current, limit, userQuery) {
   })
 }
 
-export function getusersPro( current, limit) {
+export function getusersPro( userid) {
   return request({
-    url: `/users/getuserPro/${current}/${limit}`,
+    url: `/users/getuserPro/${userid}`,
     method: 'post',
   })
 }
@@ -57,6 +57,14 @@ export function deluser(ids) {
 export function updateuser(user) {
   return request({
     url: `/users/updateuser`,
+    method: 'post',
+    data:user
+  })
+}
+
+export function formuser(user,password) {
+  return request({
+    url: `/users/formuser/${password}`,
     method: 'post',
     data:user
   })

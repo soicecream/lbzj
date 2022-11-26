@@ -15,5 +15,6 @@ public class Work {
    private String type;
    private String founder;
    private String workpassword;
-   private Integer open;
+   private Boolean open;
+   private String notice;
 }

@@ -50,3 +50,12 @@ export function updateWork(work){
     })
 }
 
+export function delWork(ids){
+    return request({
+        url: `/work/delwork`,
+        method: 'post',
+        data:ids
+    })
+}
+
+

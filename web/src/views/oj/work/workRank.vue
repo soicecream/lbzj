@@ -1,28 +1,42 @@
 <template>
   <el-card class="box-card" style="width: 95%;margin: 0.5rem auto">
     <el-table
-        style="width: 100%;margin-top: -20px"
+        style="width: 100%;margin-top: -20px;text-align: center"
         border
         :data="ranklist"
         :cell-class-name="tablecalss"
     >
-      <el-table-column label="名次" width="150px">
+      <el-table-column label="名次" width="60px" align="center">
         <template slot-scope="{row,$index}">
           <div>{{ $index+1}}</div>
         </template>
       </el-table-column>
-      <el-table-column label="用户名" prop="index"  width="250px">
+      <el-table-column label="用户名" prop="index"  min-width="250px">
         <template slot-scope="{row}">
           <div>
             {{ row.username}}
           </div>
         </template>
       </el-table-column>
-      <el-table-column v-for="(item,index) in ranklist[0].time" :label="index+1" width="100px"
-      >
+      <el-table-column label="总时长" prop="index"  width="130px" align="center">
         <template slot-scope="{row}">
-          <div>{{ row.time[index] }}</div>
-          <div style="font-size: 5px">{{row.count[index]}}try</div>
+          <div>
+            {{ row.times | date}}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="通过" prop="index"  width="130px" align="center">
+        <template slot-scope="{row}">
+          <div>
+            {{ row.pros}}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-for="(item,index) in ranklist[0].time" :label="index+1" width="150px"
+                       align="center">
+        <template slot-scope="{row}">
+          <div>{{ row.time[index] | date }}</div>
+          <div style="font-size: 5px">{{row.count[index] | count}}</div>
         </template>
       </el-table-column>
     </el-table>
@@ -41,6 +55,16 @@ export default {
 
     }
   },
+  filters: {
+    date(t){
+      if(t==-1) return '';
+      return Math.floor(t/3600000);
+    },
+    count(c){
+      if(c==0) return '';
+      return c+'try'
+    }
+  },
   created() {
     this.getRankList()
     this.getProblem()
@@ -53,9 +77,9 @@ export default {
       })
     },
     tablecalss({row,column,rowIndex,columnIndex}){
-      if(columnIndex>1) {
-        if (row.time[columnIndex - 2] > 0) {
-          console.log(row.time[columnIndex - 2])
+      if(columnIndex>3) {
+        if (row.time[columnIndex - 4] > 0) {
+          console.log(row.time[columnIndex - 4])
           return 'success';
         }
       }

@@ -51,9 +51,15 @@ export const constantRoutes = [
       {
         path: '/work/:id',
         name: 'Work-ID',
+        redirect: '/workNotice/:id',
         meta: {title: 'Work-ID'},
         component: work,
         children: [
+          {
+            path:'/workNotice/:id',
+            name:'workNotice',
+            component: () => import('@/views/oj/work/worknotice'),
+          },
           {
             path:'/workPro/:id',
             name:'workPro',
@@ -80,6 +86,11 @@ export const constantRoutes = [
         name:'user',
         component:user
       },
+      {
+        path:'/userdata',
+        name:'userdata',
+        component: () => import('@/views/oj/user/userData'),
+      },
     ],
     hidden:true
   },
@@ -99,19 +110,19 @@ export const constantRoutes = [
     component: () => import('@/views/admin/index'),
     children: [
       {
-        path:'/adminwork',
+        path:'/admin/work',
         name:'adminwork',
         component: () => import('@/views/admin/work/work'),
       },
       {
-        path: '/adminProblem',
+        path: '/admin/problem',
         name:'adminProblem',
-        component:import('@/views/admin/problem/problem')
+        component: () => import('@/views/admin/problem/problem')
       },
       {
-        path: '/adminuser',
+        path: '/admin/user',
         name:'adminuser',
-        component:import('@/views/admin/user/user')
+        component:() =>import('@/views/admin/user/user')
       }
       ]
   },

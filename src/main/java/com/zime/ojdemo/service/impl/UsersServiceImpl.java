@@ -9,15 +9,20 @@ import com.zime.ojdemo.modle.vo.*;
 import com.zime.ojdemo.modle.vo.core.security.LoginUser;
 import com.zime.ojdemo.modle.vo.query.UserQuery;
 import com.zime.ojdemo.service.SolutionService;
+import com.zime.ojdemo.untils.Io;
 import com.zime.ojdemo.untils.TokenServie;
 import com.zime.ojdemo.service.UsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,20 +75,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return getOne(s);
     }
 
-   public PageList getuserPro( HttpServletRequest request,Integer current,Integer limit){
-    LoginUser loginUser=tokenServie.getLoginUser(request);
+   public List<Solution> getuserPro(String userid){
     QueryWrapper<Solution> s=new QueryWrapper<>();
-    s.eq("user_id",loginUser.getUsername());
+    s.eq("user_id",userid);
     s.select("problem_id");
     s.groupBy("problem_id");
-    Page<Solution> pageSolution = new Page<>(current, limit);
-       solutionService.page(pageSolution, s);
-       long total = pageSolution.getTotal();
-       List<Solution> records = pageSolution.getRecords();
-       PageList pageList = new PageList();
-       pageList.setTotal(total);
-       pageList.setRows(records);
-       return pageList;
+    List<Solution> zhi=solutionService.list(s);
+    return zhi;
    }
 
    public Boolean delUsers(ArrayList<String> ids){
@@ -92,9 +90,51 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
    }
 
    public Boolean addUser(Users user){
-        System.out.println(user);
         BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
+        user.setAccesstime(new Date());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return save(user);
+   }
+
+
+    private String filePath="D:\\java1\\lbzj\\web\\src\\assets\\img\\image/";
+   public Boolean imageUpload(MultipartFile file, String userid) throws IllegalStateException
+   {
+       File filee=new File(filePath);
+       if(!filee.exists()){
+           filee.mkdirs();
+       }
+
+       //文件名称
+       String realFileName = file.getOriginalFilename();
+       //文件后缀
+       String suffix = realFileName.substring(realFileName.lastIndexOf(".") + 1);
+       /***************文件处理*********************/
+
+       String newname=userid+"."+suffix;
+       String newFilePath=filePath+newname;
+
+       QueryWrapper<Users> wrapper=new QueryWrapper<>();
+       wrapper.eq("user_id",userid);
+       Users users=getOne(wrapper);
+
+       if(!(users.getAvatar().length()>0)){
+           Io.deleteFile(new File(filePath+users.getAvatar()));
+       }
+       users.setAvatar("/"+newname);
+       update(users,wrapper);
+
+
+       try {
+           file.transferTo(new File(newFilePath));
+           //将传来的文件写入新建的文件
+           System.out.println("上传图片成功进行上传文件测试");
+
+       }catch (IllegalStateException e ) {
+           //处理异常
+       }catch(IOException e1){
+           //处理异常
+       }
+       return false;
    }
 }
