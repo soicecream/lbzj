@@ -4,7 +4,8 @@
     <el-button icon="el-icon-search" circle></el-button>
     <div>
       <el-button type="success" size="mini" icon="el-icon-plus" @click="showdig0=true">添加</el-button>
-      <el-button type="danger" size="mini" icon="el-icon-delete" @click="showdig1=true">删除</el-button>
+      <el-button type="danger" size="mini" icon="el-icon-delete" @click="showdig1=true"
+                 :disabled="delrow.length>0?false:true">删除</el-button>
       <el-button size="mini" type="info" icon="el-icon-download">导入</el-button>
       <el-button type="warning" size="mini" icon="el-icon-upload2">导出</el-button>
     </div>
@@ -41,18 +42,6 @@
           <div>{{ row.endtime | date }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="类型" width="200px" align="center">
-        <template slot-scope="{row,$index}">
-          <el-select v-model=row.type placeholder="请选择" @change="updateWork(row)">
-            <el-option
-                v-for="item in worktype"
-                :key=$index
-                :label="item.label"
-                :value="item.label">
-            </el-option>
-          </el-select>
-        </template>
-      </el-table-column>
       <el-table-column label="开放" width="200px" align="center">
         <template slot-scope="{row}">
           <el-switch
@@ -75,16 +64,16 @@
                 @pagination="getList"/>
 
     <el-dialog title="添加竞赛" :visible.sync="showdig0">
-      <el-form :model="workform">
-        <el-form-item label="竞赛名称" label-width=100px>
+      <el-form :model="workform" ref="work" :rules="rules">
+        <el-form-item label="竞赛名称" label-width=100px prop="name">
           <el-input v-model="workform.name" autocomplete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="题目选择" label-width=100px>
+        <el-form-item label="题目选择" label-width=100px prop="probelmid">
           <el-input v-model="workform.probelmid" autocomplete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="时间选择" label-width=100px>
+        <el-form-item label="时间选择" label-width=100px >
           <el-date-picker
               v-model="workform.starttime"
               type="datetime"
@@ -97,7 +86,7 @@
           </el-date-picker>
         </el-form-item>
 
-        <el-form-item label="类型选择" label-width=100px>
+        <el-form-item label="类型选择" label-width=100px prop="type">
           <el-select v-model="workform.type" placeholder="请选择" @change=passwordtype>
             <el-option
                 v-for="item in worktype"
@@ -113,7 +102,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showdig0 = false">取 消</el-button>
-        <el-button type="primary" @click="addWork()">确 定</el-button>
+        <el-button type="primary" @click="addWork('work')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -212,7 +201,7 @@ export default {
       limit: 10,
       page: 1,
       total: 10,
-      delrow:null,
+      delrow:[],
       uprow:{
         workid: undefined,
         name: undefined,
@@ -222,7 +211,21 @@ export default {
         type: undefined,
         founder: undefined,
         workpassword: undefined,
-      }
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入名称'},
+        ],
+        starttime: [
+          { required: true, message: '请输入时间'},
+        ],
+        probelmid: [
+          { required: true, message: '请输入题目'},
+        ],
+        type: [
+          { required: true, message: '请输入题目'},
+        ],
+      },
     }
   },
   created() {
@@ -281,13 +284,17 @@ export default {
         });
       })
     },
-    addWork(key) {
-      this.showdig0 = false;
-      this.workform.starttime = this.workform.starttime.getTime();
-      this.workform.endtime = this.workform.endtime.getTime();
-      console.log(this.workform);
-      addWork(this.workform).then(res => {
-        this.$message('添加成功');
+    addWork(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.showdig0 = false;
+          this.workform.starttime = this.workform.starttime.getTime();
+          this.workform.endtime = this.workform.endtime.getTime();
+          console.log(this.workform);
+          addWork(this.workform).then(res => {
+            this.$message('添加成功');
+          })
+        }
       })
     },
     showupwork(row){

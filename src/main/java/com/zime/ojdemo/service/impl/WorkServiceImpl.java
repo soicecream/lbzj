@@ -37,6 +37,7 @@ public class WorkServiceImpl extends ServiceImpl<WorkMapper, Work> implements Wo
         HashMap<Integer,Integer> promap=new HashMap<>();
         for(int i=0;i<problemids.length;i++) promap.put(Integer.valueOf(problemids[i]),i);
 
+        Work work1=getById(workid);
         ArrayList<WorkRankresult> user=new ArrayList<>();
 
         HashMap<String,Integer> usermap=new HashMap<>();
@@ -57,7 +58,7 @@ public class WorkServiceImpl extends ServiceImpl<WorkMapper, Work> implements Wo
             workRankresult.getCount().set(prowz,czhi);
 
             if(s.getResult()==4){
-                Integer time=(int)(new Date().getTime()-s.getInDate().getTime())+czhi*20000;
+                Integer time=(int)(s.getInDate().getTime()-work1.getStarttime())+czhi*20000;
                 workRankresult.getTime().set(prowz,time);
                 workRankresult.setTimes(workRankresult.getTimes()+time);
                 workRankresult.setPros(workRankresult.getPros()+1);

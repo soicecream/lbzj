@@ -70,7 +70,12 @@ export const JUDGE_STATUS = {
     short: 'CE',
     loading:false,
     type: 'warning'
-  }
+  },
+  '12': {
+    name: '全部',
+    type: 'primary'
+  },
+
 }
 
 export const Languages ={

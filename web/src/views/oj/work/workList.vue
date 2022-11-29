@@ -9,37 +9,23 @@
         style="width: 100%;margin-top: -20px"
         :data="list"
         @row-click="pdwork"
+        :show-header="false"
     >
-      <el-table-column label="#" prop="index" align="center" width="100px">
-        <template slot-scope="{row,$index}">
-          <div>
-            {{ row.workid }}
+      <el-table-column  min-width="500px" align="left">
+        <template slot-scope="{row}">
+          <h2>{{ row.name }}</h2>
+          <div style="font-size: 15px">
+          <i class="el-icon-s-order" style="color:#00b7ff;"></i>
+          <span>{{row.starttime | timestampToTime}}</span>
+
+          <i class="el-icon-time" style="color:#00b7ff;margin-left: 15px" ></i>
+          <span>{{row.starttime,row.endtime | tian}}</span>
+
+            <el-tag :type="row.type=='公有'?'success':'danger'" style="margin-left: 15px">{{row.type}}赛</el-tag>
+
+            <el-tag style="float: right" :type="row.endtime-new Date().getTime()>0?'success':'danger'"  effect="dark">
+              {{row.endtime | tian1}}</el-tag>
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="标题" min-width="500px" align="center">
-        <template slot-scope="{row}">
-          <div >{{ row.name }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column label="开始时间" width="200px" align="center">
-        <template slot-scope="{row}">
-          <div >{{ row.starttime }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column label="停止时间" width="200px" align="center">
-        <template slot-scope="{row}">
-          <div >{{ row.endtime }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column label="开放" width="200px" align="center">
-        <template slot-scope="{row}">
-          <div >{{ row.type }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建人" width="200px" align="center">
-        <template slot-scope="{row}">
-          <div >{{ row.founder }}</div>
         </template>
       </el-table-column>
     </el-table>
@@ -109,7 +95,7 @@ export default {
       workid:''
     }
   },
-  methods:{
+  filters:{
     timestampToTime(timestamp) {
       var date = new Date(timestamp );//时间戳为10位需*1000，时间戳为13位的话不需乘1000
       var Y = date.getFullYear() + '-';
@@ -120,24 +106,21 @@ export default {
       var s = (date.getSeconds() < 10 ? '0'+(date.getSeconds()) : date.getSeconds());
       return Y+M+D+h+m+s;
     },
+    tian(start,end){
+      return Math.floor((end-start)/86400000)+'天';
+    },
+    tian1(end){
+      return end-new Date().getTime()>0?'进行中':'已结束'
+    }
+  },
+  methods:{
     getList(){
       getWorkList(this.page,this.limit).then(response=>{
         this.list = response.data.rows
-        for(var i=0;i<this.list.length;i++){
-        this.list[i].starttime=this.timestampToTime(this.list[i].starttime);
-        this.list[i].endtime=this.timestampToTime(this.list[i].endtime);
-        }
         this.total = response.data.total
       })
     },
 
-    addWork(){
-      this.showaddwork=false;
-      console.log(this.workform)
-      addWork(this.workform).then(res=>{
-
-      })
-    },
     ToPage(id) {
       this.$router.push('/work/'+id)
     },
@@ -153,6 +136,7 @@ export default {
         this.$router.push('/work/'+row.workid);
       }
     },
+
     pdwork1(){
       if(this.workpassword==this.workpassword1)  {
         setWorkid(this.workid);
@@ -161,12 +145,18 @@ export default {
       else this.$message("密码错误");
       this.showaddwork=false;
     },
+
     toCreate(){
       this.$router.push('/problemCreate')
     }
   }
 }
 </script>
-
 <style>
+.gy{
+
+}
+.sy{
+
+}
 </style>

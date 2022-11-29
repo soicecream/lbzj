@@ -1,6 +1,6 @@
 <template>
   <el-card class="box-card" style="width: 95%;margin: 0.5rem auto;">
-    <span>{{list.notice}}</span>
+    <span>{{list.notice | kg}}</span>
   </el-card>
 </template>
 
@@ -12,6 +12,12 @@ export default {
   data(){
     return{
       list:null,
+    }
+  },
+  filters:{
+    kg(zhi){
+      if(zhi==null) return '暂无公告'
+      else return zhi
     }
   },
   methods:{

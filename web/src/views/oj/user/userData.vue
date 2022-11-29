@@ -5,7 +5,7 @@
        <template slot="title">
          <i class="header-icon el-icon-info"  style="color: #3498db;font-size: 20px">账号设置</i>
        </template>
-    <el-form  :model="user" :rules="rules" ref="user" class="demo-form-inline">
+    <el-form :inline="true"  :model="user" :rules="rules" ref="user" class="demo-form-inline">
     <el-form-item label="昵称">
       <el-input v-model="user.nick"></el-input>
     </el-form-item>
@@ -35,8 +35,9 @@
        <template slot="title">
          <i class="header-icon el-icon-info"  style="color: #3498db;font-size: 20px">资料设置</i>
        </template>
-       <el-avatar :size="120" :src="require('@/assets/img/image'+user.avatar)"></el-avatar>
+       <el-avatar style="margin-left: 47%" :size="120" :src="require('@/assets/img/image'+user.avatar)"></el-avatar>
      <el-upload
+         style="margin-left: 40%"
          class="upload-demo"
          drag
          :data= userid
@@ -47,8 +48,11 @@
        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过2MB</div>
      </el-upload>
+
+       <div style="text-align: center;margin-top: 40px"><h1>个人介绍</h1></div>
        <mavon-editor v-model="user.introduce" :toolbars=bars />
-       <el-button type="primary" @click="up">主要按钮</el-button>
+       <el-button type="primary" @click="up">保存</el-button>
+
      </el-collapse-item>
 
    </el-collapse>

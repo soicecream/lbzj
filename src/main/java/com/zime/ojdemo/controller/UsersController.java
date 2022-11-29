@@ -29,9 +29,6 @@ public class UsersController {
     @Autowired
     private UsersService usersService;
 
-    @Autowired
-    private TokenServie tokenServie;
-
     @PostMapping("pageuser/{current}/{limit}")
     public JsonResult<PageList> pageuser(@PathVariable Integer current,@PathVariable Integer limit,
                                          @RequestBody UserQuery userQuery){
