@@ -2,9 +2,9 @@
   <el-card class="box-card" style="width: 95%;margin: 0.5rem auto;">
     <div slot="header" class="clearfix" >
       <span style="font-size: 1.4rem">提交列表</span>
-      <el-select v-model="listQuery.result" placeholder="请选择"  @change="getList" class="in">
+      <el-select v-model="listQuery.result" placeholder="全部"  @change="getList" class="in">
         <el-option
-            v-for="item in 11"
+            v-for="item in 12"
             :key="item"
             :label="item | resultName"
             :value="item">
@@ -118,7 +118,7 @@ export default {
         contestId:this.$route.params.id,
         userId:"",
         problemId:"",
-        result:-1
+        result:null
       },
       listLoading:true,
       limit:10,

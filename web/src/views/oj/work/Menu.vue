@@ -15,7 +15,7 @@ export default {
     handleSelect(key) {
       switch (key) {
         case '1':
-
+          this.$router.push('/workNotice/'+this.$route.params.id)
           break
         case '2':
           this.$router.push('/workPro/'+this.$route.params.id)

@@ -42,7 +42,6 @@ public class SolutionController {
     * */
     @PostMapping("saveSubmission")
     public JsonResult<Boolean> saveSolution(HttpServletRequest request, @RequestBody(required = false) SolutionAndSourceCode solutionAndSourceCode) throws ParseException {
-        System.out.println(solutionAndSourceCode.getLanguage()+"6666666666666666666666666");
         return JsonResult.success(solutionService.save(request,solutionAndSourceCode));
     }
 

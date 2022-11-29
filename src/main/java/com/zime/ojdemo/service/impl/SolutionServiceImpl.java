@@ -95,7 +95,7 @@ public class SolutionServiceImpl extends ServiceImpl<SolutionMapper, Solution> i
         if(solutionQuery.getContestId()!=null) wrapper.eq("contest_id",solutionQuery.getContestId());
         if(solutionQuery.getProblemId()!=null&&!solutionQuery.getProblemId().equals("")) wrapper.eq("problem_id",solutionQuery.getProblemId());
         if(solutionQuery.getLanguage()!=null&&solutionQuery.getLanguage()!=-1) wrapper.eq("language",solutionQuery.getLanguage());
-        if(solutionQuery.getResult()!=null&&solutionQuery.getResult()!=-1) wrapper.eq("result",solutionQuery.getResult());
+        if(solutionQuery.getResult()!=null&&solutionQuery.getResult()!=12) wrapper.eq("result",solutionQuery.getResult());
         page(pageSolution, wrapper);
         long total = pageSolution.getTotal();
         List<Solution> records = pageSolution.getRecords();

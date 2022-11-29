@@ -175,10 +175,11 @@ export default {
     submit_login_form() {
       this.$refs.login_user_form.validate((valid) => {
         if (valid) {
-          login(this.login_form).then(res => {
-            setToken(res.data)
-            this.$router.push("/")
-          })
+        login(this.login_form).then(res=>{
+
+          setToken(res.data)
+          this.$router.push("/")
+        })
         }
       });
     },

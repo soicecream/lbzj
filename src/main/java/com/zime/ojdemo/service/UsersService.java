@@ -1,12 +1,15 @@
 package com.zime.ojdemo.service;
 
+import com.zime.ojdemo.entity.Solution;
 import com.zime.ojdemo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.modle.vo.*;
 import com.zime.ojdemo.modle.vo.query.UserQuery;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -27,10 +30,12 @@ public interface UsersService extends IService<Users> {
 
     Users getuser(HttpServletRequest request,String id);
 
-    PageList getuserPro( HttpServletRequest request,Integer current,Integer limit);
+    List<Solution> getuserPro(String userid);
 
     Boolean delUsers(ArrayList<String> ids);
 
     Boolean addUser(Users user);
+
+    Boolean imageUpload(MultipartFile file, String userid) throws IllegalStateException;
 
 }

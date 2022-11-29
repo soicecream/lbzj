@@ -15,12 +15,16 @@
         <el-dropdown trigger="click">
           <el-button type="text" style="display: flex;">
             <el-image v-if="user.headPortrait" :src="user.headPortrait" fit="cover" class="zimeUserImage"/>
-            <el-image v-else :src="require('@/assets/img/image/user.png')" class="zimeUserImage"/>
+            <el-image v-else :src="require('@/assets/img/image/user.jpeg')" class="zimeUserImage"/>
             <i class="el-icon-caret-bottom"/>
           </el-button>
           <el-dropdown-menu>
             <el-dropdown-item>
               <el-link type="text" @click="to_user_information_page" :underline="false">个人主页</el-link>
+            </el-dropdown-item>
+
+            <el-dropdown-item divided>
+              <el-link type="text" @click="to_userdata" :underline="false">个人设置</el-link>
             </el-dropdown-item>
 
             <el-dropdown-item v-if="isAdmin" divided>
@@ -60,6 +64,10 @@ export default {
     // 跳转到用户信息界面
     to_user_information_page() {
       this.$router.push('/user/' + this.user.id)
+    },
+
+    to_userdata() {
+      this.$router.push('/userdata')
     },
 
     // 跳转到后台管理页面
