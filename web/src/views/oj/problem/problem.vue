@@ -63,10 +63,10 @@
                     </div>
 
                     <!--                  难度-->
-                    <div v-if="problemData.problem.difficulty !== null">
+                    <div v-if="problemData.problem.degree !== null">
                       难度:
                       <!--                    <el-tag :color="problemData.problem.difficulty">{{ problemData.problem.difficulty }}</el-tag>-->
-                      <el-tag>{{ problemData.problem.difficulty }}</el-tag>
+                      <el-tag>{{ problemData.problem.degree }}</el-tag>
                     </div>
 
                     <!--                  作者-->
@@ -99,28 +99,28 @@
                   </div>
 
                   <!--                样例-->
-                  <div v-if="problemData.problem.examples">
-                    <div v-for="(example, index) of problemData.problem.examples" :key="index">
+                  <div v-if="problemData.problem.samples">
+                    <div v-for="(sample, index) of problemData.problem.samples" :key="index">
                       <div class="flex-container example">
                         <div class="example-input">
                           <p class="title">
                             样例输入 {{ index + 1 }}
-                            <a class="copy" v-clipboard:copy="example.input" v-clipboard:success="copy_expamle_success"
-                               v-clipboard:error="copy_expamle_error">
+                            <a class="copy" v-clipboard:copy="sample.input" v-clipboard:success="copy_samples_success"
+                               v-clipboard:error="copy_samples_error">
                               <i class="el-icon-document-copy"/>
                             </a>
                           </p>
-                          <pre>{{ example.input }}</pre>
+                          <pre>{{ sample.input }}</pre>
                         </div>
                         <div class="example-output">
                           <p class="title">
                             样例输出 {{ index + 1 }}
-                            <a class="copy" v-clipboard:copy="example.output" v-clipboard:success="copy_expamle_success"
-                               v-clipboard:error="copy_expamle_error">
+                            <a class="copy" v-clipboard:copy="sample.output" v-clipboard:success="copy_samples_success"
+                               v-clipboard:error="copy_samples_error">
                               <i class="el-icon-document-copy"/>
                             </a>
                           </p>
-                          <pre> {{ example.output }}</pre>
+                          <pre> {{ sample.output }}</pre>
                         </div>
                       </div>
                     </div>
@@ -129,7 +129,9 @@
                   <!--                提示-->
                   <div v-if="problemData.problem.hint">
                     <p class="title"> 提示 </p>
-                    <p v-html="problemData.problem.hint" class="content-title"/>
+                    <el-card>
+                      <p v-html="problemData.problem.hint" class="content-title"/>
+                    </el-card>
                   </div>
 
                 </div>
@@ -143,6 +145,7 @@
             </el-tab-pane>
 
             <el-tab-pane label="问题讨论"></el-tab-pane>
+
           </el-tabs>
         </el-col>
 
@@ -194,7 +197,7 @@
                   <!--                          p-id="1657" :fill="openTestCaseDrawer?'#ffffff':'#67c23a'"></path>-->
                   <!--                    </svg>-->
                   <!--                    <span style="vertical-align: middle;">在线测试</span>-->
-                  </el-tag>
+                  <!--                  </el-tag>-->
                 </el-col>
               </el-row>
             </div>
@@ -242,7 +245,7 @@ export default {
           description: "给出两个整数，请你输出他们的和。",
           input: "输两个整数 A, B。",
           output: "输出一个整数表示 A+B。",
-          examples: [
+          samples: [
             {input: "1 2 564654656546546546546546545646546546546546546", output: "3"},
             {input: "3 4", output: "7"},
           ],
@@ -344,14 +347,9 @@ export default {
 
     init() {
       fetchProblem(this.$route.params.id).then(res => {
+        res.data.samples = utils.stringToExamples(res.data.samples)
         this.problemData.problem = res.data
       })
-      // console.log(this.$route.params.id)
-      // console.log(this.problemData.problem)
-      let s = "<input>1 1</input><output>2</output><input>1 2</input><output>3</output>"
-      this.problemData.problem.examples = utils.stringToExamples(s)
-      // console.log(this.problemData.problem.examples)
-      // console.log(this.problemData.problem)
     },
 
     // 题目统计
@@ -365,10 +363,10 @@ export default {
     },
 
     //复制样例
-    copy_expamle_success(e) {
+    copy_samples_success(e) {
       this.$message.success("复制成功")
     },
-    copy_expamle_error(e) {
+    copy_samples_error(e) {
       this.$message.error("复制失败")
     },
 
@@ -661,6 +659,7 @@ a {
   border: 1px dashed #e9eaec;
   font-size: 1.1em;
   margin-right: 7%;
+  min-height: 20px;
 }
 
 .submit-detail {

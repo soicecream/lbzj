@@ -29,7 +29,7 @@
       </el-table-column>
       <el-table-column label="测试数据" width="100px" align="center">
         <template slot-scope="{row}">
-          <div><i class="el-icon-s-order" @click="getfile(row.problemId)"/></div>
+          <div><i class="el-icon-s-order" @click="getFile(row.problemId)"/></div>
         </template>
       </el-table-column>
     </el-table>
@@ -111,8 +111,8 @@
     </el-dialog>
 
     <!--    测试数据-->
-    <el-dialog title="文件列表" :visible.sync="showdig3" width="50%">
-      <el-table border :data="file" @selection-change="">
+    <el-dialog title="文件列表" :visible.sync="problemFiles_dialog" width="50%">
+      <el-table border :data="files" @selection-change="">
         <el-table-column label="文件名" prop="name" align="center" width="100px"/>
         <el-table-column label="大小" min-width="150px" align="center">
           <template slot-scope="{row}">
@@ -154,9 +154,9 @@ export default {
 
       problem_dialog: false,
       delete_dialog: false,
+      problemFiles_dialog: false,
 
       showdig2: false,
-      showdig3: false,
       pd: true,
       data: {
         title: '',
@@ -172,7 +172,7 @@ export default {
       },
       row: {},
       delrow: {},
-      file: {},
+      files: [],
 
       worktype: [],
       input: "",
@@ -205,10 +205,11 @@ export default {
       })
     },
 
-    getfile(id) {
-      this.showdig3 = true
+    // 获取文件
+    getFile(id) {
+      this.problemFiles_dialog = true
       getFile(id).then(res => {
-        this.file = res.data
+        this.files = res.data
       })
     },
 
@@ -259,7 +260,6 @@ export default {
       if (index != -1) {
         this.problem.samples.splice(index, 1)
       }
-      console.log(this.problem.samples)
     },
 
     // 保存 新增或修改
