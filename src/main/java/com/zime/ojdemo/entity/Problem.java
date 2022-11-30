@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
+
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -28,7 +30,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class Problem implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "problem_id", type = IdType.AUTO)
     private Integer problemId;
@@ -40,6 +42,8 @@ public class Problem implements Serializable {
     private String input;
 
     private String output;
+
+    private String samples;
 
     private String sampleInput;
 

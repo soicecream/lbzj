@@ -26,6 +26,12 @@ import Clipboard from 'v-clipboard'
 Vue.use(Clipboard)
 
 
+// 处理渲染
+import Fragment from 'vue-fragment'
+
+Vue.use(Fragment.Plugin)
+
+
 Vue.config.productionTip = false // 作为产品时，减少不必要的警告提示
 
 
