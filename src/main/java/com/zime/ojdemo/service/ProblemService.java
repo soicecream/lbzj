@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author zime
@@ -25,11 +25,11 @@ public interface ProblemService extends IService<Problem> {
 
     PageList getProList(long current, long limit, ProblemQuery problemQuery);
 
-    Boolean addPro(Problem Problem) throws IOException;
+    Boolean saveOrUpdateProblem(Problem problem);
 
     Boolean delPro(ArrayList<Integer> id);
 
-    Boolean upPro(Problem problem) throws IOException;
 
     ArrayList<fileResult> getFile(Integer id);
+
 }

@@ -49,6 +49,14 @@ export function addPro(pro) {
   })
 }
 
+export function insertOrUpdate(problem) {
+  return request({
+    url: `/problem/`,
+    method: 'post',
+    data: problem,
+  })
+}
+
 export function delPro(ids) {
   return request({
     url: `/problem/delPro`,

@@ -56,14 +56,9 @@ public class ProblemController {
         return JsonResult.success(problemService.getFile(id));
     }
 
-    @PostMapping("updatePro")
+    @PostMapping("")
     public JsonResult<Boolean> udpatePro(@RequestBody Problem problem) throws IOException {
-        return JsonResult.success(problemService.upPro(problem));
-    }
-
-    @PostMapping("addPro")
-    public JsonResult<Boolean> addPro(@RequestBody Problem problem) throws IOException {
-            return JsonResult.success(problemService.addPro(problem));
+        return JsonResult.success(problemService.saveOrUpdateProblem(problem));
     }
 
     @PostMapping("delPro")

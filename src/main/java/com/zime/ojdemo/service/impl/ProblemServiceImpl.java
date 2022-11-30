@@ -87,12 +87,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             queryWrapper.eq("user_id", problemQuery.getUserId());
             queryWrapper.last("limit 1");
             Solution solution = solutionService.getOne(queryWrapper);
-            if (solution != null)
-                problemListResult.setState(-1);
+            if (solution != null) problemListResult.setState(-1);
             queryWrapper.eq("result", 4);
             solution = solutionService.getOne(queryWrapper);
-            if (solution != null)
-                problemListResult.setState(1);
+            if (solution != null) problemListResult.setState(1);
             results.add(problemListResult);
         }
 
@@ -124,31 +122,39 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return pageList;
     }
 
-    public Boolean addPro(Problem Problem) throws IOException {
-        save(Problem);
-        String wz = "C:\\Users\\26444\\Desktop\\data\\" + Problem.getProblemId();
-        File file = new File(wz);
-        file.mkdir();
-        Io.write(Problem.getSampleInput(), wz + "\\test.in");
-        Io.write(Problem.getSampleOutput(), wz + "\\test.out");
-        return true;
+    public Boolean saveOrUpdateProblem(Problem problem) {
+        List<Problem> problemList = getProblem(problem.getProblemId());
+        if (problemList.size() == 0) {
+            return save(problem);
+        } else {
+            QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("problem_id", problem.getProblemId());
+            return update(problem, queryWrapper);
+        }
     }
 
     public Boolean delPro(ArrayList<Integer> ids) {
-        for (Integer id : ids) {
-            File file = new File("C:/Users/26444/Desktop/data/" + id);
-            if (!Io.deleteFile(file)) return false;
-        }
+//        for (Integer id : ids) {
+//            File file = new File("C:/Users/26444/Desktop/data/" + id);
+//            if (!Io.deleteFile(file)) return false;
+//        }
+        System.out.println("----------" + ids);
         return removeByIds(ids);
     }
 
-    public Boolean upPro(Problem problem) throws IOException {
-        QueryWrapper<Problem> wrapper = new QueryWrapper<>();
-        wrapper.eq("problem_id", problem.getProblemId());
-        String wz = "C:\\Users\\26444\\Desktop\\data\\" + problem.getProblemId();
-        File file = new File(wz);
-        Io.write(problem.getSampleInput(), wz + "\\test.in");
-        Io.write(problem.getSampleOutput(), wz + "\\test.out");
-        return update(problem, wrapper);
+    public List<Problem> getProblem(Integer problemId) {
+        QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("problem_id", problemId);
+        return list(queryWrapper);
     }
+
+//    public Boolean upPro(Problem problem) throws IOException {
+//        QueryWrapper<Problem> wrapper = new QueryWrapper<>();
+//        wrapper.eq("problem_id", problem.getProblemId());
+//        String wz = "C:\\Users\\26444\\Desktop\\data\\" + problem.getProblemId();
+//        File file = new File(wz);
+//        Io.write(problem.getSampleInput(), wz + "\\test.in");
+//        Io.write(problem.getSampleOutput(), wz + "\\test.out");
+//        return update(problem, wrapper);
+//    }
 }

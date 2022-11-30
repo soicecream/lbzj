@@ -12,7 +12,7 @@
         <span>问题管理</span>
       </template>
       <el-menu-item-group>
-        <el-menu-item index="2-1">用户列表</el-menu-item>
+        <el-menu-item index="2-1">问题列表</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
