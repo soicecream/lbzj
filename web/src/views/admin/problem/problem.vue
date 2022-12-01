@@ -11,7 +11,7 @@
     </div>
 
     <!--    信息-->
-    <el-table stripe border style="width: 100%;margin-top: 20px" :data="list" @selection-change="setdelrow">
+    <el-table stripe border style="width: 100%;margin-top: 20px" :data="problemList">
       <el-table-column type="selection" width="55"/>
       <el-table-column label="题目编号" prop="problemId" align="center" width="100px"/>
       <el-table-column label="标题" prop="title" align="center" min-width="150px"/>
@@ -35,7 +35,7 @@
     </el-table>
 
     <!--    标签页-->
-    <pagination v-show="total>0" :total="total" :page.sync="page" :limit.sync="limit"
+    <pagination v-show="total>0" :total="total" :page.sync="pageNum" :limit.sync="pageSize"
                 style="margin-top: -20px;float: right" @pagination="getList"/>
 
     <!--    添加 修改-->
@@ -116,13 +116,17 @@
         <el-table-column label="文件名" prop="name" align="center" width="100px"/>
         <el-table-column label="大小" min-width="150px" align="center">
           <template slot-scope="{row}">
-            <diV>{{ row.size }}bytes</diV>
+            <diV>{{ row.size }} bytes</diV>
           </template>
         </el-table-column>
-        <el-table-column label="修改日期" prop="time" width="150px" align="center"/>
+        <el-table-column label="修改日期" width="180px" align="center">
+          <template slot-scope="{row}">
+            {{ timeToDate(row.time) }}
+          </template>
+        </el-table-column>
         <el-table-column label="编辑" width="100px" align="center">
           <template slot-scope="{row}">
-            <el-button @click="updateFile" size="mini" type="primary" icon="el-icon-edit" circle>编辑</el-button>
+            <el-button @click="updateFile" size="mini" type="primary" icon="el-icon-edit"> 编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -140,15 +144,15 @@ import {delPro, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
 
 export default {
   name: 'ProblemList',
+
   components: {Pagination},
-  created() {
-    this.getList()
-  },
+
   data() {
     return {
-      list: [],
-      limit: 10,
-      page: 1,
+
+      problemList: [],
+      pageSize: 10,
+      pageNum: 1,
       total: 10,
       listQuery: {},
 
@@ -196,11 +200,17 @@ export default {
 
     }
   },
+
+  created() {
+    this.getList()
+
+  },
+
   methods: {
     // 获取信息
     getList() {
-      getAdminprolist(this.page, this.limit, this.listQuery).then(res => {
-        this.list = res.data.rows
+      getAdminprolist(this.pageNum, this.pageSize, this.listQuery).then(res => {
+        this.problemList = res.data.rows
         this.total = res.data.total
       })
     },
@@ -223,14 +233,10 @@ export default {
       })
     },
 
-    setdelrow(val) {
-      this.delrow = val
-    },
-
+    // 难度选择
     pdtype() {
 
     },
-
 
     // 打开关闭 问题添加修改弹窗
     showProblem_dialog(data) {
@@ -285,6 +291,29 @@ export default {
       }
     },
 
+    // 时间戳 => yyyy-MM-dd HH:mm:ss
+    timeToDate(time) {
+      if (time) {
+        var date = new Date(time)
+
+        var Y = date.getFullYear()
+        var M = date.getMonth() + 1
+        M = M < 10 ? '0' + M : M
+        var D = date.getDate()
+        D = D < 10 ? '0' + D : D
+        var h = date.getHours()
+        var m = date.getMinutes()
+        m = m < 10 ? '0' + m : m
+        var s = date.getSeconds()
+        s = s < 10 ? '0' + s : s
+
+        return Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s
+      } else {
+        return ''
+      }
+    },
+
+    // 修改文件
     updateFile() {
 
     },

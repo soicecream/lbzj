@@ -43,7 +43,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     public ArrayList<fileResult> getFile(Integer id) {
-        String wz = "C:\\Users\\26444\\Desktop\\data\\" + id;
+        String wz = "D:\\home\\judge\\data\\" + id;
         File file = new File(wz);
         return Io.readPro(file);
     }
