@@ -115,8 +115,13 @@ export const constantRoutes = [
         component: () => import('@/views/admin/work/work'),
       },
       {
+        path: '/admin/problem/list',
+        name:'adminProblemList',
+        component: () => import('@/views/admin/problem/list')
+      },
+      {
         path: '/admin/problem',
-        name:'adminProblem',
+        name: 'adminProblem',
         component: () => import('@/views/admin/problem/problem')
       },
       {

@@ -57,7 +57,7 @@ export default {
           this.$router.push('/')
           break
         case '2-1':
-          this.$router.push('/admin/problem')
+          this.$router.push('/admin/problem/list')
           break
         case '3-1':
           this.$router.push('/admin/work')
