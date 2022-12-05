@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input v-model="input" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
+    <el-input v-model="listQuery.workname" placeholder="请输入内容" style="width: 200px;margin-left: 40%" @click="getList"></el-input>
     <el-button icon="el-icon-search" circle></el-button>
     <div>
       <el-button type="success" size="mini" icon="el-icon-plus" @click="showdig0=true">添加</el-button>
@@ -226,6 +226,9 @@ export default {
           { required: true, message: '请输入题目'},
         ],
       },
+      listQuery: {
+        workname: "",
+      }
     }
   },
   created() {
@@ -249,7 +252,7 @@ export default {
   },
   methods: {
     getList() {
-      getWorkList(this.page, this.limit).then(res => {
+      getWorkList(this.page, this.limit,this.listQuery).then(res => {
         this.list = res.data.rows;
         this.total = res.data.total;
       })

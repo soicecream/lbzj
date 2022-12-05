@@ -40,12 +40,11 @@
         </template>
       </el-table-column>
     </el-table>
-
   </el-card>
 </template>
 
 <script>
-import {getProblemid, getRankWork} from "@/api/work";
+import {getRankWork} from "@/api/work";
 
 export default {
   name: "workRank",
@@ -53,7 +52,7 @@ export default {
     return {
       ranklist:[],
       problemid:null,
-
+      pd:true
     }
   },
   filters: {
@@ -74,7 +73,8 @@ export default {
     getRankList(){
       getRankWork(this.$route.params.id.toString()).then(response=>{
         this.ranklist=response.data;
-        console.log(this.ranklist)
+        this.pd=this.ranklist.length>0?false:true;
+        console.log(this.pd)
       })
     },
     tablecalss({row,column,rowIndex,columnIndex}){

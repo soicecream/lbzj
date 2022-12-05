@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zime.ojdemo.entity.Work;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
+import com.zime.ojdemo.modle.vo.query.WorkQuery;
 import com.zime.ojdemo.modle.vo.result.WorkListResult;
 import com.zime.ojdemo.modle.vo.result.WorkRankresult;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
@@ -29,9 +30,11 @@ public class WorkController {
     竞赛列表接口
      */
     @PostMapping("/pagework/{current}/{limit}")
-    public JsonResult<PageList> pageWork(@PathVariable long current,@PathVariable long limit){
+    public JsonResult<PageList> pageWork(@PathVariable long current, @PathVariable long limit, @RequestBody WorkQuery workQuery){
         Page<Work> pageProblem = new Page<>(current,limit);
         QueryWrapper<Work> wrapper = new QueryWrapper<>();
+        if(workQuery.getWorkname()!=null&&!workQuery.getWorkname().equals("")) wrapper.like("name",workQuery.getWorkname());
+        wrapper.orderByDesc("endtime");
         workService.page(pageProblem,wrapper);
         long total = pageProblem.getTotal();
         List<Work> records = pageProblem.getRecords();

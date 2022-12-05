@@ -1,9 +1,10 @@
 import request from "@/utils/request";
 
-export function getWorkList(page, limit) {
+export function getWorkList(page, limit,workname) {
     return request({
         url: `/work/pagework/${page}/${limit}`,
         method: 'post',
+        data:workname
     })
 }
 export function getWork(id) {

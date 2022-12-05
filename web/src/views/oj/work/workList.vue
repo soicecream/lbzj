@@ -3,7 +3,8 @@
   <el-card class="box-card" style="width: 95%;margin: 0.5rem auto;height: 88%">
     <div slot="header" class="clearfix">
       <span style="font-size: 1.4rem">竞赛列表</span>
-      <el-input placeholder="请输入内容" size="small" style="float: right;width: 200px;height: 20px"><el-button slot="append" icon="el-icon-search"></el-button></el-input>
+      <el-input placeholder="请输入内容" size="small" style="float: right;width: 200px;height: 20px" v-model="listQuery.workname">
+        <el-button slot="append" icon="el-icon-search" @click="getList"></el-button></el-input>
     </div>
     <el-table
         style="width: 100%;margin-top: -20px"
@@ -66,9 +67,9 @@ export default {
       limit:10,
       page:1,
       total:10,
-      listQuery:{
+      listQuery: {
+        workname: "",
       },
-
       workform:{
         workid:undefined,
         name:undefined,
@@ -115,7 +116,7 @@ export default {
   },
   methods:{
     getList(){
-      getWorkList(this.page,this.limit).then(response=>{
+      getWorkList(this.page,this.limit,this.listQuery).then(response=>{
         this.list = response.data.rows
         this.total = response.data.total
       })

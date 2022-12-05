@@ -6,24 +6,25 @@
          <i class="header-icon el-icon-info"  style="color: #3498db;font-size: 20px">账号设置</i>
        </template>
     <el-form :inline="true"  :model="user" :rules="rules" ref="user" class="demo-form-inline">
-    <el-form-item label="昵称">
-      <el-input v-model="user.nick"></el-input>
+    <el-form-item label="昵称" class="a1">
+      <el-input v-model="user.nick" class="a"></el-input>
     </el-form-item>
-    <el-form-item label="学校" >
-      <el-input v-model="user.school"></el-input>
+    <el-form-item label="学校" class="a1">
+      <el-input v-model="user.school" class="a"></el-input>
     </el-form-item>
-    <el-form-item label="当前密码" prop="possword">
-      <el-input v-model="user.possword" ></el-input>
+      <el-form-item label="邮箱" class="a1">
+        <el-input v-model="user.email" class="a"></el-input>
+      </el-form-item>
+    <el-form-item label="当前密码" prop="possword" class="a1">
+      <el-input v-model="user.possword" class="a"></el-input>
     </el-form-item>
-    <el-form-item label="新密码">
-      <el-input v-model="possword1" ></el-input>
+    <el-form-item label="新密码" class="a1">
+      <el-input v-model="possword1" class="a"></el-input>
     </el-form-item>
-    <el-form-item label="确认新密码">
-      <el-input v-model="possword2"></el-input>
+    <el-form-item label="确认新密码" class="a1">
+      <el-input v-model="possword2" class="a"> </el-input>
     </el-form-item>
-    <el-form-item label="邮箱">
-      <el-input v-model="user.email"></el-input>
-    </el-form-item>
+      <br>
     <el-form-item>
       <el-button type="primary" @click="submitForm('user')">保存</el-button>
     </el-form-item>
@@ -178,6 +179,11 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+.a{
+  width: 100%;
+}
+.a1{
+  width: 30%;
+}
 </style>

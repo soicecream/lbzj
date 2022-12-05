@@ -64,7 +64,5 @@ public class Users implements Serializable {
 
     private String introduce;
 
-    private String js;
-
 
 }

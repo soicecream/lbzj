@@ -6,9 +6,10 @@
         <span style="margin-top: 20px;float: left">开始时间：{{list.starttime | date }}</span>
         <span style="margin-top: 20px;float: right">结束时间：{{list.endtime | date}}</span>
       </div>
-      <el-progress style="margin-top: 100px" :stroke-width="15" :percentage="100" :format="f"></el-progress>
+      <el-progress style="margin-top: 100px" :stroke-width="15" :percentage="progresszhi"
+                   :format="f"></el-progress>
       <div :class="worktime>0?'start':'end'"  style="text-align: center;margin-top: 20px;font-size: 20px">
-        <i class="el-icon-loading"></i> {{worktime|time}}</div>
+       {{worktime|time}}</div>
     </el-card>
     <Menu> </Menu>
     <router-view style="margin-top: 20px"></router-view>
@@ -59,7 +60,8 @@ export default {
       list:null,
       value1:10,
       worktime:'',
-      time:''
+      time:'',
+      progresszhi:0
     }
   },
   methods:{
@@ -72,7 +74,8 @@ export default {
     },
     start(){
      this.worktime=this.list.endtime-new Date().getTime()
-      console.log(this.worktime)
+     this.progresszhi=100-this.worktime/(this.list.endtime-this.list.starttime)*100;
+     console.log(this.worktime/(this.list.endtime-this.list.starttime))
      this.time=setInterval(this.f1,1000)
     },
 
