@@ -120,10 +120,21 @@ export const constantRoutes = [
         component: () => import('@/views/admin/problem/list')
       },
       {
-        path: '/admin/problem',
-        name: 'adminProblem',
-        component: () => import('@/views/admin/problem/problem')
+        path: '/admin/problem/create',
+        name: 'admin-create-problem',
+        component: () => import('@/views/admin/problem/problem'),
       },
+      {
+        path: '/admin/problem/edit/:problemId',
+        name: 'admin-edit-problem',
+        component: () => import('@/views/admin/problem/problem'),
+      },
+      {
+        path: '/admin/tags/list',
+        name: 'admin-tags-list',
+        component: () => import('@/views/admin/problem/tags')
+      },
+
       {
         path: '/admin/user',
         name:'adminuser',

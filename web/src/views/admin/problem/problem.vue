@@ -2,37 +2,14 @@
   <div class="problem">
     <el-card>
       <div slot="header">
-        <span class="panel-title home-title">{{ title }}</span>
+        <span class="panel-title home-title">{{ (mode === 'add' ? '创建题目' : '修改题目') }}</span>
       </div>
       <el-form ref="form" :model="problem" :rules="rules" label-position="top" label-width="70px">
-        <!--        题目展示id-->
-        <el-row :gutter="20">
-          <el-col :span="24">
-            <el-form-item prop="problemId" label="题目展示ID" required>
-              <el-input placeholder="题目展示ID" v-model="problem.problemId" :disabled="problem.isRemote"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <!--        标题-->
         <el-row :gutter="20">
           <el-col :span="24">
             <el-form-item prop="title" label="标题" required>
               <el-input placeholder="标题" v-model="problem.title"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <!--        比赛显示时标题和id-->
-        <el-row :gutter="20" v-if="contestID">
-          <el-col :md="12" :xs="24">
-            <el-form-item label="比赛显示标题" required>
-              <el-input placeholder="比赛显示标题" v-model="contestProblem.displayTitle"/>
-            </el-form-item>
-          </el-col>
-
-          <el-col :md="12" :xs="24">
-            <el-form-item label="比赛显示id" required>
-              <el-input placeholder="比赛显示id" v-model="contestProblem.displayId"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -49,28 +26,21 @@
         <!--        时间限制 空间限制 栈限制 难度-->
         <el-row :gutter="20">
           <el-col :md="6" :xs="24">
-            <el-form-item label="时间限制(ms)" required>
-              <el-input type="Number" placeholder="时间限制" v-model="problem.timeLimit" :disabled="problem.isRemote"/>
+            <el-form-item prop="timeLimit" label="时间限制(ms)" required>
+              <el-input type="Number" placeholder="时间限制" v-model="problem.timeLimit"/>
             </el-form-item>
           </el-col>
           <el-col :md="6" :xs="24">
-            <el-form-item label="空间限制(mb)" required>
-              <el-input type="Number" placeholder="空间限制" v-model="problem.memoryLimit"
-                        :disabled="problem.isRemote"/>
-            </el-form-item>
-          </el-col>
-          <el-col :md="6" :xs="24">
-            <el-form-item label="栈限制(mb)" required>
-              <el-input type="Number" placeholder="栈限制" v-model="problem.stackLimit"
-                        :disabled="problem.isRemote"/>
+            <el-form-item prop="memoryLimit" label="空间限制(mb)" required>
+              <el-input type="Number" placeholder="空间限制" v-model="problem.memoryLimit"/>
             </el-form-item>
           </el-col>
           <el-col :md="6" :xs="24">
             <el-form-item label="难度" required>
-              <el-select class="difficulty-select" placeholder="Enter the level of problem"
-                         v-model="problem.difficulty">
-                <el-option :label="getLevelName(key)" :value="parseInt(key)"
-                           v-for="(value, key, index) in PROBLEM_LEVEL" :key="index"/>
+              <el-select class="difficulty-select" placeholder="问题难度" v-model="problem.difficulty">
+                <el-option label="简单" :value="1"></el-option>
+                <el-option label="中等" :value="2"></el-option>
+                <el-option label="困难" :value="3"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -95,18 +65,16 @@
           </el-col>
         </el-row>
 
-        <!--        难度 标签-->
+        <!--        状态 标签-->
         <el-row :gutter="20">
+          <!--          状态-->
           <el-col :md="4" :xs="24">
-            <el-form-item label="难度">
-              <el-select v-model="problem.auth" size="small">
-                <el-option label="公开题目" :value="1"></el-option>
-                <el-option label="隐藏题目" :value="2"></el-option>
-                <el-option label="比赛题目" :value="3"></el-option>
-              </el-select>
+            <el-form-item label="状态">
+              <el-switch v-model="problem.defunct" active-text="公开题目" inactive-text="隐藏题目"/>
             </el-form-item>
           </el-col>
 
+          <!--          标签-->
           <el-col :md="12" :xs="24">
             <el-form-item label="标签">
               <el-tag v-for="tag in problemTags" closable :close-transition="false" :key="tag.name" size="small"
@@ -115,9 +83,9 @@
               </el-tag>
               <!-- 输入时建议，回车，选择，光标消失触发更新 -->
               <el-autocomplete v-if="inputVisible" size="mini" class="input-new-tag" v-model="tagInput"
-                               :trigger-on-focus="true" @keyup.enter.native="addTag" @click="selectTag" @select="addTag"
-                               :fetch-suggestions="querySearch"/>
-              <el-tooltip effect="dark" content="添加" placement="top" v-else>
+                               @keyup.enter.native="addTag" @click="selectTag" @select="addTag"
+                               :trigger-on-focus="true" :fetch-suggestions="querySearch"/>
+              <el-tooltip v-else effect="dark" content="添加" placement="top">
                 <el-button class="button-new-tag" size="small" @click="inputVisible = true" icon="el-icon-plus"/>
               </el-tooltip>
             </el-form-item>
@@ -125,18 +93,18 @@
         </el-row>
 
         <!--        语言列表-->
-        <el-row>
-          <el-col :md="24" :xs="24">
-            <el-form-item label="语言列表" :error="error.languages" required>
-              <el-checkbox-group v-model="problemLanguages">
-                <el-tooltip class="spj-radio" v-for="lang in allLanguage" :key="lang.name" effect="dark"
-                            :content="lang.description" placement="top-start">
-                  <el-checkbox :label="lang.name"/>
-                </el-tooltip>
-              </el-checkbox-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <!--        <el-row>-->
+        <!--          <el-col :md="24" :xs="24">-->
+        <!--            <el-form-item label="语言列表" :error="error.languages" required>-->
+        <!--              <el-checkbox-group v-model="problemLanguages">-->
+        <!--                <el-tooltip class="spj-radio" v-for="lang in allLanguage" :key="lang.name" effect="dark"-->
+        <!--                            :content="lang.description" placement="top-start">-->
+        <!--                  <el-checkbox :label="lang.name"/>-->
+        <!--                </el-tooltip>-->
+        <!--              </el-checkbox-group>-->
+        <!--            </el-form-item>-->
+        <!--          </el-col>-->
+        <!--        </el-row>-->
 
         <!--        题面样例-->
         <div>
@@ -148,7 +116,7 @@
             </el-popover>
           </div>
           <el-form-item v-for="(example, index) in problem.examples" :key="'example' + index">
-            <Accordion :title="'样例' + (index + 1)" :isOpen="example.isOpen ? true : false" :index="index"
+            <Accordion :title="'样例' + (index + 1)" :isOpen="example.isOpen" :index="index"
                        @changeVisible="changeExampleVisible">
               <el-button type="danger" size="small" icon="el-icon-delete" slot="header" @click="deleteExample(index)">
                 删除
@@ -175,7 +143,7 @@
         </div>
 
         <!--        添加测试样例数据-->
-        <el-row :gutter="20" v-if="!problem.isRemote">
+        <el-row :gutter="20">
           <!--          标题-->
           <div class="panel-title home-title">
             后台测试数据
@@ -187,18 +155,16 @@
 
           <!--          手动输入 还是 上传文件-->
           <el-form-item required>
-            <el-switch v-model="problem.isUploadCase" active-text="上传文件" inactive-text="输入文件" style="margin: 10px 0"/>
+            <el-switch v-model="isUploadCase" active-text="上传文件" inactive-text="输入文件" style="margin: 10px 0"/>
           </el-form-item>
 
           <!--          文件上传-->
-          <div v-show="problem.isUploadCase">
+          <div v-show="isUploadCase">
             <el-col :span="24">
               <el-form-item :error="error.testcase">
                 <el-upload :action="uploadFileUrl+'?mode='+problem.judgeCaseMode" name="file" :show-file-list="true"
                            :on-success="uploadSucceeded" :on-error="uploadFailed">
-                  <el-button size="small" type="primary" icon="el-icon-upload">
-                    选择文件
-                  </el-button>
+                  <el-button size="small" type="primary" icon="el-icon-upload">选择文件</el-button>
                 </el-upload>
               </el-form-item>
             </el-col>
@@ -226,9 +192,9 @@
           </div>
 
           <!--          样例输入-->
-          <div v-show="!problem.isUploadCase">
+          <div v-show="!isUploadCase">
             <el-form-item v-for="(sample, index) in problemSamples" :key="'sample' + index">
-              <Accordion :title="'测试样例' + (sample.index)" :isOpen="sample.isOpen ? true : false" :index="index"
+              <Accordion :title="'测试样例' + (sample.index)" :isOpen="sample.isOpen" :index="index"
                          @changeVisible="changeSampleVisible">
                 <el-button type="danger" size="small" icon="el-icon-delete" slot="header" @click="deleteSample(index)">
                   删除
@@ -256,16 +222,21 @@
         </el-row>
 
         <!--        提交-->
-        <el-button type="primary" @click.native="submit()" size="small">保存</el-button>
+        <el-button type="primary" @click="submit()" size="small">保存</el-button>
+        <el-button type="primary" @click.native="clearInput()" size="small">重置表单</el-button>
       </el-form>
     </el-card>
   </div>
 </template>
 
 <script>
-
 import Accordion from "@/components/admin/accordion";
 import Editor from "@/components/admin/editor";
+
+
+import utils from "@/utils/utils";
+import {fetchProblem, insertOrUpdate} from "@/api/problem";
+
 
 export default {
   name: "Problem",
@@ -276,324 +247,95 @@ export default {
 
   data() {
     return {
-      title: "",
+      pid: null, // 题目id，如果为创建模式则为null
+      problem: {
+        problemId: "",
+        title: "", // 标题
+        description: "", // 描述
+        timeLimit: "1000", // 时间限制
+        memoryLimit: "256", // 空间限制
+        difficulty: "", // 难度
+        input: "", // 输入描述
+        output: "", // 输出描述
+        hint: "", // 提示
+        examples: [], // 样例
+        defunct: 0, // 题目状态
+      }, // 题目信息
+      problemTags: [], // 题目标签
+      tagInput: "",
+      allTagsTmp: [],
+
+      isUploadCase: true, // 是否文件上传
+
+      PROBLEM_LEVEL: {}, // 题目难度
+      inputVisible: false, //
+      error: {},
+      uploadFileUrl: "", // 上传文件的路径
+
+      problemSamples: [], // 判题机样例
+      sampleIndex: 1, // 判题机样例长度
 
       rules: {
         title: {required: true, message: "标题不能为空", trigger: "blur",},
+        timeLimit: {required: true, message: "时间限制不能为空", trigger: "blur",},
+        memoryLimit: {required: true, message: "空间限制不能为空", trigger: "blur",},
       },
-      backPath: "",
-      loadingCompile: false,
-      mode: "", // 该题目是编辑或者创建
-      contest: {},
-      codeTemplate: {},
-      pid: null, // 题目id，如果为创建模式则为null
-      contestID: null, // 比赛id
-      contestProblem: {
-        displayId: null,
-        displayTitle: null,
-        cid: null,
-        pid: null,
-      }, // 比赛题目的相关属性
-      problem: {
-        id: null,
-        title: "",
-        problemId: "",
-        description: "",
-        input: "",
-        output: "",
-        timeLimit: 1000,
-        memoryLimit: 256,
-        stackLimit: 128,
-        difficulty: 0,
-        auth: 1,
-        codeShare: true,
-        examples: [], // 题面上的样例输入输出
-        spjLanguage: "",
-        spjCode: "",
-        spjCompileOk: false,
-        uploadTestcaseDir: "",
-        testCaseScore: [],
-        isRemote: false,
-        isUploadCase: true,
-        type: 0,
-        hint: "",
-        source: "",
-        cid: null,
-        isRemoveEndBlank: false,
-        openCaseResult: true,
-        judgeMode: "default",
-        judgeCaseMode: "default",
-        userExtraFile: "",
-        judgeExtraFile: "",
-      },
-      problemTags: [], //指定问题的标签列表
-      problemLanguages: [], //指定问题的编程语言列表
-      problemSamples: [], // 判题机使用的样例
-      problemCodeTemplate: [],
-      reProblem: {},
-      testCaseUploaded: false,
-      allLanguage: [], //所有编程语言
-      allSpjLanguage: [], // 所有可以用特殊判题的语言
-      allTags: [],
-      allTagsTmp: [],
-      inputVisible: false,
-      tagInput: "",
 
-      spjMode: "",
-      disableRuleType: false,
-      routeName: "",
-      uploadTestcaseDir: "",
-      uploadFileUrl: "",
-      error: {
-        tags: "",
-        spj: "",
-        languages: "",
-        testCase: "",
-      },
-      PROBLEM_LEVEL: {},
-      JUDGE_CASE_MODE: {},
-      spjRecord: {
-        spjCode: "",
-        spjLanguage: "",
-      },
-      addUserExtraFile: false,
-      addJudgeExtraFile: false,
-      userExtraFile: null,
-      judgeExtraFile: null,
-      judgeCaseModeRecord: "default",
-      sampleIndex: 1,
-    };
+      mode: "", // 该题目是编辑或者创建
+
+      testCaseUploaded: false,
+
+
+    }
   },
 
   mounted() {
-    // this.PROBLEM_LEVEL = Object.assign({}, PROBLEM_LEVEL);
-    // this.JUDGE_CASE_MODE = Object.assign({}, JUDGE_CASE_MODE);
     this.routeName = this.$route.name;
-    let contestID = this.$route.params.contestId;
-    this.uploadFileUrl = "/api/file/upload-testcase-zip";
-    if (this.routeName === "admin-edit-problem" || this.routeName === "admin-edit-contest-problem") {
+    this.mode = "add";
+    if (this.routeName === "admin-edit-problem") {
       this.mode = "edit";
-    } else {
-      this.mode = "add";
+      this.pid = this.$route.params.problemId
+      this.init_problem_information()
     }
-    // api.admin_getAllProblemTagList("ALL").then((res) => {
-    //   this.allTags = res.data.data;
-    //   for (let tag of res.data.data) {
-    //     this.allTagsTmp.push({value: tag.name, oj: tag.oj});
-    //   }
-    // }).catch(() => {
-    // });
-    // api.getLanguages(this.$route.params.problemId, false).then((res) => {
-    //   let allLanguage = res.data.data;
-    //   this.allLanguage = allLanguage;
-    //   for (let i = 0; i < allLanguage.length; i++) {
-    //     if (allLanguage[i].isSpj == true) {
-    //       this.allSpjLanguage.push(allLanguage[i]);
-    //     }
-    //   }
-    //   this.problem = this.reProblem = {
-    //     id: null,
-    //     problemId: "",
-    //     title: "",
-    //     description: "",
-    //     input: "",
-    //     output: "",
-    //     timeLimit: 1000,
-    //     memoryLimit: 256,
-    //     stackLimit: 128,
-    //     difficulty: 0,
-    //     auth: 1,
-    //     codeShare: true,
-    //     examples: [],
-    //     spjLanguage: "",
-    //     spjCode: "",
-    //     spjCompileOk: false,
-    //     isUploadCase: true,
-    //     uploadTestcaseDir: "",
-    //     testCaseScore: [],
-    //     contestProblem: {},
-    //     type: 0,
-    //     hint: "",
-    //     source: "",
-    //     cid: null,
-    //     isRemoveEndBlank: false,
-    //     openCaseResult: true,
-    //     judgeMode: "default",
-    //     judgeCaseMode: "default",
-    //     userExtraFile: null,
-    //     judgeExtraFile: null,
-    //   };
-    //
-    //   this.contestID = contestID;
-    //   if (contestID) {
-    //     this.problem.cid = this.reProblem.cid = contestID;
-    //     this.problem.auth = this.reProblem.auth = 3;
-    //     this.disableRuleType = true;
-    //     api.admin_getContest(contestID).then((res) => {
-    //       this.problem.type = this.reProblem.type = res.data.data.type;
-    //       this.contest = res.data.data;
-    //     });
-    //   }
-    //   this.problem.spjLanguage = "C";
-    //   this.init();
-    // });
+
   },
 
-  watch: {
-    $route() {
-      this.routeName = this.$route.name;
-      if (this.routeName === "admin-edit-problem" || this.routeName === "admin-edit-contest-problem") {
-        this.mode = "edit";
-      } else {
-        this.mode = "add";
-      }
-      this.$refs.form.resetFields();
-      this.problem = this.reProblem;
-      this.problemTags = []; //指定问题的标签列表
-      this.problemLanguages = []; //指定问题的编程语言列表
-      this.problemSamples = [];
-      this.problemCodeTemplate = [];
-      this.codeTemplate = [];
-      this.init();
-    },
-
-    problemLanguages(newVal) {
-      let data = {};
-      // use deep copy to avoid infinite loop
-      let languages = JSON.parse(JSON.stringify(newVal)).sort();
-      for (let item of languages) {
-        if (this.codeTemplate[item] === undefined) {
-          let langConfig = this.allLanguage.find((lang) => {
-            return lang.name === item;
-          });
-          let codeTemp;
-          let problemCodeTemplate = this.problemCodeTemplate;
-          if (problemCodeTemplate) {
-            codeTemp = problemCodeTemplate.find((temp) => {
-              return temp.lid == langConfig.id;
-            });
-          }
-          if (codeTemp == undefined) {
-            data[item] = {
-              id: null,
-              status: false,
-              code: langConfig.codeTemplate,
-              mode: langConfig.contentType,
-            };
-          } else {
-            data[item] = {
-              id: codeTemp.id,
-              status: true,
-              code: codeTemp.code,
-              mode: langConfig.contentType,
-            };
-          }
-        } else {
-          data[item] = this.codeTemplate[item];
-        }
-      }
-      this.codeTemplate = data;
-    },
-
-    "problem.spjLanguage"(newVal) {
-      if (this.allSpjLanguage.length && this.problem.judgeMode != "default") {
-        this.spjMode = this.allSpjLanguage.find((item) => {
-          return item.name == this.problem.spjLanguage && item.isSpj == true;
-        })["contentType"];
-      }
-    },
-  },
+  watch: {},
 
   methods: {
-    init() {
-      this.sampleIndex = 1;
-      if (this.mode === "edit") {
-        this.pid = this.$route.params.problemId;
-        this.backPath = this.$route.query.back;
-        this.title = "修改题目";
-        let funcName = {
-          "admin-edit-problem": "admin_getProblem",
-          "admin-edit-contest-problem": "admin_getContestProblem",
-        }[this.routeName];
-        // api[funcName](this.pid).then((problemRes) => {
-        //   let data = problemRes.data.data;
-        //   data.spjCompileOk = false;
-        //   data.uploadTestcaseDir = "";
-        //   data.testCaseScore = [];
-        //   if (!data.spjCode) {
-        //     data.spjCode = "";
-        //   }
-        //   data.spjLanguage = data.spjLanguage || "C";
-        //   this.spjRecord.spjLanguage = data.spjLanguage;
-        //   this.spjRecord.spjCode = data.spjCode;
-        //   this.judgeCaseModeRecord = data.judgeCaseModeRecord;
-        //   this.problem = data;
-        //   this.problem["examples"] = utils.stringToExamples(data.examples);
-        //   if (this.problem["examples"].length > 0) {
-        //     this.problem["examples"][0]["isOpen"] = true;
-        //   }
-        //   this.testCaseUploaded = true;
-        //   if (this.problem.userExtraFile) {
-        //     this.addUserExtraFile = true;
-        //     this.userExtraFile = JSON.parse(this.problem.userExtraFile);
-        //   }
-        //   if (this.problem.judgeExtraFile) {
-        //     this.addJudgeExtraFile = true;
-        //     this.judgeExtraFile = JSON.parse(this.problem.judgeExtraFile);
-        //   }
-        //   api.admin_getProblemCases(this.pid, this.problem.isUploadCase).then((res) => {
-        //     if (this.problem.isUploadCase) {
-        //       this.problem.testCaseScore = res.data.data;
-        //       this.problem.testCaseScore.forEach((item, index) => {
-        //         item.index = index + 1;
-        //       });
-        //       this.$refs.xTable.sort("groupNum", "asc");
-        //     } else {
-        //       this.problemSamples = res.data.data;
-        //       if (this.problemSamples != null && this.problemSamples.length > 0) {
-        //         this.problemSamples[0]["isOpen"] = true;
-        //         this.problemSamples.forEach((item, index) => {
-        //           item.index = index + 1;
-        //         });
-        //         this.sampleIndex = this.problemSamples.length + 1;
-        //       }
-        //     }
-        //   });
-        // });
-        if (funcName === "admin_getContestProblem") {
-          // api.admin_getContestProblemInfo(this.pid, this.contestID).then((res) => {
-          //   this.contestProblem = res.data.data;
-          // });
-        }
-        this.getProblemCodeTemplateAndLanguage();
-
-        // api.admin_getProblemTags(this.pid).then((res) => {
-        //   this.problemTags = res.data.data;
-        // });
-      } else {
-        this.addExample();
-        this.testCaseUploaded = false;
-        this.title = "创建题目";
-        for (let item of this.allLanguage) {
-          this.problemLanguages.push(item.name);
-        }
+    // 加载题目信息
+    init_problem_information() {
+      if (this.pid) {
+        fetchProblem(this.pid).then(res => {
+          const data = res.data
+          if (data.examples) {
+            data.examples = utils.stringToExamples(data.examples)
+            for (var i = 0; i < data.examples.length; i++) {
+              data.examples[i].isOpen = true
+            }
+          }
+          if (!data.hint) {
+            data.hint = ""
+          }
+          this.problem = data
+        })
       }
     },
 
-    async getProblemCodeTemplateAndLanguage() {
-      const that = this;
-      // await api.getProblemCodeTemplate(that.pid).then((res) => {
-      //   that.problemCodeTemplate = res.data.data;
-      // });
-      // api.getProblemLanguages(that.pid).then((res) => {
-      //   let Languages = res.data.data;
-      //   for (let i = 0; i < Languages.length; i++) {
-      //     that.problemLanguages.push(Languages[i].name);
-      //   }
-      // });
+    // 上传返回
+    uploadSucceeded(res) {
+      if (res.status !== 200) {
+        this.$message.error(res.msg)
+        this.testCaseUploaded = false;
+        return false
+      }
+      this.$message.success("上传成功")
+    },
+    uploadFailed() {
+      this.$message.error("上传失败")
     },
 
-    //tab搜索
+    // 标签
     querySearch(queryString, cb) {
       var ojName = "ME";
       if (this.problem.isRemote) {
@@ -603,33 +345,22 @@ export default {
       var results = queryString ? restaurants.filter((item) => item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0) : restaurants;
       cb(results);
     },
-
-    // 获取难度名
-    getLevelName(difficulty) {
-      return utils.getLevelName(difficulty);
-    },
-
-    // 选择标签
     selectTag(item) {
       for (var i = 0; i < this.problemTags.length; i++) {
         if (this.problemTags[i].name == item.value) {
-          this.$message.warning("添加标签错误")
-          // myMessage.warning(this.$i18n.t("m.Add_Tag_Error"));
+          this.$message.warning("添加标签失败")
           this.tagInput = "";
           return;
         }
       }
       this.tagInput = item.value;
     },
-
-    // 添加标签
-    addTag() {
+    addTag(item) {
       let newTag = {name: this.tagInput,};
       if (this.tagInput) {
         for (var i = 0; i < this.problemTags.length; i++) {
           if (this.problemTags[i].name == this.tagInput) {
-            this.$message.warning("添加标签错误")
-            // myMessage.warning(this.$i18n.t("m.Add_Tag_Error"));
+            this.$message.warning("添加标签失败")
             this.tagInput = "";
             return;
           }
@@ -639,53 +370,26 @@ export default {
         this.tagInput = "";
       }
     },
-
     // 根据tag name从题目的tags列表中移除
     closeTag(tag) {
       this.problemTags.splice(this.problemTags.map((item) => item.name).indexOf(tag), 1);
     },
-
 
     // 添加题目样例 和 判题机的测试样例
     addExample() {
       this.problem.examples.push({input: "", output: "", isOpen: true});
     },
     addSample() {
-      let len = this.sampleIndex;
-      if (this.mode === "edit") {
-        this.problemSamples.push({
-          input: "",
-          output: "",
-          score: this.problem.type == 0 ? null : 0,
-          groupNum: this.problem.type == 0 ? null : len,
-          pid: this.pid,
-          isOpen: true,
-          index: len
-        });
-      } else {
-        this.problemSamples.push({
-          input: "",
-          output: "",
-          score: this.problem.type == 0 ? null : 0,
-          groupNum: this.problem.type == 0 ? null : len,
-          pid: this.pid,
-          isOpen: true,
-          index: len
-        });
-      }
-      this.sampleIndex = len + 1;
-      this.sortManualProblemSampleList();
+      this.problemSamples.push({input: "", output: "", isOpen: true,});
+      this.sampleIndex = this.sampleIndex + 1;
     },
-
     // 修改当前样例 和 判题机的测试样例 是否显示
     changeExampleVisible(index, isOpen) {
-      isOpen = !isOpen;
-      this.problem.examples[index]["isOpen"] = isOpen;
+      this.problem.examples[index]["isOpen"] = !isOpen;
     },
     changeSampleVisible(index, isOpen) {
-      this.problemSamples[index]["isOpen"] = isOpen;
+      this.problemSamples[index]["isOpen"] = !isOpen;
     },
-
     //根据下标删除特定的题目样例 和 判题机测试样例
     deleteExample(index) {
       this.problem.examples.splice(index, 1);
@@ -694,82 +398,58 @@ export default {
       this.problemSamples.splice(index, 1);
     },
 
-
-    // 上传成功 和 失败
-    uploadSucceeded(response) {
-      if (response.status != 200) {
-        this.$message.error(response.msg);
-        // myMessage.error(response.msg);
-        this.testCaseUploaded = false;
-        return;
-      }
-      this.$message.success("上传成功")
-      // myMessage.success(this.$i18n.t("m.Upload_Testcase_Successfully"));
-      let fileList = response.data.fileList;
-      let averSorce = parseInt(100 / fileList.length);
-      let add_1_num = 100 - averSorce * fileList.length;
-      for (let i = 0; i < fileList.length; i++) {
-        if (averSorce) {
-          if (i >= fileList.length - add_1_num) {
-            fileList[i].score = averSorce + 1;
-          } else {
-            fileList[i].score = averSorce;
-          }
-        }
-        if (!fileList[i].output) {
-          fileList[i].output = "-";
-        }
-        fileList[i].pid = this.problem.id;
-      }
-      this.problem.testCaseScore = fileList;
-      this.problem.testCaseScore.forEach((item, index) => {
-        item.index = index + 1;
-      });
-      this.testCaseUploaded = true;
-      this.problem.uploadTestcaseDir = response.data.fileListDir;
-    },
-    uploadFailed() {
-      this.$message.error("上传失败")
-      // myMessage.error(this.$i18n.t("m.Upload_Testcase_Failed"));
-    },
-
-
-    // 排序
-    sortTestCaseList() {
-      this.$refs.xTable.clearSort();
-      this.$refs.xTable.sort("groupNum", "asc");
-    },
-
-    customSortMethod({data, sortList}) {
-      const sortItem = sortList[0];
-      const {property, order} = sortItem;
-      let list = [];
-      list = data.sort(function (a, b) {
-        var value1 = a.groupNum,
-            value2 = b.groupNum;
-        if (value1 === value2) {
-          return a.index - b.index;
-        }
-        if (order == "desc") {
-          return value2 - value1;
-        } else {
-          return value1 - value2;
-        }
-      });
-      return list;
-    },
-    sortManualProblemSampleList() {
-      this.problemSamples = this.problemSamples.sort(function (a, b) {
-        var value1 = a.groupNum,
-            value2 = b.groupNum;
-        if (value1 === value2) {
-          return a.index - b.index;
-        }
-        return value1 - value2;
-      });
-    },
+    // 提交或者保存修改
     submit() {
+      console.log(this.problem.title, this.problem.description, this.problem.input, this.problem.output, this.problem.timeLimit, this.problem.memoryLimit)
+      if (!(this.checkInput(this.problem.title, "标题不能为空") &&
+          this.checkInput(this.problem.description, "题目描述不能为空") &&
+          this.checkInput(this.problem.input, "输入描述不能为空") &&
+          this.checkInput(this.problem.output, "输出描述不能为空") &&
+          this.checkInput(this.problem.timeLimit, "时间限制不能为空") &&
+          this.checkInput(this.problem.memoryLimit, "空间限制不能为空") &&
+          this.checkInput(this.problem.description, "题目难度不能为空")
+      )) {
+        return false
+      } else {
+        let res = this.problem.examples
+        this.problem.examples = utils.examplesToString(res)
+        insertOrUpdate(this.problem).then(res => {
+          if (res.status === '200') {
+            this.$message.success("ok")
+
+            this.clearInput()
+            this.$router.push('/admin/problem/list')
+          } else {
+            this.$message.error(res.message)
+          }
+        })
+      }
     },
+    // 判断输入
+    checkInput(s, message) {
+      if (!s) {
+        this.$message.error(message)
+        return false;
+      }
+      return true;
+    },
+
+    // 清空输入
+    clearInput() {
+      this.$refs.form.resetFields()
+      this.problem.title = ""
+      this.problem.description = ""
+      this.problem.input = ""
+      this.problem.output = ""
+      this.problem.examples = []
+      this.problem.timeLimit = "1000"
+      this.problem.memoryLimit = "256"
+      this.problem.difficulty = ""
+      this.problem.hint = ""
+      this.problem.defunct = 0
+    },
+
+
   },
 
   computed: {},
@@ -787,7 +467,7 @@ export default {
 }
 
 .difficulty-select {
-  width: 120px;
+  width: 200px;
 }
 
 .input-new-tag {

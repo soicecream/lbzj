@@ -5,7 +5,7 @@
       <el-menu-item index="/home"><i class="el-icon-s-home"></i>主页</el-menu-item>
       <el-menu-item index="/problem"><i class="el-icon-s-grid"></i>问题</el-menu-item>
       <el-menu-item index="/work"><i class="el-icon-s-order"></i>竞赛/作业</el-menu-item>
-      <el-menu-item index="/problem/1008"><i class="el-icon-s-platform"></i>课程</el-menu-item>
+      <el-menu-item index=""><i class="el-icon-s-platform"></i>课程</el-menu-item>
       <el-menu-item index="/state"><i class="el-icon-s-marketing"></i>状态</el-menu-item>
       <el-menu-item index="/ranking"><i class="el-icon-s-data"></i>排名</el-menu-item>
       <el-menu-item index="7"><i class="el-icon-question"></i>常见问题</el-menu-item>

@@ -66,7 +66,9 @@
                     <div v-if="problemData.problem.degree !== null">
                       难度:
                       <!--                    <el-tag :color="problemData.problem.difficulty">{{ problemData.problem.difficulty }}</el-tag>-->
-                      <el-tag>{{ problemData.problem.degree }}</el-tag>
+                      <el-tag>
+                        {{ problemData.problem.degree === 1 ? '简单' : problemData.problem.degree === 2 ? '中等' : '困难' }}
+                      </el-tag>
                     </div>
 
                     <!--                  作者-->
@@ -99,28 +101,28 @@
                   </div>
 
                   <!--                样例-->
-                  <div v-if="problemData.problem.samples">
-                    <div v-for="(sample, index) of problemData.problem.samples" :key="index">
+                  <div v-if="problemData.problem.examples">
+                    <div v-for="(example, index) of problemData.problem.examples" :key="index">
                       <div class="flex-container example">
                         <div class="example-input">
                           <p class="title">
                             样例输入 {{ index + 1 }}
-                            <a class="copy" v-clipboard:copy="sample.input" v-clipboard:success="copy_samples_success"
-                               v-clipboard:error="copy_samples_error">
+                            <a class="copy" v-clipboard:copy="example.input"
+                               v-clipboard:success="copy_samples_success" v-clipboard:error="copy_samples_error">
                               <i class="el-icon-document-copy"/>
                             </a>
                           </p>
-                          <pre>{{ sample.input }}</pre>
+                          <pre>{{ example.input }}</pre>
                         </div>
                         <div class="example-output">
                           <p class="title">
                             样例输出 {{ index + 1 }}
-                            <a class="copy" v-clipboard:copy="sample.output" v-clipboard:success="copy_samples_success"
-                               v-clipboard:error="copy_samples_error">
+                            <a class="copy" v-clipboard:copy="example.output"
+                               v-clipboard:success="copy_samples_success" v-clipboard:error="copy_samples_error">
                               <i class="el-icon-document-copy"/>
                             </a>
                           </p>
-                          <pre> {{ sample.output }}</pre>
+                          <pre> {{ example.output }}</pre>
                         </div>
                       </div>
                     </div>
@@ -237,23 +239,16 @@ export default {
       problemID: "",
       problemData: {
         problem: {
-          title: "a + b",
+          title: "",
           timeLimit: 1,
           memoryLimit: 300,
           difficulty: 0,
           author: "admin",
-          description: "给出两个整数，请你输出他们的和。",
-          input: "输两个整数 A, B。",
-          output: "输出一个整数表示 A+B。",
-          samples: [
-            {input: "1 2 564654656546546546546546545646546546546546546", output: "3"},
-            {input: "3 4", output: "7"},
-          ],
-          hint: "a + b = ???<br>" +
-              "我大抵是倦了，横竖瘦不下来，起身盛一碗饭，这忧伤没有由来的，黯黯然看着那两只空碗，一只是我吃的，另一只也是我吃的。我向来是不屑于多吃一碗饭的，而如今却也生出了贪婪的念头，也罢，大概是这饭太香了，减肥索性就不提了<br>" +
-              "我大抵是倦了，横竖瘦不下来，起身盛一碗饭，这忧伤没有由来的，黯黯然看着那两只空碗，一只是我吃的，另一只也是我吃的。我向来是不屑于多吃一碗饭的，而如今却也生出了贪婪的念头，也罢，大概是这饭太香了，减肥索性就不提了<br>" +
-              "我大抵是倦了，横竖瘦不下来，起身盛一碗饭，这忧伤没有由来的，黯黯然看着那两只空碗，一只是我吃的，另一只也是我吃的。我向来是不屑于多吃一碗饭的，而如今却也生出了贪婪的念头，也罢，大概是这饭太香了，减肥索性就不提了<br>" +
-              "我大抵是倦了，横竖瘦不下来，起身盛一碗饭，这忧伤没有由来的，黯黯然看着那两只空碗，一只是我吃的，另一只也是我吃的。我向来是不屑于多吃一碗饭的，而如今却也生出了贪婪的念头，也罢，大概是这饭太香了，减肥索性就不提了<br>",
+          description: "",
+          input: "",
+          output: "",
+          examples: [],
+          hint: "",
 
         },
         defunct: true, // 题目是否可用
@@ -347,8 +342,13 @@ export default {
 
     init() {
       fetchProblem(this.$route.params.id).then(res => {
-        res.data.samples = utils.stringToExamples(res.data.samples)
-        this.problemData.problem = res.data
+        if (res.data) {
+          let s = res.data
+          s.examples = utils.stringToExamples(s.examples)
+          this.problemData.problem = s
+        } else {
+          this.$message.error("题目不存在，请确认题目")
+        }
       })
     },
 

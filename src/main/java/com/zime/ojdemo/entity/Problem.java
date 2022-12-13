@@ -43,7 +43,7 @@ public class Problem implements Serializable {
 
     private String output;
 
-    private String samples;
+    private String examples;
 
     private String sampleInput;
 

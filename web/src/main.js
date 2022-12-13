@@ -32,6 +32,13 @@ import Fragment from 'vue-fragment'
 Vue.use(Fragment.Plugin)
 
 
+// mavon 编写器
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+
+Vue.use(mavonEditor)
+
+
 Vue.config.productionTip = false // 作为产品时，减少不必要的警告提示
 
 

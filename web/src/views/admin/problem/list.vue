@@ -4,14 +4,15 @@
     <el-button icon="el-icon-search" circle></el-button>
 
     <div>
-      <el-button type="success" size="mini" icon="el-icon-plus" @click="showProblem_dialog(null)">添加</el-button>
+      <el-button type="success" size="mini" icon="el-icon-plus" @click="to_Problem_createOrEdit(null)">添加</el-button>
       <el-button type="danger" size="mini" icon="el-icon-delete" @click="delete_dialog=true">删除</el-button>
       <el-button size="mini" type="info" icon="el-icon-download">导入</el-button>
       <el-button type="warning" size="mini" icon="el-icon-upload2">导出</el-button>
     </div>
 
     <!--    信息-->
-    <el-table stripe border style="width: 100%;margin-top: 20px" :data="problemList">
+    <el-table stripe border style="width: 100%;margin-top: 20px" :data="problemList"
+              @selection-change="handlerSelectionChange">
       <el-table-column type="selection" width="55"/>
       <el-table-column label="题目编号" prop="problemId" align="center" width="100px"/>
       <el-table-column label="标题" prop="title" align="center" min-width="150px"/>
@@ -24,12 +25,14 @@
       </el-table-column>
       <el-table-column label="编辑" width="100px" align="center">
         <template slot-scope="{row}">
-          <el-button @click="showProblem_dialog(row)" size="mini" type="primary" icon="el-icon-edit" circle/>
+          <el-button @click="to_Problem_createOrEdit(row.problemId)" size="mini" type="primary" icon="el-icon-edit"
+                     circle/>
         </template>
       </el-table-column>
-      <el-table-column label="测试数据" width="100px" align="center">
+      <el-table-column label="删除" width="100px" align="center">
         <template slot-scope="{row}">
-          <div><i class="el-icon-s-order" @click="getFile(row.problemId)"/></div>
+          <el-button @click="delete_problems(row.problemId)" size="mini" type="primary" icon="el-icon-edit"
+                     circle/>
         </template>
       </el-table-column>
     </el-table>
@@ -39,67 +42,69 @@
                 style="margin-top: -20px;float: right" @pagination="getList"/>
 
     <!--    添加 修改-->
-    <el-dialog :title="problemTitle_dialog + '题目'" :visible.sync="problem_dialog">
-      <el-form :model="problem" label-width="100px" ref="problem">
-        <el-form-item label="题目名称" prop="title">
-          <el-input v-model="problem.title" autocomplete="off"></el-input>
-        </el-form-item>
+    <div>
+      <!--    <el-dialog :title="problemTitle_dialog + '题目'" :visible.sync="problem_dialog">-->
+      <!--      <el-form :model="problem" label-width="100px" ref="problem">-->
+      <!--        <el-form-item label="题目名称" prop="title">-->
+      <!--          <el-input v-model="problem.title" autocomplete="off"></el-input>-->
+      <!--        </el-form-item>-->
 
-        <el-form-item label="时间限制" prop="timeLimit">
-          <el-input v-model="problem.timeLimit" autocomplete="off"></el-input>
-        </el-form-item>
+      <!--        <el-form-item label="时间限制" prop="timeLimit">-->
+      <!--          <el-input v-model="problem.timeLimit" autocomplete="off"></el-input>-->
+      <!--        </el-form-item>-->
 
-        <el-form-item label="内存限制" prop="memoryLimit">
-          <el-input v-model="problem.memoryLimit" autocomplete="off"></el-input>
-        </el-form-item>
+      <!--        <el-form-item label="内存限制" prop="memoryLimit">-->
+      <!--          <el-input v-model="problem.memoryLimit" autocomplete="off"></el-input>-->
+      <!--        </el-form-item>-->
 
-        <el-form-item label="问题难度" prop="degree">
-          <el-select v-model="problem.degree" placeholder="请选择" @change="pdtype">
-            <el-option v-for="item in worktype" :key="item.value" :label="item.label" :value="item.value"></el-option>
-          </el-select>
-        </el-form-item>
+      <!--        <el-form-item label="问题难度" prop="degree">-->
+      <!--          <el-select v-model="problem.degree" placeholder="请选择" @change="pdtype">-->
+      <!--            <el-option v-for="item in worktype" :key="item.value" :label="item.label" :value="item.value"></el-option>-->
+      <!--          </el-select>-->
+      <!--        </el-form-item>-->
 
-        <el-form-item label="题目描述" prop="description">
-          <el-input v-model="problem.description" type="textarea" :autosize="{minRows: 4, maxRows: 4}"/>
-        </el-form-item>
+      <!--        <el-form-item label="题目描述" prop="description">-->
+      <!--          <el-input v-model="problem.description" type="textarea" :autosize="{minRows: 4, maxRows: 4}"/>-->
+      <!--        </el-form-item>-->
 
-        <el-form-item label="输入描述" prop="input">
-          <el-input v-model="problem.input" type="textarea" :autosize="{minRows: 4, maxRows: 4}"/>
-        </el-form-item>
+      <!--        <el-form-item label="输入描述" prop="input">-->
+      <!--          <el-input v-model="problem.input" type="textarea" :autosize="{minRows: 4, maxRows: 4}"/>-->
+      <!--        </el-form-item>-->
 
-        <el-form-item label="输出描述" prop="output">
-          <el-input v-model="problem.output" type="textarea" :autosize="{minRows: 4,maxRows: 4}"/>
-        </el-form-item>
+      <!--        <el-form-item label="输出描述" prop="output">-->
+      <!--          <el-input v-model="problem.output" type="textarea" :autosize="{minRows: 4,maxRows: 4}"/>-->
+      <!--        </el-form-item>-->
 
 
-        <el-form-item v-for="(sample, index) in problem.samples" :key="index" :label="'题目样例' + (index + 1)"
-                      :prop="'samples' + index">
-          <el-row :gutter="10">
-            <el-col :span="10">
-              <el-input v-model="sample.input" type="textarea" :autosize="{minRows: 3,maxRows: 3}"/>
-            </el-col>
-            <el-col :span="10">
-              <el-input v-model="sample.output" type="textarea" :autosize="{minRows: 3,maxRows: 3}"/>
-            </el-col>
-            <el-col :span="3">
-              <el-button @click="removeSample(index)" style="margin-top: 15px;">删除</el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-divider content-position="left">仅为题目中测试的样例 不加入测试用例</el-divider>
+      <!--        <el-form-item v-for="(sample, index) in problem.samples" :key="index" :label="'题目样例' + (index + 1)"-->
+      <!--                      :prop="'samples' + index">-->
+      <!--          <el-row :gutter="10">-->
+      <!--            <el-col :span="10">-->
+      <!--              <el-input v-model="sample.input" type="textarea" :autosize="{minRows: 3,maxRows: 3}"/>-->
+      <!--            </el-col>-->
+      <!--            <el-col :span="10">-->
+      <!--              <el-input v-model="sample.output" type="textarea" :autosize="{minRows: 3,maxRows: 3}"/>-->
+      <!--            </el-col>-->
+      <!--            <el-col :span="3">-->
+      <!--              <el-button @click="removeSample(index)" style="margin-top: 15px;">删除</el-button>-->
+      <!--            </el-col>-->
+      <!--          </el-row>-->
+      <!--        </el-form-item>-->
+      <!--        <el-divider content-position="left">仅为题目中测试的样例 不加入测试用例</el-divider>-->
 
-        <el-form-item label="提示" prop="hint">
-          <el-input v-model="problem.hint" type="textarea" :autosize="{minRows: 4,maxRows: 4}"/>
-        </el-form-item>
+      <!--        <el-form-item label="提示" prop="hint">-->
+      <!--          <el-input v-model="problem.hint" type="textarea" :autosize="{minRows: 4,maxRows: 4}"/>-->
+      <!--        </el-form-item>-->
 
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="resetProblem_dialog">重置表单</el-button>
-        <el-button @click="addSample">添加样例</el-button>
-        <el-button @click="closeProblem_dialog">取 消</el-button>
-        <el-button @click="problem_form_ok" type="primary">确 定</el-button>
-      </div>
-    </el-dialog>
+      <!--      </el-form>-->
+      <!--      <div slot="footer" class="dialog-footer">-->
+      <!--        <el-button @click="resetProblem_dialog">重置表单</el-button>-->
+      <!--        <el-button @click="addSample">添加样例</el-button>-->
+      <!--        <el-button @click="closeProblem_dialog">取 消</el-button>-->
+      <!--        <el-button @click="problem_form_ok" type="primary">确 定</el-button>-->
+      <!--      </div>-->
+      <!--    </el-dialog>-->
+    </div>
 
     <!--    确认删除-->
     <el-dialog title="提示" :visible.sync="delete_dialog" width="30%">
@@ -111,26 +116,28 @@
     </el-dialog>
 
     <!--    测试数据-->
-    <el-dialog title="文件列表" :visible.sync="problemFiles_dialog" width="50%">
-      <el-table border :data="files" @selection-change="">
-        <el-table-column label="文件名" prop="name" align="center" width="100px"/>
-        <el-table-column label="大小" min-width="150px" align="center">
-          <template slot-scope="{row}">
-            <diV>{{ row.size }} bytes</diV>
-          </template>
-        </el-table-column>
-        <el-table-column label="修改日期" width="180px" align="center">
-          <template slot-scope="{row}">
-            {{ timeToDate(row.time) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="编辑" width="100px" align="center">
-          <template slot-scope="{row}">
-            <el-button @click="updateFile" size="mini" type="primary" icon="el-icon-edit"> 编辑</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
+    <div>
+      <!--    <el-dialog title="文件列表" :visible.sync="problemFiles_dialog" width="50%">-->
+      <!--      <el-table border :data="files" @selection-change="">-->
+      <!--        <el-table-column label="文件名" prop="name" align="center" width="100px"/>-->
+      <!--        <el-table-column label="大小" min-width="150px" align="center">-->
+      <!--          <template slot-scope="{row}">-->
+      <!--            <diV>{{ row.size }} bytes</diV>-->
+      <!--          </template>-->
+      <!--        </el-table-column>-->
+      <!--        <el-table-column label="修改日期" width="180px" align="center">-->
+      <!--          <template slot-scope="{row}">-->
+      <!--            {{ timeToDate(row.time) }}-->
+      <!--          </template>-->
+      <!--        </el-table-column>-->
+      <!--        <el-table-column label="编辑" width="100px" align="center">-->
+      <!--          <template slot-scope="{row}">-->
+      <!--            <el-button @click="updateFile" size="mini" type="primary" icon="el-icon-edit"> 编辑</el-button>-->
+      <!--          </template>-->
+      <!--        </el-table-column>-->
+      <!--      </el-table>-->
+      <!--    </el-dialog>-->
+    </div>
 
   </div>
 </template>
@@ -145,11 +152,12 @@ import {delPro, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
 export default {
   name: 'list',
 
-  components: {Pagination},
+  components: {
+    Pagination
+  },
 
   data() {
     return {
-
       problemList: [],
       pageSize: 10,
       pageNum: 1,
@@ -160,8 +168,6 @@ export default {
       delete_dialog: false,
       problemFiles_dialog: false,
 
-      showdig2: false,
-      pd: true,
       data: {
         title: '',
         description: '',
@@ -216,11 +222,16 @@ export default {
     },
 
     // 获取文件
-    getFile(id) {
-      this.problemFiles_dialog = true
-      getFile(id).then(res => {
-        this.files = res.data
-      })
+    // getFile(id) {
+    //   this.problemFiles_dialog = true
+    //   getFile(id).then(res => {
+    //     this.files = res.data
+    //   })
+    // },
+
+    // 复选框选中
+    handlerSelectionChange(val) {
+      this.delrow = val
     },
 
     // 去删除
@@ -232,6 +243,12 @@ export default {
         this.getList()
       })
     },
+    delete_problems(id) {
+      delPro([id]).then(res => {
+        this.$message.success("删除成功")
+        this.getList()
+      })
+    },
 
     // 难度选择
     pdtype() {
@@ -239,57 +256,52 @@ export default {
     },
 
     // 打开关闭 问题添加修改弹窗
-    showProblem_dialog(data) {
-      this.resetProblem_dialog()
-
-      this.problemTitle_dialog = "添加"
-      if (data) {
-        this.problemTitle_dialog = "修改"
-        this.problem = data
-
-        this.problem.samples = utils.stringToExamples(data.samples)
-      }
-
-      this.problem_dialog = true
-    },
-    closeProblem_dialog() {
-      this.resetProblem_dialog()
-
-      this.problem_dialog = false
-    },
-
-    // 添加删除样例
-    addSample() {
-      this.problem.samples.push({input: "", output: ""})
-    },
-    removeSample(index) {
-      if (index != -1) {
-        this.problem.samples.splice(index, 1)
+    to_Problem_createOrEdit(problemId) {
+      if (problemId) {
+        this.$router.push('/admin/problem/edit/' + problemId)
+      } else {
+        this.$router.push('/admin/problem/create')
       }
     },
+    // closeProblem_dialog() {
+    //   this.resetProblem_dialog()
+    //
+    //   this.problem_dialog = false
+    // },
 
-    // 保存 新增或修改
-    problem_form_ok() {
-      this.problem.samples = utils.examplesToString(this.problem.samples)
-      insertOrUpdate(this.problem).then(res => {
-        this.closeProblem_dialog()
-        this.getList()
-      })
-    },
+    // // 添加删除样例
+    // addSample() {
+    //   this.problem.samples.push({input: "", output: ""})
+    // },
+    // removeSample(index) {
+    //   if (index != -1) {
+    //     this.problem.samples.splice(index, 1)
+    //   }
+    // },
+
+    // // 保存 新增或修改
+    // problem_form_ok() {
+    //   this.problem.samples = utils.examplesToString(this.problem.samples)
+    //   insertOrUpdate(this.problem).then(res => {
+    //     this.closeProblem_dialog()
+    //     this.getList()
+    //   })
+    // },
+
     // 修改状态
     changedeFunct(row) {
       insertOrUpdate(row).then(res => {
       })
     },
 
-    // 重置
-    resetProblem_dialog() {
-      if (this.$refs.problem) {
-        this.$refs.problem.resetFields()
-
-        this.problem.samples = this.problem_samples_init
-      }
-    },
+    // // 重置
+    // resetProblem_dialog() {
+    //   if (this.$refs.problem) {
+    //     this.$refs.problem.resetFields()
+    //
+    //     this.problem.samples = this.problem_samples_init
+    //   }
+    // },
 
     // 时间戳 => yyyy-MM-dd HH:mm:ss
     timeToDate(time) {
@@ -311,11 +323,6 @@ export default {
       } else {
         return ''
       }
-    },
-
-    // 修改文件
-    updateFile() {
-
     },
 
   }

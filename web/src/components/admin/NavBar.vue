@@ -13,6 +13,7 @@
       </template>
       <el-menu-item-group>
         <el-menu-item index="2-1">问题列表</el-menu-item>
+        <el-menu-item index="2-2">标签列表</el-menu-item>
       </el-menu-item-group>
     </el-submenu>
 
@@ -58,6 +59,9 @@ export default {
           break
         case '2-1':
           this.$router.push('/admin/problem/list')
+          break
+        case '2-2':
+          this.$router.push('/admin/tags/list')
           break
         case '3-1':
           this.$router.push('/admin/work')

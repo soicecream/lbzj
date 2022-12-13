@@ -10,7 +10,7 @@
       <slot></slot>
     </div>
     <footer @click="changeVisible">
-      <i :class="{ rotate: !isOpen }" class="el-icon-caret-top" style="color:#2d8cf0"/>
+      <i :class="{ rotate: !isOpen }" class="el-icon-caret-top" style="color:#2d8cf0"></i>
     </footer>
   </div>
 </template>
@@ -25,7 +25,6 @@ export default {
   },
   methods: {
     changeVisible() {
-
       this.$emit('changeVisible', this.index, this.isOpen);
     },
   },
@@ -36,18 +35,15 @@ export default {
 .accordion {
   box-shadow: 0 1px 2px 0 rgb(34 36 38 / 15%), 0 0 0 1px rgb(34 36 38 / 15%);
 }
-
 .accordion header {
   position: relative;
 }
-
 .title {
   font-size: 16px;
   margin: 0 0 0 10px;
   line-height: 50px;
   font-weight: bolder;
 }
-
 .header_right {
   float: right;
 }
@@ -59,7 +55,6 @@ export default {
   overflow: hidden;
   padding: 15px 10px;
 }
-
 footer {
   border-top: 1px solid rgb(34 36 38 / 15%);
   height: 36px;
@@ -73,11 +68,9 @@ footer {
   cursor: pointer;
   transition: 0.2s;
 }
-
 footer:hover {
   background-color: #ebeef5;
 }
-
 .rotate {
   transform: rotate(180deg);
 }

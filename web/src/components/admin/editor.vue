@@ -23,7 +23,6 @@ export default {
   },
   data() {
     return {
-
       isAdminRole: false,
 
       currentValue: this.value,
