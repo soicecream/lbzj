@@ -23,7 +23,7 @@
       </el-table-column>
       <el-table-column label="删除" width="100px" align="center">
         <template slot-scope="{row}">
-          <el-button @click="Mydelete(row.id)" size="mini" type="primary" icon="el-icon-edit" circle/>
+          <el-button @click="MyDelete(row.id)" size="mini" type="primary" icon="el-icon-delete-solid" circle/>
         </template>
       </el-table-column>
     </el-table>
@@ -51,7 +51,7 @@
       <span>确认删除</span>
       <span slot="footer" class="dialog-footer">
      <el-button @click="delete_dialog = false">取 消</el-button>
-    <el-button type="primary" @click="Mydelete(null)">确 定</el-button>
+    <el-button type="primary" @click="MyDeletes">确 定</el-button>
     </span>
     </el-dialog>
 
@@ -84,10 +84,12 @@ export default {
       form_dialog: false,
       delete_dialog: false,
 
-      row: {},
       delrow: {},
+      deleteRow: {},
 
-      tags_from: {},
+      tags_from: {
+        name: "",
+      },
       form_rules: {
         name: [
           {required: true, message: '请输入标签名', trigger: 'blur'},
@@ -119,11 +121,11 @@ export default {
 
     // 新建修改弹窗
     createOrEdit(row) {
+      this.form_dialog = true
       this.clearTags_Form()
       if (row) {
-        this.tags_from = row
+        this.tags_from = Object.assign({}, row)
       }
-      this.form_dialog = true
     },
     form_ok() {
       tagsApi.createOrUpdate(this.tags_from).then(res => {
@@ -141,12 +143,37 @@ export default {
     },
 
 
+    // 复选框选中
     handlerSelectionChange(val) {
-
+      this.delrow = val
     },
 
-    Mydelete(id) {
-
+    //删除
+    MyDelete(id) {
+      this.deleteRow = [{'id': id}]
+      this.DeleteIds()
+    },
+    MyDeletes() {
+      this.deleteRow = this.delrow
+      this.delete_dialog = false
+      this.DeleteIds()
+    },
+    DeleteIds() {
+      if (!this.deleteRow) {
+        this.$message.error("请选择要删除的内容")
+        return false
+      }
+      let ids = this.deleteRow.map(v => v.id)
+      if (ids.length == 0) {
+        this.$message.error("请选择要删除的内容")
+      } else {
+        tagsApi.deleteByIds(ids).then(res => {
+          if (res.status === 200) {
+            this.$message.success("删除成功")
+            this.getList()
+          }
+        })
+      }
     },
 
 

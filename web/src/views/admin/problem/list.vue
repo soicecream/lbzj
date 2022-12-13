@@ -31,7 +31,7 @@
       </el-table-column>
       <el-table-column label="删除" width="100px" align="center">
         <template slot-scope="{row}">
-          <el-button @click="delete_problems(row.problemId)" size="mini" type="primary" icon="el-icon-edit"
+          <el-button @click="delete_problems(row.problemId)" size="mini" type="primary" icon="el-icon-delete-solid"
                      circle/>
         </template>
       </el-table-column>
