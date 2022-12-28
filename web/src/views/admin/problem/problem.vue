@@ -77,34 +77,24 @@
           <!--          标签-->
           <el-col :md="12" :xs="24">
             <el-form-item label="标签">
+              <!--              显示已添加的标签-->
               <el-tag v-for="tag in problemTags" closable :close-transition="false" :key="tag.name" size="small"
                       @close="closeTag(tag.name)" style="margin-right: 7px;margin-top:4px">
                 {{ tag.name }}
               </el-tag>
+
               <!-- 输入时建议，回车，选择，光标消失触发更新 -->
               <el-autocomplete v-if="inputVisible" size="mini" class="input-new-tag" v-model="tagInput"
                                @keyup.enter.native="addTag" @click="selectTag" @select="addTag"
-                               :trigger-on-focus="true" :fetch-suggestions="querySearch"/>
+                               :fetch-suggestions="querySearch"/>
+
+              <!--              添加标签按钮-->
               <el-tooltip v-else effect="dark" content="添加" placement="top">
                 <el-button class="button-new-tag" size="small" @click="inputVisible = true" icon="el-icon-plus"/>
               </el-tooltip>
             </el-form-item>
           </el-col>
         </el-row>
-
-        <!--        语言列表-->
-        <!--        <el-row>-->
-        <!--          <el-col :md="24" :xs="24">-->
-        <!--            <el-form-item label="语言列表" :error="error.languages" required>-->
-        <!--              <el-checkbox-group v-model="problemLanguages">-->
-        <!--                <el-tooltip class="spj-radio" v-for="lang in allLanguage" :key="lang.name" effect="dark"-->
-        <!--                            :content="lang.description" placement="top-start">-->
-        <!--                  <el-checkbox :label="lang.name"/>-->
-        <!--                </el-tooltip>-->
-        <!--              </el-checkbox-group>-->
-        <!--            </el-form-item>-->
-        <!--          </el-col>-->
-        <!--        </el-row>-->
 
         <!--        题面样例-->
         <div>
@@ -236,6 +226,7 @@ import Editor from "@/components/admin/editor";
 
 import utils from "@/utils/utils";
 import {fetchProblem, insertOrUpdate} from "@/api/problem";
+import tagsApi from '@/api/tags'
 
 
 export default {
@@ -297,6 +288,7 @@ export default {
       this.pid = this.$route.params.problemId
       this.init_problem_information()
     }
+    this.init_tags_all()
 
   },
 
@@ -321,6 +313,15 @@ export default {
         })
       }
     },
+    // 获取全部标签
+    init_tags_all() {
+      tagsApi.getAllList().then(res => {
+        if (res.status === 200) {
+          this.allTagsTmp = res.data
+        }
+      })
+    },
+
 
     // 上传返回
     uploadSucceeded(res) {
@@ -337,13 +338,9 @@ export default {
 
     // 标签
     querySearch(queryString, cb) {
-      var ojName = "ME";
-      if (this.problem.isRemote) {
-        ojName = this.problem.problemId.split("-")[0];
-      }
-      var restaurants = this.allTagsTmp.filter((item) => item.oj == ojName);
-      var results = queryString ? restaurants.filter((item) => item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0) : restaurants;
-      cb(results);
+      var restaurants = this.allTagsTmp
+      var results = queryString ? restaurants.filter(item => item.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1) : restaurants
+      cb(results)
     },
     selectTag(item) {
       for (var i = 0; i < this.problemTags.length; i++) {
@@ -400,7 +397,7 @@ export default {
 
     // 提交或者保存修改
     submit() {
-      console.log(this.problem.title, this.problem.description, this.problem.input, this.problem.output, this.problem.timeLimit, this.problem.memoryLimit)
+      // console.log(this.problem.title, this.problem.description, this.problem.input, this.problem.output, this.problem.timeLimit, this.problem.memoryLimit)
       if (!(this.checkInput(this.problem.title, "标题不能为空") &&
           this.checkInput(this.problem.description, "题目描述不能为空") &&
           this.checkInput(this.problem.input, "输入描述不能为空") &&
@@ -411,9 +408,15 @@ export default {
       )) {
         return false
       } else {
-        let res = this.problem.examples
-        this.problem.examples = utils.examplesToString(res)
-        insertOrUpdate(this.problem).then(res => {
+
+        let problemDto = {}
+        problemDto.problem = Object.assign({}, this.problem)
+        problemDto.problem.examples = utils.examplesToString(this.problem.examples)
+
+        problemDto.tags = this.problemTags
+        problemDto.samples = this.problemSamples
+
+        insertOrUpdate(problemDto).then(res => {
           if (res.status === '200') {
             this.$message.success("ok")
 

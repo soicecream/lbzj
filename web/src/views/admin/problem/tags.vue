@@ -15,7 +15,13 @@
               @selection-change="handlerSelectionChange">
       <el-table-column type="selection" width="55"/>
       <el-table-column label="id" prop="id" align="center" width="100px"/>
-      <el-table-column label="标签名" prop="name" align="center" min-width="150px"/>
+      <el-table-column label="标签名" align="center" min-width="150px">
+        <template slot-scope="{row}">
+          <span :style="{'color': row.color}">
+            {{ row.value }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column label="编辑" width="100px" align="center">
         <template slot-scope="{row}">
           <el-button @click="createOrEdit(row)" size="mini" type="primary" icon="el-icon-edit" circle/>
@@ -36,7 +42,10 @@
     <el-dialog title="重命名" :visible.sync="form_dialog" width="30%" @close="clearTags_Form">
       <el-form :model="tags_from" :rules="form_rules" ref="tags_from">
         <el-form-item label="标题名称" prop="name">
-          <el-input v-model="tags_from.name" clearable/>
+          <el-input v-model="tags_from.value" clearable/>
+        </el-form-item>
+        <el-form-item label="颜色" prop="color">
+          <el-color-picker v-model="tags_from.color"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -88,10 +97,10 @@ export default {
       deleteRow: {},
 
       tags_from: {
-        name: "",
+        value: "",
       },
       form_rules: {
-        name: [
+        value: [
           {required: true, message: '请输入标签名', trigger: 'blur'},
           {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur'}
         ],
@@ -128,6 +137,7 @@ export default {
       }
     },
     form_ok() {
+      console.log(this.tags_from)
       tagsApi.createOrUpdate(this.tags_from).then(res => {
         if (res.status === 200) {
           this.$message.success("修改成功")
@@ -137,9 +147,9 @@ export default {
       })
     },
     clearTags_Form() {
-      if (this.$refs.tags_from !== undefined) {
+      if (this.$refs.tags_from)
         this.$refs.tags_from.resetFields()
-      }
+      this.tags_from = Object.assign({}, {})
     },
 
 

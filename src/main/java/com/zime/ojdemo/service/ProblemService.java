@@ -1,13 +1,16 @@
 package com.zime.ojdemo.service;
 
+import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.Problem;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.result.fileResult;
+import org.springframework.security.core.parameters.P;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -25,10 +28,13 @@ public interface ProblemService extends IService<Problem> {
 
     PageList getProList(long current, long limit, ProblemQuery problemQuery);
 
-    Boolean saveOrUpdateProblem(Problem problem);
+    Boolean CreateOrUpdate(ProblemDto problem);
 
     Boolean delPro(ArrayList<Integer> id);
 
+    List<Problem> getProblemListByIds(Integer id);
+
+    List<Problem> getProblemListByTitles(String title);
 
     ArrayList<fileResult> getFile(Integer id);
 

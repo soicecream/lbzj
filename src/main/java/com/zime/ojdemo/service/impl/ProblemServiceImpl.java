@@ -2,8 +2,11 @@ package com.zime.ojdemo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.Problem;
+import com.zime.ojdemo.entity.ProblemTags;
 import com.zime.ojdemo.entity.Solution;
+import com.zime.ojdemo.entity.Tags;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.result.ProblemListResult;
@@ -13,7 +16,9 @@ import com.zime.ojdemo.service.ProblemService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -36,6 +41,15 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Autowired
     SolutionService solutionService;
+
+    @Autowired
+    private TagServiceImpl tagService;
+
+    @Autowired
+    private ProblemTagsServiceImpl problemTagsService;
+
+    @Value("${files.upload.path}")
+    private String fileUploadPath;
 
     @Override
     public Problem getProblemById(int id) {
@@ -122,15 +136,46 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return pageList;
     }
 
-    public Boolean saveOrUpdateProblem(Problem problem) {
-        List<Problem> problemList = getProblem(problem.getProblemId());
+    //    先存问题 再存标签 最后存后台测试样例
+    public Boolean CreateOrUpdate(ProblemDto problemDto) {
+        Problem problem = problemDto.getProblem();
+        List<Problem> problemList = getProblemListByIds(problem.getProblemId());
+
+//        存问题
+        boolean addProblem = true;
         if (problemList.size() == 0) {
-            return save(problem);
+            addProblem = save(problem);
         } else {
-            QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("problem_id", problem.getProblemId());
-            return update(problem, queryWrapper);
+            QueryWrapper<Problem> problemQueryWrapper = new QueryWrapper<>();
+            problemQueryWrapper.eq("problem_id", problem.getProblemId());
+            addProblem = update(problem, problemQueryWrapper);
         }
+        QueryWrapper<Problem> problemQueryWrapper = new QueryWrapper<>();
+        problemQueryWrapper.eq("title", problem.getTitle());
+        problem = getOne(problemQueryWrapper);
+
+//        存标签
+        boolean addTags = true;
+        if (problemDto.getTagsList() != null) {
+            List<Integer> TagsList = new ArrayList<>();
+            for (Tags tags : problemDto.getTagsList()) {
+                if (tags.getId() == null) {
+                    tagService.CreateOrUpdate(tags);
+
+                    QueryWrapper<Tags> tagsQueryWrapper = new QueryWrapper<>();
+                    tagsQueryWrapper.eq("value", tags.getValue());
+                    tags = tagService.getOne(tagsQueryWrapper);
+                }
+
+                TagsList.add(tags.getId());
+            }
+            addTags = problemTagsService.CreateOrUpdate(problem.getProblemId(), TagsList);
+        }
+
+        boolean addSample = true;
+
+
+        return addProblem && addTags;
     }
 
     public Boolean delPro(ArrayList<Integer> ids) {
@@ -138,13 +183,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //            File file = new File("C:/Users/26444/Desktop/data/" + id);
 //            if (!Io.deleteFile(file)) return false;
 //        }
-        System.out.println("----------" + ids);
+//        System.out.println("----------" + ids);
         return removeByIds(ids);
     }
 
-    public List<Problem> getProblem(Integer problemId) {
+    public List<Problem> getProblemListByIds(Integer problemId) {
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("problem_id", problemId);
+        return list(queryWrapper);
+    }
+
+    public List<Problem> getProblemListByTitles(String title) {
+        QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("title", title);
         return list(queryWrapper);
     }
 

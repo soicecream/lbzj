@@ -25,24 +25,18 @@ public class TagsController {
 
     @PostMapping("createOrUpdate")
     public JsonResult CreateOrUpdate(@RequestBody Tags tags) {
-        if (tags.getName() == null) {
+        if (tags.getValue() == null) {
             return JsonResult.error(405, "请输入标签名");
         }
 
         QueryWrapper<Tags> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name", tags.getName());
+        queryWrapper.eq("value", tags.getValue());
         List<Tags> list = tagsService.list(queryWrapper);
-        if (list.size() != 0) {
+        if (list.size() != 0 && !(list.size() == 1 && list.get(0).getId() == tags.getId())) {
             return JsonResult.error(400, "标签名已存在");
         }
 
-        if (tags.getId() == null) {
-            return JsonResult.success(tagsService.save(tags));
-        } else {
-            queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("id", tags.getId());
-            return JsonResult.success(tagsService.update(tags, queryWrapper));
-        }
+        return JsonResult.success(tagsService.CreateOrUpdate(tags));
     }
 
     @PostMapping("deleteIds")
