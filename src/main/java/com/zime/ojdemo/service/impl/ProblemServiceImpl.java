@@ -2,11 +2,8 @@ package com.zime.ojdemo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zime.ojdemo.entity.*;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
-import com.zime.ojdemo.entity.Problem;
-import com.zime.ojdemo.entity.ProblemTags;
-import com.zime.ojdemo.entity.Solution;
-import com.zime.ojdemo.entity.Tags;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.result.ProblemListResult;
@@ -16,6 +13,7 @@ import com.zime.ojdemo.service.ProblemService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
+import io.netty.util.CharsetUtil;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +21,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * <p>
@@ -51,6 +54,8 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Value("${files.upload.path}")
     private String fileUploadPath;
 
+    private String samplesPathUrl = "D:\\毕设\\lbzj\\samples\\";
+
     @Override
     public Problem getProblemById(int id) {
         return getById(id);
@@ -61,6 +66,41 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         File file = new File(wz);
         return Io.readPro(file);
     }
+
+
+    //    获取后台测试数据
+    public List<ProblemCase> getSample(Integer id) throws IOException {
+        String sampleFileName = samplesPathUrl + "\\" + String.format("%05d", id);
+        File problemSample = new File(sampleFileName);
+        File files[] = problemSample.listFiles();
+        TreeMap<String, ProblemCase> treeMap = new TreeMap<>();
+        for (File file : files) {
+            String s[] = file.getName().split("\\.");
+
+            ProblemCase problemCase;
+            if (treeMap.containsKey(s[0])) {
+                problemCase = treeMap.get(s[0]);
+            } else {
+                problemCase = new ProblemCase();
+            }
+
+            String FileName = sampleFileName + "\\" + file.getName();
+            if (s[1].equals("in")) {
+                problemCase.setInput(readSampleFile(FileName));
+            } else {
+                problemCase.setOutput(readSampleFile(FileName));
+            }
+
+            treeMap.put(s[0], problemCase);
+        }
+
+        List<ProblemCase> list = new ArrayList<>();
+        for (String i : treeMap.keySet()) {
+            list.add(treeMap.get(i));
+        }
+        return list;
+    }
+
 
     @Override
     public PageList pageProblemsCondition(long current, long limit, ProblemQuery problemQuery) {
@@ -137,12 +177,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     //    先存问题 再存标签 最后存后台测试样例
-    public Boolean CreateOrUpdate(ProblemDto problemDto) {
-        Problem problem = problemDto.getProblem();
-        List<Problem> problemList = getProblemListByIds(problem.getProblemId());
-
+    public Boolean CreateOrUpdate(ProblemDto problemDto) throws IOException {
 //        存问题
         boolean addProblem = true;
+
+        Problem problem = problemDto.getProblem();
+        List<Problem> problemList = getProblemListByIds(problem.getProblemId());
         if (problemList.size() == 0) {
             addProblem = save(problem);
         } else {
@@ -153,6 +193,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         QueryWrapper<Problem> problemQueryWrapper = new QueryWrapper<>();
         problemQueryWrapper.eq("title", problem.getTitle());
         problem = getOne(problemQueryWrapper);
+
 
 //        存标签
         boolean addTags = true;
@@ -172,10 +213,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             addTags = problemTagsService.CreateOrUpdate(problem.getProblemId(), TagsList);
         }
 
+
+//        存后台测试样例
         boolean addSample = true;
+        String sampleFileName = samplesPathUrl + "" + String.format("%05d", problem.getProblemId());
+        File problemSampleFile = new File(sampleFileName);
+//        判断文件夹是否存在 存在则删除
+        if (problemSampleFile.isDirectory()) {
+            deleteFile(problemSampleFile);
+        }
+        problemSampleFile.mkdirs();
+        addSample = init_ProblemSampleCase(problemDto.getSamples(), sampleFileName);
 
-
-        return addProblem && addTags;
+        return addProblem && addTags && addSample;
     }
 
     public Boolean delPro(ArrayList<Integer> ids) {
@@ -184,20 +234,33 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //            if (!Io.deleteFile(file)) return false;
 //        }
 //        System.out.println("----------" + ids);
+        boolean f = true;
+        for (int i : ids) {
+            String sampleFileName = samplesPathUrl + "" + String.format("%05d", i);
+            File problemSampleFile = new File(sampleFileName);
+//          判断文件夹是否存在 存在则删除
+            if (problemSampleFile.isDirectory()) {
+                deleteFile(problemSampleFile);
+            }
+        }
         return removeByIds(ids);
     }
 
+
+    //    根据id查询问题
     public List<Problem> getProblemListByIds(Integer problemId) {
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("problem_id", problemId);
         return list(queryWrapper);
     }
 
+    //    根据标题查询问题
     public List<Problem> getProblemListByTitles(String title) {
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("title", title);
         return list(queryWrapper);
     }
+
 
 //    public Boolean upPro(Problem problem) throws IOException {
 //        QueryWrapper<Problem> wrapper = new QueryWrapper<>();
@@ -208,4 +271,52 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //        Io.write(problem.getSampleOutput(), wz + "\\test.out");
 //        return update(problem, wrapper);
 //    }
+
+    //    删除文件
+    public boolean deleteFile(File file) {
+        File[] files = file.listFiles();
+        for (File f : files) {
+            if (f.isDirectory()) {
+                deleteFile(f); // 是文件夹的话 去删除其中的文件及文件夹
+            } else {
+                f.delete(); // 文件则直接删除
+            }
+        }
+        file.delete(); // 删除最后的文件夹
+        return true;
+    }
+
+    //    导入问题后台测试数据
+    public boolean init_ProblemSampleCase(List<ProblemCase> samples, String sampleFileName) throws IOException {
+        for (int i = 0; i < samples.size(); i++) {
+            String input = samples.get(i).getInput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+            String output = samples.get(i).getOutput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+
+            createSampleFile(sampleFileName + "/" + String.format("test%02d", i + 1) + ".in", input);
+            createSampleFile(sampleFileName + "/" + String.format("test%02d", i + 1) + ".out", output);
+        }
+        return true;
+    }
+
+    //    创建文件
+    public void createSampleFile(String FileUrlName, String Sample) throws IOException {
+        File SampleFile = new File(FileUrlName);
+        SampleFile.createNewFile();
+
+        FileWriter SampleFileWriter = new FileWriter(SampleFile);
+        SampleFileWriter.write(Sample);
+        SampleFileWriter.flush();
+        SampleFileWriter.close();
+    }
+
+    //    获取测试样例文件的内容
+    public String readSampleFile(String fileName) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> list = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+        for (String i : list) {
+            stringBuilder.append(i);
+        }
+        return stringBuilder.toString();
+    }
+
 }

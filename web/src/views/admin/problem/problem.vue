@@ -225,7 +225,7 @@ import Editor from "@/components/admin/editor";
 
 
 import utils from "@/utils/utils";
-import {fetchProblem, insertOrUpdate} from "@/api/problem";
+import {fetchProblem, getSample, insertOrUpdate} from "@/api/problem";
 import tagsApi from '@/api/tags'
 
 
@@ -287,6 +287,7 @@ export default {
       this.mode = "edit";
       this.pid = this.$route.params.problemId
       this.init_problem_information()
+      this.init_sample()
     }
     this.init_tags_all()
 
@@ -320,6 +321,21 @@ export default {
           this.allTagsTmp = res.data
         }
       })
+    },
+    // 获取本题标签
+    init_tags() {
+      
+    },
+    // 获取本题后台测试样例
+    init_sample() {
+      if (this.pid) {
+        getSample(this.pid).then(res => {
+          console.log(res)
+          if (res.status === 200) {
+            this.problemSamples = res.data
+          }
+        })
+      }
     },
 
 
@@ -417,7 +433,7 @@ export default {
         problemDto.samples = this.problemSamples
 
         insertOrUpdate(problemDto).then(res => {
-          if (res.status === '200') {
+          if (res.status === 200) {
             this.$message.success("ok")
 
             this.clearInput()
