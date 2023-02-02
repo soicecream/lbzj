@@ -55,7 +55,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     public PageList pageusers( Integer current,Integer limit, UserQuery userQuery){
         Page<Users> pageSolution = new Page<>(current, limit);
         QueryWrapper<Users> wrapper = new QueryWrapper<>();
-        if(userQuery.getNick()!=""&&userQuery.getNick()!=null) wrapper.eq("nick",userQuery.getNick());
+        if(!userQuery.getUsername().equals("")&&userQuery.getUsername()!=null) wrapper.eq("nick",userQuery.getUsername());
         page(pageSolution, wrapper);
         long total = pageSolution.getTotal();
         List<Users> records = pageSolution.getRecords();
@@ -67,11 +67,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     public Users getuser(HttpServletRequest request,String id){
         QueryWrapper<Users> s = new QueryWrapper<>();
-        if(id==null) {
+        if(id==null||id.equals("undefined")) {
             LoginUser loginUser = tokenServie.getLoginUser(request);
-            s.eq("user_id", loginUser.getUsername());
+            s.eq("user_id", loginUser.getUserId());
         }
-        else s.eq("user_id",id);
+        else s.eq("user_id",Long.valueOf(id));
         return getOne(s);
     }
 
@@ -93,6 +93,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder();
         user.setAccesstime(new Date());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setAvatar("mo.jpeg");
         return save(user);
    }
 
@@ -121,7 +122,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
        if(!(users.getAvatar().length()>0)){
            Io.deleteFile(new File(filePath+users.getAvatar()));
        }
-       users.setAvatar("/"+newname);
+       users.setAvatar(newname);
        update(users,wrapper);
 
 

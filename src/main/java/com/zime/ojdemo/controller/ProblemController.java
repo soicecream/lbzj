@@ -39,6 +39,10 @@ public class ProblemController {
         return JsonResult.success(problemService.getProblemById(id));
     }
 
+    @GetMapping("getPros")
+    public JsonResult<List<Problem>> getProblems() {
+        return JsonResult.success(problemService.list());
+    }
     /*
      * 问题列表接口
      * 2022年9月11日18:21:12

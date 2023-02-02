@@ -3,6 +3,7 @@ package com.zime.ojdemo.exception;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.base.ResultCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -26,4 +27,6 @@ public class GlobalExceptionHandler {
         log.error("格式错误");
         return JsonResult.error(ResultCode.REQUEST_NOT_SUPPORT.code,e.getMessage());
     }
+
+
 }

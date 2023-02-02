@@ -38,9 +38,19 @@ service.interceptors.response.use(
     response => {
       const res = response.data
       if(res.status==undefined) return res;
-     console.log(res.status)
-      // if the custom code is not 20000, it is judged as an error.
-      if (res.status !== 200) {
+
+        if (res.status === 403) {
+            MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+                    confirmButtonText: '重新登录',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }
+            ).then(() => {
+              router.push('/login')
+            }).catch(() => {});
+            return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
+        }
+        else if (res.status !== 200) {
 
         Message({
           message: res.message || 'Error',

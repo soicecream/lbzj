@@ -1,12 +1,15 @@
 package com.zime.ojdemo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.entity.Problem;
 import com.zime.ojdemo.entity.Solution;
 import com.zime.ojdemo.entity.Work;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.mapper.WorkMapper;
+import com.zime.ojdemo.modle.vo.PageList;
+import com.zime.ojdemo.modle.vo.query.WorkQuery;
 import com.zime.ojdemo.modle.vo.result.WorkListResult;
 import com.zime.ojdemo.modle.vo.result.WorkRankresult;
 import com.zime.ojdemo.service.SolutionService;
@@ -33,7 +36,8 @@ public class WorkServiceImpl extends ServiceImpl<WorkMapper, Work> implements Wo
         List<Solution> szhi=solutionService.list(wrapper);
 
         String work=getProblem(workid);
-        String[] problemids=work.split("&");
+        int[] problemids=Arrays.stream(work.split("&")).mapToInt(Integer::parseInt).toArray();
+        Arrays.sort(problemids);
         HashMap<Integer,Integer> promap=new HashMap<>();
         for(int i=0;i<problemids.length;i++) promap.put(Integer.valueOf(problemids[i]),i);
 
@@ -83,53 +87,6 @@ public class WorkServiceImpl extends ServiceImpl<WorkMapper, Work> implements Wo
         return user;
     }
 
-
-//    public ArrayList<WorkRankresult> getworkrank(Integer workid){
-//        QueryWrapper<Solution> wrapper=new QueryWrapper<>();
-//        wrapper.eq("contest_id",workid);
-//        wrapper.eq("result",4);
-//        wrapper.select("problem_id,user_id,min(in_date) as in_date");
-//        wrapper.groupBy("problem_id,user_id");
-//        List<Solution> szhi=solutionService.list(wrapper);
-//
-//        String work=getProblem(workid);
-//        String[] problemids=work.split("&");
-//        HashMap<String,Integer> promap=new HashMap<>();
-//        for(int i=0;i<problemids.length;i++) promap.put(problemids[i],i);
-//
-//        ArrayList<WorkRankresult> user=new ArrayList<>();
-//
-//        HashMap<String,HashMap<Integer,Integer>> user=new HashMap<>();
-//
-//        for(Solution s:szhi){
-//            if(user.containsKey(s.getUserId())){
-//                user.get(s.getUserId()).put(s.getProblemId(),s.getTime());
-//            }
-//            else{
-//                HashMap<Integer,Integer> zhi=new HashMap<>();
-//                zhi.put(s.getProblemId(),s.getTime());
-//                user.put(s.getUserId(),zhi);
-//            }
-//        }
-//
-//        ArrayList<WorkRankresult> user=new ArrayList<>();
-//        WorkRankresult workRankresult=new WorkRankresult();
-//        workRankresult.setUsername("admin");
-//        workRankresult.setTimes(100);
-//        ArrayList<Integer> zhi=new ArrayList<>(2);
-//        ArrayList<Integer> zhi1=new ArrayList<>(2);
-//        zhi.add(1);
-//        zhi1.add(2);
-//        ArrayList<Integer> c=new ArrayList<>(2);
-//        ArrayList<Integer> c1=new ArrayList<>(2);
-//        c.add(1);
-//        c1.add(2);
-//        workRankresult.setCount(c);
-//        workRankresult.setTime(zhi);
-//        user.add(workRankresult);
-//        return user;
-//    }
-
     public String getProblem(Integer workid){
         QueryWrapper<Work> wrapper=new QueryWrapper<>();
         wrapper.eq("workid",workid);
@@ -140,6 +97,23 @@ public class WorkServiceImpl extends ServiceImpl<WorkMapper, Work> implements Wo
         QueryWrapper<Work> wrapper=new QueryWrapper<>();
         wrapper.eq("workid",id);
         return getOne(wrapper);
+    }
+
+    @Override
+    public PageList pageWork(long current, long limit, WorkQuery workQuery,Boolean pd) {
+        Page<Work> pageProblem = new Page<>(current,limit);
+        QueryWrapper<Work> wrapper = new QueryWrapper<>();
+        if(workQuery.getWorkname()!=null&&!workQuery.getWorkname().equals("")) wrapper.like("name",workQuery.getWorkname());
+        wrapper.orderByDesc("endtime");
+        if(pd) wrapper.eq("open",1);
+        wrapper.le("starttime",new Date().getTime());
+        page(pageProblem,wrapper);
+        long total = pageProblem.getTotal();
+        List<Work> records = pageProblem.getRecords();
+        PageList pageList = new PageList();
+        pageList.setTotal(total);
+        pageList.setRows(records);
+        return pageList;
     }
 
     public List<WorkListResult> pageWorkid(String problemid){

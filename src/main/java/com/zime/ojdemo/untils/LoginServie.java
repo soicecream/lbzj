@@ -31,13 +31,14 @@ public class LoginServie {
         {
             if (e instanceof BadCredentialsException)
             {
-            System.out.println(e.getMessage());
+              return "password";
             }
             else
             {
-                System.out.println(e.getMessage());
+             return  "name";
             }
         }
+
         LoginUser loginUser=(LoginUser) authentication.getPrincipal();
         return tokenServie.createToken(loginUser);
     }

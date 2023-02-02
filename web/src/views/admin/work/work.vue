@@ -6,7 +6,7 @@
       <el-button type="success" size="mini" icon="el-icon-plus" @click="showdig0=true">添加</el-button>
       <el-button type="danger" size="mini" icon="el-icon-delete" @click="showdig1=true"
                  :disabled="delrow.length>0?false:true">删除</el-button>
-      <el-button size="mini" type="info" icon="el-icon-download">导入</el-button>
+      <el-button size="mini" type="info" icon="el-icon-download" v-hasPermi="['11']">导入</el-button>
       <el-button type="warning" size="mini" icon="el-icon-upload2">导出</el-button>
     </div>
     <el-table
@@ -69,8 +69,17 @@
           <el-input v-model="workform.name" autocomplete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="题目选择" label-width=100px prop="probelmid">
-          <el-input v-model="workform.probelmid" autocomplete="off"></el-input>
+        <el-form-item label="题目选择" label-width=100px prop="probelmid" >
+          <el-select v-model="workform.probelmid" multiple>
+            <el-option
+                v-for="item in works"
+                :key="item.problemId"
+                :label="item.title"
+                :value="item.problemId">
+              <span style="float: left">{{ item.title }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.problemId }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="时间选择" label-width=100px >
@@ -112,8 +121,17 @@
           <el-input v-model="uprow.name" autocomplete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="题目选择" label-width=100px>
-          <el-input v-model="uprow.probelmid" autocomplete="off"></el-input>
+        <el-form-item label="题目选择" label-width=100px >
+          <el-select v-model="uprow.probelmid" multiple  @change="optionzhi">
+            <el-option
+                v-for="item in works"
+                :key="item.problemId"
+                :label="item.title"
+                :value="item.problemId">
+              <span style="float: left">{{ item.title }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.problemId }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="时间选择" label-width=100px>
@@ -164,7 +182,7 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import {addWork, getWorkList, updateWork,delWork} from "@/api/work";
+import {addWork, getAdminWorkList, updateWork,delWork,getWorks} from "@/api/work";
 
 
 export default {
@@ -228,7 +246,8 @@ export default {
       },
       listQuery: {
         workname: "",
-      }
+      },
+      works:[]
     }
   },
   created() {
@@ -252,14 +271,28 @@ export default {
   },
   methods: {
     getList() {
-      getWorkList(this.page, this.limit,this.listQuery).then(res => {
+      getAdminWorkList(this.page, this.limit,this.listQuery).then(res => {
         this.list = res.data.rows;
         this.total = res.data.total;
       })
+      getWorks().then(res=>{
+        this.works=res.data
+      })
+    },
+    optionzhi(zhi){
+        var options=this.works;
     },
     updwork(){
       if(this.uprow.endtime instanceof Object) this.uprow.endtime=this.uprow.endtime.getTime();
       if(this.uprow.starttime instanceof Object) this.uprow.starttime=this.uprow.starttime.getTime();
+      var workss="";
+      for(let i=0;i<this.uprow.probelmid.length;i++){
+        if(i<this.uprow.probelmid.length-1)
+          workss+=this.uprow.probelmid[i]+"&"
+        else
+          workss+=this.uprow.probelmid[i]
+      }
+      this.uprow.probelmid=workss
       this.updateWork(this.uprow)
       this.showdig2=false
     },
@@ -270,7 +303,9 @@ export default {
           message: '修改成功',
           type: 'success'
         });
+        this.getList()
       })
+
     },
     delWork(){
       this.showdig1=false
@@ -285,23 +320,38 @@ export default {
           message: '删除成功',
           type: 'success'
         });
+        this.getList()
       })
     },
     addWork(formName) {
+
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.showdig0 = false;
           this.workform.starttime = this.workform.starttime.getTime();
           this.workform.endtime = this.workform.endtime.getTime();
-          console.log(this.workform);
+          var workss="";
+          for(let i=0;i<this.workform.probelmid.length;i++){
+            if(i<this.workform.probelmid.length-1)
+            workss+=this.workform.probelmid[i]+"&"
+            else
+              workss+=this.workform.probelmid[i]
+          }
+          this.workform.probelmid=workss
           addWork(this.workform).then(res => {
             this.$message('添加成功');
           })
+          this.getList()
         }
       })
     },
     showupwork(row){
       this.uprow=row
+      if(!(this.uprow.probelmid instanceof Array)) {
+        this.uprow.probelmid=this.uprow.probelmid.split("&")
+        this.uprow.probelmid=this.uprow.probelmid.map(i => i * 1)
+      }
+      console.log(this.uprow.probelmid)
       this.showdig2=true
     },
     setdelrow(val) {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin-top: 120px;float:none">
-      <el-avatar :size="120" :src="require('@/assets/img/image'+user.avatar)" style="margin-left: 45%"></el-avatar>
+      <el-avatar :size="120" :src="require('@/assets/img/image/'+user.avatar)" style="margin-left: 45%"></el-avatar>
     </div>
 
   <el-card class="box-card" style="width: 70%;margin: 0.5rem auto;margin-top: -45px;height: 88%">
@@ -40,7 +40,7 @@ export default {
   },
   methods:{
     getList(){
-      getuser().then(response=>{
+      getuser(this.$route.params.id).then(response=>{
         this.user = response.data;
         this.getProList(this.user.userId)
       })

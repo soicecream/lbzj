@@ -4,7 +4,8 @@ import workList from "@/views/oj/work/workList";
 import work from "@/views/oj/work/work"
 import ranking from "@/views/oj/rank/ranking";
 import user from "@/views/oj/user/user";
-
+import store from "@/store/work";
+import {removeToken} from "@/utils/auth";
 
 Vue.use(Router)
 export const constantRoutes = [
@@ -104,46 +105,12 @@ export const constantRoutes = [
     name: 'login',
     component: () => import('@/views/share/loginRegister'),
   },
-  {
-    path:'/admin',
-    name:'admin',
-    component: () => import('@/views/admin/index'),
-    children: [
-      {
-        path:'/admin/work',
-        name:'adminwork',
-        component: () => import('@/views/admin/work/work'),
-      },
-      {
-        path: '/admin/problem/list',
-        name:'adminProblemList',
-        component: () => import('@/views/admin/problem/list')
-      },
-      {
-        path: '/admin/problem/create',
-        name: 'admin-create-problem',
-        component: () => import('@/views/admin/problem/problem'),
-      },
-      {
-        path: '/admin/problem/edit/:problemId',
-        name: 'admin-edit-problem',
-        component: () => import('@/views/admin/problem/problem'),
-      },
-      {
-        path: '/admin/tags/list',
-        name: 'admin-tags-list',
-        component: () => import('@/views/admin/problem/tags')
-      },
-
-      {
-        path: '/admin/user',
-        name:'adminuser',
-        component:() =>import('@/views/admin/user/user')
-      }
-      ]
-  },
-  {path: '*', redirect: '/404'}
 ]
+
+const a404={
+  path: '*',
+  component: () => import('@/views/share/404'),
+}
 
 const createRouter = () => new Router({
   mode: 'history', // require service support
@@ -154,6 +121,7 @@ const createRouter = () => new Router({
 const  router = createRouter()
 
 import { getToken } from '@/utils/auth'
+import getter from "@/store/getters";
 
 
 const whiteList = ['/login']
@@ -161,7 +129,27 @@ const whiteList = ['/login']
 router.beforeEach((to, from, next) => {
   if (getToken()) {
     /* has token*/
-    next()
+    if (to.path === '/login') {
+      next()
+    }
+    else {
+      if(store.getters.roles.length===0) {
+        store.dispatch('GetInfo').then(() => {
+          store.dispatch('GenerateRoutes').then(accessRoutes => {
+            // 根据roles权限生成可访问的路由表
+            for(let i=0,length=accessRoutes.length;i<length;i++){
+              router.addRoute(accessRoutes[i])
+            }
+            router.addRoute(a404)
+             // 动态添加可访问路由表// hack方法 确保addRoutes已完成
+            next({...to,replace:true})
+          })
+        })
+      }
+      else {
+        next()
+      }
+    }
   } else {
     // 没有token
     if (whiteList.indexOf(to.path) !== -1) {

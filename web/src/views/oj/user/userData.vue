@@ -36,7 +36,7 @@
        <template slot="title">
          <i class="header-icon el-icon-info"  style="color: #3498db;font-size: 20px">资料设置</i>
        </template>
-       <el-avatar style="margin-left: 47%" :size="120" :src="require('@/assets/img/image'+user.avatar)"></el-avatar>
+       <el-avatar style="margin-left: 47%" :size="120" :src="require('@/assets/img/image/'+user.avatar)"></el-avatar>
      <el-upload
          style="margin-left: 40%"
          class="upload-demo"

@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class UserQuery {
-    private String nick;
+    private String username;
 }

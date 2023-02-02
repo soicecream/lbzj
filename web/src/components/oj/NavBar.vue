@@ -14,8 +14,7 @@
       <el-menu-item-group class="user-menus">
         <el-dropdown trigger="click">
           <el-button type="text" style="display: flex;">
-            <el-image v-if="user.headPortrait" :src="user.headPortrait" fit="cover" class="zimeUserImage"/>
-            <el-image v-else :src="require('@/assets/img/image/user.jpeg')" class="zimeUserImage"/>
+            <el-image  :src="require('@/assets/img/image/'+user.avatar)" class="zimeUserImage"/>
             <i class="el-icon-caret-bottom"/>
           </el-button>
           <el-dropdown-menu>
@@ -27,12 +26,12 @@
               <el-link type="text" @click="to_userdata" :underline="false">个人设置</el-link>
             </el-dropdown-item>
 
-            <el-dropdown-item v-if="isAdmin" divided>
-              <el-link type="text" @click="to_admin_page" :underline="false">后台管理</el-link>
+            <el-dropdown-item  divided v-if="admin>0">
+              <el-link type="text" @click="to_admin_page" :underline="false" >后台管理</el-link>
             </el-dropdown-item>
 
             <el-dropdown-item divided>
-              <el-link type="text" @click="logout" :underline="false">退出登录</el-link>
+              <el-link type="text" @click="logout" :underline="false" >退出登录</el-link>
             </el-dropdown-item>
 
           </el-dropdown-menu>
@@ -45,19 +44,25 @@
 
 <script>
 
+import {getuser, logout} from "@/api/user";
+import {removeToken} from "@/utils/auth";
+import store from "@/store/work";
+
+
 export default {
-
-  props: {
-    user: Object,
-    isAdmin: Boolean,
-
-  },
-
   data() {
     return {
       activeIndex: this.$route.path,
+      user:{},
+      admin:store.getters.permissions.length
 
     }
+  },
+  created() {
+    getuser().then(res=>{
+      this.user=res.data
+    })
+    console.log(this.admin>0)
   },
   methods: {
 
@@ -75,11 +80,17 @@ export default {
       this.$router.push('/admin')
     },
 
+
     // 退出用户
     logout() {
-      this.$store.commit('logout')
-
-      this.$message.success("退出成功")
+      logout().then(res=>{
+        this.$message.success("退出成功")
+        removeToken()
+        this.$store.commit('SET_ROUTES',{routes:[]})
+        this.$store.commit('SET_ROLES', [])
+        this.$store.commit('SET_PERMISSIONS', [])
+        this.$router.push('/login')
+      })
     }
 
   }

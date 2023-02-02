@@ -176,13 +176,14 @@ export default {
       this.$refs.login_user_form.validate((valid) => {
         if (valid) {
         login(this.login_form).then(res=>{
-
           setToken(res.data)
-          this.$router.push("/")
+          console.log(res.data)
+          this.$router.push("/home").catch()
         })
         }
       });
     },
+
     submit_register_form() {
       this.$refs.register_user_form.validate((valid) => {
         if (valid) {

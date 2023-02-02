@@ -29,7 +29,7 @@ public class Users implements Serializable {
     private static final long serialVersionUID=1L;
 
     @TableId(value = "user_id", type = IdType.ASSIGN_UUID)
-    private String userId;
+    private Long userId;
 
     private String email;
 
@@ -49,6 +49,8 @@ public class Users implements Serializable {
 //    private String signature;
 
     private  int volume;
+
+    private String userName;
 
     private String password;
 

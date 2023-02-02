@@ -10,7 +10,9 @@ import com.zime.ojdemo.modle.vo.result.WorkListResult;
 import com.zime.ojdemo.modle.vo.result.WorkRankresult;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.service.WorkService;
+import com.zime.ojdemo.untils.SecurityUntils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,18 +33,18 @@ public class WorkController {
      */
     @PostMapping("/pagework/{current}/{limit}")
     public JsonResult<PageList> pageWork(@PathVariable long current, @PathVariable long limit, @RequestBody WorkQuery workQuery){
-        Page<Work> pageProblem = new Page<>(current,limit);
-        QueryWrapper<Work> wrapper = new QueryWrapper<>();
-        if(workQuery.getWorkname()!=null&&!workQuery.getWorkname().equals("")) wrapper.like("name",workQuery.getWorkname());
-        wrapper.orderByDesc("endtime");
-        workService.page(pageProblem,wrapper);
-        long total = pageProblem.getTotal();
-        List<Work> records = pageProblem.getRecords();
-        PageList pageList = new PageList();
-        pageList.setTotal(total);
-        pageList.setRows(records);
-        return JsonResult.success(pageList);
+        return JsonResult.success(workService.pageWork(current,limit,workQuery,true));
     }
+
+    /*
+   后台竞赛列表接口
+   */
+    @PreAuthorize("@ss.hasPermi('work:list')")
+    @PostMapping("/adminpagework/{current}/{limit}")
+    public JsonResult<PageList> adminPageWork(@PathVariable long current, @PathVariable long limit, @RequestBody WorkQuery workQuery){
+        return JsonResult.success(workService.pageWork(current,limit,workQuery,false));
+    }
+
 
     /*
     竞赛接口
@@ -51,6 +53,7 @@ public class WorkController {
     public JsonResult<Work> pageWorkid(@PathVariable Integer id){
         return JsonResult.success(workService.getWork(id));
     }
+
 
     /*
     竞赛题目接口
@@ -68,6 +71,7 @@ public class WorkController {
         return JsonResult.success(workService.getworkrank(workid));
     }
 
+
     /*
     竞赛题目接口
     题目按&分割
@@ -77,17 +81,24 @@ public class WorkController {
         return JsonResult.success(workService.getProblem(workid));
     }
 
+
+    @PreAuthorize("@ss.hasPermi('user:add')")
     @PostMapping("/addwork")
     public JsonResult<Boolean> addWork(@RequestBody Work work){
+        work.setFounder(String.valueOf(SecurityUntils.getLoginUser().getUserId()));
+        work.setOpen(true);
         return JsonResult.success(workService.save(work));
     }
 
+    @PreAuthorize("@ss.hasPermi('work:up')")
     @PostMapping("/updatework")
     public JsonResult<Boolean> updatework(@RequestBody Work work){
         QueryWrapper<Work> wrapper=new QueryWrapper<>();
         wrapper.eq("workid",work.getWorkid());
         return JsonResult.success(workService.saveOrUpdate(work,wrapper));
     }
+
+    @PreAuthorize("@ss.hasPermi('work:del')")
     @PostMapping("/delwork")
     public JsonResult<Boolean> delPro(@RequestBody ArrayList<Integer> ids){
         return JsonResult.success(workService.removeByIds(ids));

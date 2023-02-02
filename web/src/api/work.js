@@ -7,6 +7,22 @@ export function getWorkList(page, limit,workname) {
         data:workname
     })
 }
+
+export function getAdminWorkList(page, limit,workname) {
+    return request({
+        url: `/work/adminpagework/${page}/${limit}`,
+        method: 'post',
+        data:workname
+    })
+}
+
+export function getWorks() {
+    return request({
+        url: `/problem/getPros`,
+        method: 'get',
+    })
+}
+
 export function getWork(id) {
     return request({
         url: `/work/getwork/${id}`,

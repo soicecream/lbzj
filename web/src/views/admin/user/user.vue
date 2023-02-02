@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-input v-model="listQuery.nick" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
+    <el-input v-model="listQuery.username" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
     <el-button icon="el-icon-search" circle @click="getList"></el-button>
 
     <div>
-      <el-button type="success" size="mini" icon="el-icon-plus"  @click="showdig=true">添加</el-button>
+      <el-button type="success" size="mini" icon="el-icon-plus"  @click="showdig=true" v-has-permi="['user:add']">添加</el-button>
       <el-button type="danger" size="mini" icon="el-icon-delete"  @click="showdig1=true"
-                 :disabled="delrow.length>0?false:true">删除</el-button>
+                 :disabled="delrow.length>0?false:true" v-has-permi="['user:del']">删除</el-button>
       <el-button  size="mini" type="info" icon="el-icon-download">导入</el-button>
       <el-button  type="warning"  size="mini" icon="el-icon-upload2">导出</el-button>
     </div>
@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column label="昵称" min-width="150px" align="center">
         <template slot-scope="{row}">
-          <div>{{ row.nick }}</div>
+          <div>{{ row.userName}}</div>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" min-width="150px" align="center">
@@ -46,19 +46,19 @@
           <div>{{ row.email}}</div>
         </template>
       </el-table-column>
-      <el-table-column label="开放" width="200px" align="center">
+      <el-table-column label="开放" width="200px" align="center" v-has-permi="['user:up']">
         <template slot-scope="{row}">
           <el-switch
               v-model= row.defunct
               active-color="#13ce66"
               inactive-color="#ff4949"
-              @change="upuser(row)">
+              @change="upuser1(row)">
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="编辑" width="100px" align="center">
+      <el-table-column label="编辑" width="100px" align="center" v-has-permi="['user:up']">
         <template slot-scope="{row}">
-          <el-button size="mini" type="primary" icon="el-icon-edit" circle @click="tableuppro(row)"></el-button>
+          <el-button size="mini"  type="primary" icon="el-icon-edit" circle @click="tableuppro(row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -73,8 +73,8 @@
           <el-input v-model="data.userId" autocomplete="off"></el-input>
         </el-form-item>
 
-        <el-form-item label="用户名称" label-width=100px prop="nick">
-          <el-input v-model="data.nick" autocomplete="off"></el-input>
+        <el-form-item label="用户名称" label-width=100px prop="userName">
+          <el-input v-model="data.userName" autocomplete="off"></el-input>
         </el-form-item>
 
         <el-form-item label="用户密码" label-width=100px prop="password">
@@ -103,7 +103,7 @@
         </el-form-item>
 
         <el-form-item label="用户名称" label-width=100px prop="nick">
-          <el-input v-model="row.nick" autocomplete="off"></el-input>
+          <el-input v-model="row.userName" autocomplete="off"></el-input>
         </el-form-item>
 
         <el-form-item label="用户密码" label-width=100px >
@@ -160,7 +160,7 @@ export default {
       page:1,
       total:10,
       listQuery:{
-        nick:''
+        username:''
       },
       showdig:false,
       showdig1:false,
@@ -168,7 +168,7 @@ export default {
       data:{
          userId:'',
          password:'',
-         nick:'',
+         userName:'',
          email:'',
          school:''
       },
@@ -183,7 +183,7 @@ export default {
         userId: [
           { required: true, message: '请输入编号'},
         ],
-        nick: [
+        userName: [
           { required: true, message: '请输入昵称'},
         ],
       },
@@ -212,14 +212,18 @@ export default {
         if (valid) {
           this.showdig2 = false
           if(this.password.length>0) row.password=this.password
-          updateuser(row).then(res => {
-            this.$message({
-              showClose: true,
-              message: '修改成功',
-              type: 'success'
-            });
-          })
+          this.upuser1(row);
         }
+      })
+    },
+
+    upuser1(row){
+      updateuser(row).then(res => {
+        this.$message({
+          showClose: true,
+          message: '修改成功',
+          type: 'success'
+        });
       })
     },
     addpro(data,formName){
@@ -232,6 +236,7 @@ export default {
               message: '添加成功',
               type: 'success'
             });
+            this.getList()
           })
         }
     })
@@ -252,6 +257,7 @@ export default {
           message: '删除成功',
           type: 'success'
         });
+        this.getList()
       })
     },
   }

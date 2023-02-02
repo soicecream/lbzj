@@ -80,8 +80,10 @@ export default {
     tablecalss({row,column,rowIndex,columnIndex}){
       if(columnIndex>3) {
         if (row.time[columnIndex - 4] > 0) {
-          console.log(row.time[columnIndex - 4])
           return 'success';
+        }
+        else if (row.count[columnIndex - 4] > 0) {
+          return 'fail';
         }
       }
       return ''

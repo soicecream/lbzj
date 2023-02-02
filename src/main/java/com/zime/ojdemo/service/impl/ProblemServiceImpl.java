@@ -48,8 +48,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
 
-    @Value("${files.upload.path}")
-    private String fileUploadPath;
+
 
     @Override
     public Problem getProblemById(int id) {

@@ -9,10 +9,24 @@ export function login(data) {
   })
 }
 
+export function getInfo() {
+  return request({
+    url: '/getInfo',
+    method: 'get'
+  })
+}
+
+export function getRouters() {
+  return request({
+    url: '/getRouters',
+    method: 'get'
+  })
+}
+
 export function logout() {
   return request({
     url: '/logout',
-    method: 'post'
+    method: 'get'
   })
 }
 

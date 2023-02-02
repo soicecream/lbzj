@@ -1,22 +1,31 @@
 package com.zime.ojdemo.modle.vo.core.security;
 
+import com.zime.ojdemo.entity.Users;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Data
 public class LoginUser implements UserDetails {
-    private String username;
-    private String password;
+    private Long userId;
     private String token;
     private Long loginTime;
     private Long expireTime;
 
-    public LoginUser(String username, String password){
-        this.username=username;
-        this.password=password;
+    private Users users;
+
+    /**
+     * 权限列表
+     */
+    private Set<String> permissions;
+
+    public LoginUser(Long userId, Set<String> permissions,Users user){
+        this.userId=userId;
+        this.permissions=permissions;
+        this.users=user;
     }
 
 
@@ -27,12 +36,12 @@ public class LoginUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return users.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return users.getUserName();
     }
 
     @Override

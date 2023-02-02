@@ -1,58 +1,44 @@
 <template>
   <el-menu :default-active="activeIndex" @select="handleSelect"
            style="height: 100%" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b"
-           class="el-menu-demo">
+           class="el-menu-demo"
+           router>
     <el-menu-item>
       <div style="display:inline-block;font-size: 1.3rem">ZIME Online Judge</div>
     </el-menu-item>
-    <el-menu-item index="1"><i class="el-icon-s-home"></i>主页</el-menu-item>
-    <el-submenu index="2">
-      <template slot="title">
-        <i class="el-icon-location"></i>
-        <span>问题管理</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item index="2-1">问题列表</el-menu-item>
-        <el-menu-item index="2-2">添加问题</el-menu-item>
-        <el-menu-item index="2-3">标签列表</el-menu-item>
-      </el-menu-item-group>
-    </el-submenu>
-
-    <el-submenu index="3">
-      <template slot="title">
-        <i class="el-icon-s-order"></i>
-        <span>竞赛管理</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item index="3-1">竞赛列表</el-menu-item>
-      </el-menu-item-group>
-    </el-submenu>
-
-    <el-submenu index="4">
-      <template slot="title">
-        <i class="el-icon-location"></i>
-        <span>用户管理</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item index="4-1">用户</el-menu-item>
-        <el-menu-item index="4-2">选项2</el-menu-item>
-      </el-menu-item-group>
-    </el-submenu>
-
+    <el-menu-item index="/"><i class="el-icon-s-home"></i>主页</el-menu-item>
+     <nav-bar-item
+     v-for="item in topbarRouters"
+     :item="item">
+     </nav-bar-item>
   </el-menu>
 
 </template>
 
 <script>
+import { mapGetters,mapMutation} from "vuex";
+import NavBarItem from "@/components/admin/NavBarItem";
+import store from "@/store/work";
+
 export default {
   name: "adminNavBar",
+  components:{NavBarItem},
   data() {
     return {
       activeIndex: "",
+      zhi:null
     }
   },
+  created() {
 
+  },
+  computed: {
+    ...mapGetters(["topbarRouters"]),
+  },
   methods: {
+    a () {
+      return store.getters.topbarRouters
+    },
     handleSelect(key) {
       switch (key) {
         case '1':

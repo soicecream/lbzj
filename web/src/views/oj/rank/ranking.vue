@@ -67,7 +67,7 @@ export default {
       page:1,
       total:10,
       listQuery:{
-
+       username:''
       },
       degreeOptions: [1, 2, 3, 4, 5],
     }
