@@ -1,8 +1,10 @@
 package com.zime.ojdemo.service;
 
+import com.zime.ojdemo.controller.ProblemController;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.Problem;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zime.ojdemo.entity.ProblemCase;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.result.fileResult;
@@ -28,7 +30,7 @@ public interface ProblemService extends IService<Problem> {
 
     PageList getProList(long current, long limit, ProblemQuery problemQuery);
 
-    Boolean CreateOrUpdate(ProblemDto problem);
+    Boolean CreateOrUpdate(ProblemDto problem) throws IOException;
 
     Boolean delPro(ArrayList<Integer> id);
 
@@ -38,4 +40,5 @@ public interface ProblemService extends IService<Problem> {
 
     ArrayList<fileResult> getFile(Integer id);
 
+    List<ProblemCase> getSample(Integer id) throws IOException;
 }

@@ -4,6 +4,10 @@ function getAllList() {
     return request.get('/tags/allTags')
 }
 
+function getProblemTags(id) {
+    return request.get(`/problem/tags/getProblem/{id}`)
+}
+
 function createOrUpdate(data) {
     return request.post('/tags/createOrUpdate', data)
 }

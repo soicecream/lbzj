@@ -48,20 +48,23 @@ public class ProblemController {
      * 2022年9月11日18:21:12
      * */
     @PostMapping("pageProblemsCondition/{current}/{limit}")
-    public JsonResult<PageList> pageProblemsCondition(@PathVariable long current, @PathVariable long limit,
-                                                      @RequestBody(required = false) ProblemQuery problemQuery) {
+    public JsonResult<PageList> pageProblemsCondition(@PathVariable long current, @PathVariable long limit, @RequestBody(required = false) ProblemQuery problemQuery) {
         return JsonResult.success(problemService.pageProblemsCondition(current, limit, problemQuery));
     }
 
     @PostMapping("adminprolist/{current}/{limit}")
-    public JsonResult<PageList> pageAdminProlist(@PathVariable long current, @PathVariable long limit,
-                                                 @RequestBody(required = false) ProblemQuery problemQuery) {
+    public JsonResult<PageList> pageAdminProlist(@PathVariable long current, @PathVariable long limit, @RequestBody(required = false) ProblemQuery problemQuery) {
         return JsonResult.success(problemService.getProList(current, limit, problemQuery));
     }
 
     @GetMapping("getFile/{id}")
     public JsonResult<ArrayList<fileResult>> udpatePro(@PathVariable Integer id) {
         return JsonResult.success(problemService.getFile(id));
+    }
+
+    @GetMapping("getSample/{id}")
+    public JsonResult getSample(@PathVariable Integer id) throws IOException {
+        return JsonResult.success(problemService.getSample(id));
     }
 
     @PostMapping("")
@@ -72,6 +75,9 @@ public class ProblemController {
             if (problemList.size() != 0) {
                 return JsonResult.error("标题重复，请重新输入");
             }
+        }
+        if (problemDto.getSamples().size() == 0) {
+            return JsonResult.error("后台测试样例不能为空");
         }
         return JsonResult.success(problemService.CreateOrUpdate(problemDto));
     }
