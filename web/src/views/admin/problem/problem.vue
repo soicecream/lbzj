@@ -254,7 +254,7 @@ export default {
       }, // 题目信息
       problemTags: [], // 题目标签
       tagInput: "",
-      allTagsTmp: [],
+      allTagsTmp: [], // 所有标签
 
       isUploadCase: true, // 是否文件上传
 
@@ -324,13 +324,18 @@ export default {
     },
     // 获取本题标签
     init_tags() {
+      tagsApi.getProblemTags(this.pid).then(res => {
+        if(res.status === 200) {
+          this.problemTags = res.data
+        }
+      })
       
     },
     // 获取本题后台测试样例
     init_sample() {
       if (this.pid) {
         getSample(this.pid).then(res => {
-          console.log(res)
+          // console.log(res)
           if (res.status === 200) {
             this.problemSamples = res.data
           }

@@ -258,9 +258,9 @@ export default {
     // 打开关闭 问题添加修改弹窗
     to_Problem_createOrEdit(problemId) {
       if (problemId) {
-        this.$router.push('/admin/problem/edit/' + problemId)
+        this.$router.push('/admin/pro/edit/' + problemId)
       } else {
-        this.$router.push('/admin/problem/create')
+        this.$router.push('/admin/pro')
       }
     },
     // closeProblem_dialog() {

@@ -6,6 +6,7 @@ import com.zime.ojdemo.entity.*;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
+import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.result.ProblemListResult;
 import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.result.fileResult;
@@ -50,7 +51,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
-
 
 
     private String samplesPathUrl = "D:\\毕设\\lbzj\\samples\\";
@@ -118,6 +118,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             wrapper.eq("title", id).or().eq("problem_id", id);
         }
         page(pageProblem, wrapper);
+
         long total = pageProblem.getTotal();
         List<Problem> records = pageProblem.getRecords();
 
@@ -162,7 +163,8 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         String id = problemQuery.getId();
 
         //判断条件值是否为空，如果不为空拼接条件
-        wrapper.orderByAsc("in_date");
+//        wrapper.orderByAsc("in_date");
+//        wrapper.orderByAsc("problem_id");
         if (degree != null) {
             wrapper.eq("degree", degree);
         }
@@ -177,6 +179,11 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     //    先存问题 再存标签 最后存后台测试样例
     public Boolean CreateOrUpdate(ProblemDto problemDto) throws IOException {
+        if (!checkUserIsAdmin()) {
+            JsonResult.error(400, "用户没有修改权限");
+            return false;
+        }
+
 //        存问题
         boolean addProblem = true;
 
@@ -228,11 +235,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     public Boolean delPro(ArrayList<Integer> ids) {
-//        for (Integer id : ids) {
-//            File file = new File("C:/Users/26444/Desktop/data/" + id);
-//            if (!Io.deleteFile(file)) return false;
-//        }
-//        System.out.println("----------" + ids);
         boolean f = true;
         for (int i : ids) {
             String sampleFileName = samplesPathUrl + "" + String.format("%05d", i);
@@ -245,6 +247,14 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return removeByIds(ids);
     }
 
+
+//    ----------------------------------------------------------------------------------------------------------------------------------
+
+    //    判断是否为管理员
+    public boolean checkUserIsAdmin() {
+
+        return true;
+    }
 
     //    根据id查询问题
     public List<Problem> getProblemListByIds(Integer problemId) {
@@ -260,16 +270,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return list(queryWrapper);
     }
 
-
-//    public Boolean upPro(Problem problem) throws IOException {
-//        QueryWrapper<Problem> wrapper = new QueryWrapper<>();
-//        wrapper.eq("problem_id", problem.getProblemId());
-//        String wz = "C:\\Users\\26444\\Desktop\\data\\" + problem.getProblemId();
-//        File file = new File(wz);
-//        Io.write(problem.getSampleInput(), wz + "\\test.in");
-//        Io.write(problem.getSampleOutput(), wz + "\\test.out");
-//        return update(problem, wrapper);
-//    }
 
     //    删除文件
     public boolean deleteFile(File file) {

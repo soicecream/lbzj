@@ -18,6 +18,8 @@ public class ProblemDto {
 
     private List<Tags> tagsList;
 
+    private Boolean isUploadCase;
+
     private List<ProblemCase> samples;
 
 }

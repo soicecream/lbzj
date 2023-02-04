@@ -57,61 +57,61 @@ public class RoleController {
     @PreAuthorize("@ss.hasPermi('role:list')")
     @PostMapping("adminpageuser/{current}/{limit}")
     public JsonResult<PageList> adminpageuser(@PathVariable Integer current, @PathVariable Integer limit,
-                                         @RequestBody UserQuery userQuery){
+                                              @RequestBody UserQuery userQuery){
         return JsonResult.success(roleService.pageusers(current,limit,userQuery,false));
     }
 
 
 
-   @GetMapping("getRoles")
-   public JsonResult<List<Role>> getRoles(){
+    @GetMapping("getRoles")
+    public JsonResult<List<Role>> getRoles(){
         QueryWrapper<Role> wrapper=new QueryWrapper<>();
         wrapper.eq("status",1);
         return JsonResult.success(roleService.list(wrapper));
-   }
+    }
 
 
-   @GetMapping("getRole")
-   public JsonResult<List<Menu>> getRole(){
+    @GetMapping("getRole")
+    public JsonResult<List<Menu>> getRole(){
         List<Menu> menus=menuService.selectMenuTreeByUserId(-1L);
-       return JsonResult.success(menus);
-   }
+        return JsonResult.success(menus);
+    }
 
-   @GetMapping("getRoleMenu/{roleid}")
-   public JsonResult<List<Long>> getRoleMenu(@PathVariable Long roleid){
-       List<RoleMenu> rolemenus=roleMenuService.list(new QueryWrapper<RoleMenu>().eq("role_id",roleid));
-       ArrayList<Long> menuids=new ArrayList<>();
-       for(RoleMenu rolemenu:rolemenus){
-           menuids.add(rolemenu.getMenuId());
-       }
-       return JsonResult.success(menuids);
-   }
+    @GetMapping("getRoleMenu/{roleid}")
+    public JsonResult<List<Long>> getRoleMenu(@PathVariable Long roleid){
+        List<RoleMenu> rolemenus=roleMenuService.list(new QueryWrapper<RoleMenu>().eq("role_id",roleid));
+        ArrayList<Long> menuids=new ArrayList<>();
+        for(RoleMenu rolemenu:rolemenus){
+            menuids.add(rolemenu.getMenuId());
+        }
+        return JsonResult.success(menuids);
+    }
 
     @PreAuthorize("@ss.hasPermi('role:add')")
-   @PostMapping("addRole")
+    @PostMapping("addRole")
     public JsonResult<Boolean> addRole(@RequestBody RoleZhi roleZhi){
         roleService.addrole(roleZhi);
         return JsonResult.success(true);
-   }
+    }
 
     @PreAuthorize("@ss.hasPermi('role:del')")
-   @PostMapping("delRole")
-   public JsonResult<Boolean> delRole(@RequestBody ArrayList<Long> roleid){
-       roleService.removeByIds(roleid);
-       for (Long role:roleid){
-           QueryWrapper<RoleMenu> wrapper=new QueryWrapper<>();
-           wrapper.eq("role_id",role);
-           roleMenuService.remove(wrapper);
-       }
-       return JsonResult.success(true);
-   }
+    @PostMapping("delRole")
+    public JsonResult<Boolean> delRole(@RequestBody ArrayList<Long> roleid){
+        roleService.removeByIds(roleid);
+        for (Long role:roleid){
+            QueryWrapper<RoleMenu> wrapper=new QueryWrapper<>();
+            wrapper.eq("role_id",role);
+            roleMenuService.remove(wrapper);
+        }
+        return JsonResult.success(true);
+    }
 
     @PreAuthorize("@ss.hasPermi('role:up')")
-   @PostMapping("upRole")
-   public JsonResult<Boolean> upRole(@RequestBody RoleZhi roleZhi){
-       roleService.uprole(roleZhi);
-       return JsonResult.success(true);
-   }
+    @PostMapping("upRole")
+    public JsonResult<Boolean> upRole(@RequestBody RoleZhi roleZhi){
+        roleService.uprole(roleZhi);
+        return JsonResult.success(true);
+    }
 
     @PreAuthorize("@ss.hasPermi('role:up')")
     @PostMapping("upRoleS/{roleid}/{status}")

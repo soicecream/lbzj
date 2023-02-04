@@ -76,6 +76,15 @@ public class LoginController {
         LoginUser user = SecurityUntils.getLoginUser();
         Long userid=user.getUserId();
         List<Menu> menus = menuService.selectMenuTreeByUserId(userid);
+        System.out.println("---------------------------------------------------------------------------");
+        for(Menu i : menus) {
+            System.out.println(i);
+            if(i.getChildren() != null) {
+                for(Menu j : i.getChildren()) {
+                    System.out.println("\t " + j);
+                }
+            }
+        }
         return JsonResult.success(menus);
     }
 

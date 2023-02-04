@@ -18,6 +18,7 @@ function deleteByIds(data) {
 
 export default {
     getAllList: getAllList,
+    getProblemTags: getProblemTags,
     createOrUpdate: createOrUpdate,
     deleteByIds: deleteByIds,
 }

@@ -266,19 +266,19 @@ export default {
 .btitle {
   font-size: 1.5em;
   font-weight: bold;
-  color: #ff5252cc;
+  color: #10aec2;
 }
 
 .bbutton {
   width: 100%;
-  background-color: #ff5252cc;
+  background-color: #10aec2;
   color: #fff;
 }
 
 .small-box {
   width: 30%;
   height: 100%;
-  background: linear-gradient(45deg, #fad0c4, #ff5252cc);
+  background: linear-gradient(45deg, #c6e6e8, #10aec2);
   position: absolute;
   top: 0;
   left: 0;
