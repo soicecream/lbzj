@@ -41,7 +41,7 @@ public class TokenServie {
 
     public LoginUser getLoginUser(HttpServletRequest request){
         String token=getToken(request);
-        System.out.println(token);
+        System.out.println(token+"666");
         if(token!=null&&!token.equals("undefined")) {
             Claims claims = parseToken(token);
             // 解析对应的权限以及用户信息

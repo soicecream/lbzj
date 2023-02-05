@@ -39,8 +39,17 @@ const permission = {
         getRouters().then(res => {
           const sdata = JSON.parse(JSON.stringify(res.data))
           const sidebarRoutes = filterAsyncRouter(sdata)
+          const s=filterAsyncRouter(JSON.parse(JSON.stringify(res.data)))
+          for(var i=0;i<3;i++){
+            for (var j=0;j<sidebarRoutes[i].children.length;j++){
+              if(sidebarRoutes[i].children[j].menuName==="修改问题") {
+                sidebarRoutes[i].children.splice(j,1);
+              }
+            }
+          }
+          console.log(s)
           commit('SET_ROUTES', sidebarRoutes)
-          resolve(sidebarRoutes)
+          resolve(s)
         })
       })
     }

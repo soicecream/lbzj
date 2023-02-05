@@ -94,7 +94,7 @@ public class RoleController {
         return JsonResult.success(true);
     }
 
-    @PreAuthorize("@ss.hasPermi('role:del')")
+   @PreAuthorize("@ss.hasPermi('role:del')")
     @PostMapping("delRole")
     public JsonResult<Boolean> delRole(@RequestBody ArrayList<Long> roleid){
         roleService.removeByIds(roleid);
