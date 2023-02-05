@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-input v-model="input" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
-    <el-button icon="el-icon-search" circle></el-button>
+    <el-input v-model="listQuery.value" placeholder="请输入标签名" style="width: 200px;margin-left: 40%" clearable></el-input>
+    <el-button icon="el-icon-search" circle @click="getList"></el-button>
 
     <div>
       <el-button type="success" size="mini" icon="el-icon-plus" @click="createOrEdit(null)">添加</el-button>
@@ -41,7 +41,7 @@
     <!--    添加 修改-->
     <el-dialog title="重命名" :visible.sync="form_dialog" width="30%" @close="clearTags_Form">
       <el-form :model="tags_from" :rules="form_rules" ref="tags_from">
-        <el-form-item label="标题名称" prop="name">
+        <el-form-item label="标题名称" prop="value">
           <el-input v-model="tags_from.value" clearable/>
         </el-form-item>
         <el-form-item label="颜色" prop="color">
@@ -88,7 +88,9 @@ export default {
       pageSize: 10,
       pageNum: 1,
       total: 10,
-      listQuery: {},
+      listQuery: {
+        value: '',
+      },
 
       form_dialog: false,
       delete_dialog: false,
@@ -96,17 +98,13 @@ export default {
       delrow: {},
       deleteRow: {},
 
-      tags_from: {
-        value: "",
-      },
+      tags_from: {},
       form_rules: {
         value: [
           {required: true, message: '请输入标签名', trigger: 'blur'},
           {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur'}
         ],
       },
-
-      input: "",
 
 
     }
@@ -120,10 +118,10 @@ export default {
   methods: {
     // 获取信息
     getList() {
-      tagsApi.getAllList().then(res => {
+      tagsApi.getPageList(this.pageNum, this.pageSize, this.listQuery).then(res => {
         if (res.status === 200) {
-          this.tagsList = res.data
-          this.total = res.data.length
+          this.tagsList = res.data.records
+          this.total = res.data.total
         }
       })
     },
@@ -137,7 +135,6 @@ export default {
       }
     },
     form_ok() {
-      console.log(this.tags_from)
       tagsApi.createOrUpdate(this.tags_from).then(res => {
         if (res.status === 200) {
           this.$message.success("修改成功")

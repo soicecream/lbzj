@@ -4,6 +4,10 @@ function getAllList() {
     return request.get('/tags/allTags')
 }
 
+function getPageList(current, limit, data) {
+    return request.post(`/tags/get/page/${current}/${limit}`, data)
+}
+
 function getProblemTags(id) {
     return request.get(`/problem/tags/getProblem/{id}`)
 }
@@ -18,6 +22,7 @@ function deleteByIds(data) {
 
 export default {
     getAllList: getAllList,
+    getPageList: getPageList,
     getProblemTags: getProblemTags,
     createOrUpdate: createOrUpdate,
     deleteByIds: deleteByIds,

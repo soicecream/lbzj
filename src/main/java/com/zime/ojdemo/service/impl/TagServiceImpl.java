@@ -9,6 +9,8 @@ import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.service.TagsService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TagServiceImpl extends ServiceImpl<TagsMapper, Tags> implements TagsService {
 
@@ -17,9 +19,10 @@ public class TagServiceImpl extends ServiceImpl<TagsMapper, Tags> implements Tag
         if (tags.getId() == null) {
             return save(tags);
         } else {
-            QueryWrapper queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("id", tags.getId());
-            return update(tags, queryWrapper);
+            return lambdaUpdate().eq(Tags::getId, tags.getId())
+                    .set(Tags::getValue, tags.getValue())
+                    .set(Tags::getColor, tags.getColor())
+                    .update();
         }
     }
 

@@ -3,6 +3,7 @@ package com.zime.ojdemo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zime.ojdemo.entity.*;
+import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
@@ -16,6 +17,7 @@ import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
 import io.netty.util.CharsetUtil;
 import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,9 +57,22 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     private String samplesPathUrl = "D:\\毕设\\lbzj\\samples\\";
 
+
     @Override
-    public Problem getProblemById(int id) {
-        return getById(id);
+    public ProblemDto getProblem(int id) {
+        ProblemDto problemDto = new ProblemDto();
+        problemDto.setProblem(getProblemById(id));
+        problemDto.setTagsList(getTagsById(id));
+        return problemDto;
+    }
+
+    @Override
+    public AdminProblemDto AdminGetProblem(int id) throws IOException {
+        ProblemDto problemDto = getProblem(id);
+        AdminProblemDto adminProblemDto = new AdminProblemDto();
+        BeanUtils.copyProperties(problemDto, adminProblemDto); // problemDto 的已有的值 赋值给 adminProblemDto 中
+        adminProblemDto.setSamples(getSample(id));
+        return adminProblemDto;
     }
 
     public ArrayList<fileResult> getFile(Integer id) {
@@ -178,7 +193,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     //    先存问题 再存标签 最后存后台测试样例
-    public Boolean CreateOrUpdate(ProblemDto problemDto) throws IOException {
+    public Boolean CreateOrUpdate(AdminProblemDto problemDto) throws IOException {
         if (!checkUserIsAdmin()) {
             JsonResult.error(400, "用户没有修改权限");
             return false;
@@ -256,14 +271,40 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return true;
     }
 
-    //    根据id查询问题
+    //    id查询问题
+    public Problem getProblemById(int id) {
+        QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("problem_id", id);
+        return getOne(queryWrapper);
+    }
+
+    //    id查询标签
+    public List<Tags> getTagsById(int id) {
+        List<Tags> tagsList = tagService.list();
+        TreeMap<Integer, Tags> treeMap = new TreeMap<>();
+        for (Tags i : tagsList) {
+            treeMap.put(i.getId(), i);
+        }
+
+        QueryWrapper<ProblemTags> problemServiceQueryWrapper = new QueryWrapper<>();
+        problemServiceQueryWrapper.eq("problem_id", id);
+        List<ProblemTags> problemTagsList = problemTagsService.list(problemServiceQueryWrapper);
+
+        List<Tags> list = new ArrayList<>();
+        for (ProblemTags i : problemTagsList) {
+            list.add(treeMap.get(i.getTagsId()));
+        }
+        return list;
+    }
+
+    //    根据id查询所有问题
     public List<Problem> getProblemListByIds(Integer problemId) {
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("problem_id", problemId);
         return list(queryWrapper);
     }
 
-    //    根据标题查询问题
+    //    根据标题查询所有问题
     public List<Problem> getProblemListByTitles(String title) {
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("title", title);

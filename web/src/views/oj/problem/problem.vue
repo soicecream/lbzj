@@ -341,9 +341,12 @@ export default {
   methods: {
 
     init() {
+
       fetchProblem(this.$route.params.id).then(res => {
         if (res.data) {
-          let s = res.data
+          this.problemData.problem = res.data.problem
+          this.problemData.tags = res.data.tagsList
+          let s = res.data.problem
           s.examples = utils.stringToExamples(s.examples)
           this.problemData.problem = s
         } else {

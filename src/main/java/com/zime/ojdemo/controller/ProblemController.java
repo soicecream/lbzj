@@ -2,6 +2,7 @@ package com.zime.ojdemo.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.Problem;
 import com.zime.ojdemo.modle.vo.PageList;
@@ -9,6 +10,7 @@ import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 import com.zime.ojdemo.service.ProblemService;
+import com.zime.ojdemo.service.impl.ProblemTagsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +32,21 @@ public class ProblemController {
     @Autowired
     private ProblemService problemService;
 
+    @Autowired
+    private ProblemTagsServiceImpl problemTagsService;
+
     /*
      * 根据id获取问题接口
      * 2022年9月11日18:20:42
      * */
     @GetMapping("getProblemById/{id}")
-    public JsonResult<Problem> getProblemById(@PathVariable int id) {
-        return JsonResult.success(problemService.getProblemById(id));
+    public JsonResult<ProblemDto> getProblemById(@PathVariable int id) {
+        return JsonResult.success(problemService.getProblem(id));
+    }
+
+    @GetMapping("admin/getProblemById/{id}")
+    public JsonResult<AdminProblemDto> AdminGetProblemById(@PathVariable int id) throws IOException {
+        return JsonResult.success(problemService.AdminGetProblem(id));
     }
 
     @GetMapping("getPros")
@@ -68,7 +78,7 @@ public class ProblemController {
     }
 
     @PostMapping("")
-    public JsonResult<Boolean> CreateOrUpdate(@RequestBody ProblemDto problemDto) throws IOException {
+    public JsonResult<Boolean> CreateOrUpdate(@RequestBody AdminProblemDto problemDto) throws IOException {
         Problem problem = problemDto.getProblem();
         if (problem.getProblemId() == null) {
             List<Problem> problemList = problemService.getProblemListByTitles(problem.getTitle());

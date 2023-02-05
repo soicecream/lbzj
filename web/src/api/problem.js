@@ -35,10 +35,11 @@ export function getTags(id) {
 
 
 export function fetchProblem(id) {
-    return request({
-        url: `/problem/getProblemById/${id}`,
-        method: 'get'
-    })
+    return request.get('/problem/getProblemById/' + id)
+    // return request({
+    //     url: `/problem/getProblemById/${id}`,
+    //     method: 'get'
+    // })
 }
 
 export function updatePro(pro) {

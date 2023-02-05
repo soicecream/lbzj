@@ -12,10 +12,14 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class ProblemDto {
+public class AdminProblemDto {
 
     private Problem problem;
 
     private List<Tags> tagsList;
+
+    private Boolean isUploadCase;
+
+    private List<ProblemCase> samples;
 
 }

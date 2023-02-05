@@ -1,9 +1,10 @@
 package com.zime.ojdemo.controller;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zime.ojdemo.entity.Tags;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
+import com.zime.ojdemo.modle.vo.query.TagsQuery;
 import com.zime.ojdemo.service.TagsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,16 @@ public class TagsController {
     @GetMapping("allTags")
     public JsonResult AllTags() {
         return JsonResult.success(tagsService.list());
+    }
+
+    @PostMapping("get/page/{current}/{limit}")
+    public JsonResult GetPage(@PathVariable long current, @PathVariable long limit, @RequestBody TagsQuery tagsQuery) {
+        System.out.println("-------------------------------------------");
+        QueryWrapper<Tags> queryWrapper = new QueryWrapper<>();
+        String value = tagsQuery.getValue();
+        if(!value.equals("")) queryWrapper.like("value", value);
+        System.out.println("---------------" + value);
+        return JsonResult.success(tagsService.page(new Page<>(current, limit), queryWrapper));
     }
 
     @PostMapping("createOrUpdate")

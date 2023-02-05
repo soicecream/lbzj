@@ -27,9 +27,7 @@ public class ProblemTagsController {
 
     @GetMapping("/getProblem/{problemId}")
     private JsonResult findProblem(@PathVariable Integer problemId) {
-        QueryWrapper<ProblemTags> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("problem_id", problemId);
-        return JsonResult.success(problemTagsService.list(queryWrapper));
+        return JsonResult.success(problemTagsService.getProblemTags(problemId));
     }
 
     @PostMapping("/setOrUpdateTags/problemId")
