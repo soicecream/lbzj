@@ -26,11 +26,9 @@ public class TagsController {
 
     @PostMapping("get/page/{current}/{limit}")
     public JsonResult GetPage(@PathVariable long current, @PathVariable long limit, @RequestBody TagsQuery tagsQuery) {
-        System.out.println("-------------------------------------------");
         QueryWrapper<Tags> queryWrapper = new QueryWrapper<>();
         String value = tagsQuery.getValue();
         if(!value.equals("")) queryWrapper.like("value", value);
-        System.out.println("---------------" + value);
         return JsonResult.success(tagsService.page(new Page<>(current, limit), queryWrapper));
     }
 

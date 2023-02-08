@@ -10,6 +10,22 @@ export function fetchProblemsList(page, limit, listQuery) {
     })
 }
 
+export function fetchProblem(id) {
+    return request.get('/problem/getProblemById/' + id)
+    // return request({
+    //     url: `/problem/getProblemById/${id}`,
+    //     method: 'get'
+    // })
+}
+
+export function fetchAdminProblem(id) {
+    return request.get('/problem/admin/getProblemById/' + id)
+    // return request({
+    //     url: `/problem/getProblemById/${id}`,
+    //     method: 'get'
+    // })
+}
+
 export function getAdminprolist(page, limit, listQuery) {
     return request({
         url: `/problem/adminprolist/${page}/${limit}`,
@@ -25,22 +41,7 @@ export function getFile(id) {
     })
 }
 
-export function getSample(id) {
-    return request.get(`/problem/getSample/${id}`)
-}
 
-export function getTags(id) {
-    return request.get(`/problem/getSample/${id}`)
-}
-
-
-export function fetchProblem(id) {
-    return request.get('/problem/getProblemById/' + id)
-    // return request({
-    //     url: `/problem/getProblemById/${id}`,
-    //     method: 'get'
-    // })
-}
 
 export function updatePro(pro) {
     return request({
@@ -48,6 +49,10 @@ export function updatePro(pro) {
         method: 'post',
         data: pro
     })
+}
+
+export function changEnable(data) {
+    return request.post('/problem/chang/enable', data)
 }
 
 export function addPro(pro) {

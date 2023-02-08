@@ -54,6 +54,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
 
+    @Autowired
+    private ProblemCaseServiceImpl problemCaseService;
+
 
     private String samplesPathUrl = "D:\\毕设\\lbzj\\samples\\";
 
@@ -71,7 +74,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         ProblemDto problemDto = getProblem(id);
         AdminProblemDto adminProblemDto = new AdminProblemDto();
         BeanUtils.copyProperties(problemDto, adminProblemDto); // problemDto 的已有的值 赋值给 adminProblemDto 中
-        adminProblemDto.setSamples(getSample(id));
+        adminProblemDto.setSamples(problemCaseService.GetProblemCase(id));
         return adminProblemDto;
     }
 
@@ -125,7 +128,8 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         String id = problemQuery.getId();
 
         //判断条件值是否为空，如果不为空拼接条件
-        wrapper.orderByAsc("in_date");
+//        wrapper.orderByAsc("in_date");
+        wrapper.orderByDesc("id");
         if (degree != null) {
             wrapper.eq("degree", degree);
         }
@@ -194,57 +198,18 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     //    先存问题 再存标签 最后存后台测试样例
     public Boolean CreateOrUpdate(AdminProblemDto problemDto) throws IOException {
-        if (!checkUserIsAdmin()) {
-            JsonResult.error(400, "用户没有修改权限");
-            return false;
-        }
+        Problem problem = problemDto.getProblem();
 
 //        存问题
-        boolean addProblem = true;
+        boolean addProblem = createOrUpdateProblem(problem);
 
-        Problem problem = problemDto.getProblem();
-        List<Problem> problemList = getProblemListByIds(problem.getProblemId());
-        if (problemList.size() == 0) {
-            addProblem = save(problem);
-        } else {
-            QueryWrapper<Problem> problemQueryWrapper = new QueryWrapper<>();
-            problemQueryWrapper.eq("problem_id", problem.getProblemId());
-            addProblem = update(problem, problemQueryWrapper);
-        }
-        QueryWrapper<Problem> problemQueryWrapper = new QueryWrapper<>();
-        problemQueryWrapper.eq("title", problem.getTitle());
-        problem = getOne(problemQueryWrapper);
-
+        Integer problemId = getOne(new QueryWrapper<Problem>().eq("title", problem.getTitle())).getProblemId();
 
 //        存标签
-        boolean addTags = true;
-        if (problemDto.getTagsList() != null) {
-            List<Integer> TagsList = new ArrayList<>();
-            for (Tags tags : problemDto.getTagsList()) {
-                if (tags.getId() == null) {
-                    tagService.CreateOrUpdate(tags);
-
-                    QueryWrapper<Tags> tagsQueryWrapper = new QueryWrapper<>();
-                    tagsQueryWrapper.eq("value", tags.getValue());
-                    tags = tagService.getOne(tagsQueryWrapper);
-                }
-
-                TagsList.add(tags.getId());
-            }
-            addTags = problemTagsService.CreateOrUpdate(problem.getProblemId(), TagsList);
-        }
-
+        boolean addTags = createOrUpdateTags(problemDto.getTagsList(), problemId);
 
 //        存后台测试样例
-        boolean addSample = true;
-        String sampleFileName = samplesPathUrl + "" + String.format("%05d", problem.getProblemId());
-        File problemSampleFile = new File(sampleFileName);
-//        判断文件夹是否存在 存在则删除
-        if (problemSampleFile.isDirectory()) {
-            deleteFile(problemSampleFile);
-        }
-        problemSampleFile.mkdirs();
-        addSample = init_ProblemSampleCase(problemDto.getSamples(), sampleFileName);
+        boolean addSample = createOrUpdateSample(problemDto.getSamples(), problemId);
 
         return addProblem && addTags && addSample;
     }
@@ -265,36 +230,72 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
 //    ----------------------------------------------------------------------------------------------------------------------------------
 
-    //    判断是否为管理员
-    public boolean checkUserIsAdmin() {
+    //    存问题
+    public Boolean createOrUpdateProblem(Problem problem) {
+        List<Problem> problemList = getProblemListByIds(problem.getProblemId());
+        if (problemList.size() == 0) {
+            return save(problem);
+        } else {
+            QueryWrapper<Problem> problemQueryWrapper = new QueryWrapper<>();
+            problemQueryWrapper.eq("problem_id", problem.getProblemId());
+            return update(problem, problemQueryWrapper);
+        }
+    }
 
+    //    存标签
+    public Boolean createOrUpdateTags(List<Tags> tagsList, Integer problemId) {
+        System.err.println("tagslist\t" + tagsList);
+        if (tagsList != null) {
+            // 处理
+            List<Integer> list = new ArrayList<>();
+            for (Tags tags : tagsList) {
+                if (tags.getId() == null) {
+                    tagService.CreateOrUpdate(tags);
+
+                    tags = tagService.getOne(new QueryWrapper<Tags>().eq("value", tags.getValue()));
+                }
+
+                list.add(tags.getId());
+            }
+
+            // 导入
+            return problemTagsService.CreateOrUpdate(list, problemId);
+        }
         return true;
     }
 
+    // 存后台测试数据
+    public Boolean createOrUpdateSample(List<ProblemCase> problemCaseList, Integer problemId) throws IOException {
+        // 删除
+        String sampleFileName = samplesPathUrl + "" + String.format("%05d", problemId);
+        File problemSampleFile = new File(sampleFileName);
+//        判断文件夹是否存在 存在则删除
+        if (problemSampleFile.isDirectory()) {
+            deleteFile(problemSampleFile);
+        }
+        problemSampleFile.mkdirs();
+
+        // 导入
+        init_ProblemSampleCase(problemCaseList, problemId);
+
+        for (ProblemCase i : problemCaseList) {
+            i.setProblemId(problemId);
+        }
+        // 存数据库中
+        return problemCaseService.createOrUpdate(problemCaseList, problemId);
+    }
+
+
+//    ----------------------------------------------------------------------------------------------------------------------------------
+
     //    id查询问题
     public Problem getProblemById(int id) {
-        QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("problem_id", id);
-        return getOne(queryWrapper);
+        return getOne(new QueryWrapper<Problem>().eq("problem_id", id));
     }
 
     //    id查询标签
     public List<Tags> getTagsById(int id) {
-        List<Tags> tagsList = tagService.list();
-        TreeMap<Integer, Tags> treeMap = new TreeMap<>();
-        for (Tags i : tagsList) {
-            treeMap.put(i.getId(), i);
-        }
-
-        QueryWrapper<ProblemTags> problemServiceQueryWrapper = new QueryWrapper<>();
-        problemServiceQueryWrapper.eq("problem_id", id);
-        List<ProblemTags> problemTagsList = problemTagsService.list(problemServiceQueryWrapper);
-
-        List<Tags> list = new ArrayList<>();
-        for (ProblemTags i : problemTagsList) {
-            list.add(treeMap.get(i.getTagsId()));
-        }
-        return list;
+        return problemTagsService.getProblemTags(id);
     }
 
     //    根据id查询所有问题
@@ -327,7 +328,8 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     //    导入问题后台测试数据
-    public boolean init_ProblemSampleCase(List<ProblemCase> samples, String sampleFileName) throws IOException {
+    public void init_ProblemSampleCase(List<ProblemCase> samples, Integer problemId) throws IOException {
+        String sampleFileName = samplesPathUrl + "" + String.format("%05d", problemId);
         for (int i = 0; i < samples.size(); i++) {
             String input = samples.get(i).getInput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
             String output = samples.get(i).getOutput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
@@ -335,7 +337,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             createSampleFile(sampleFileName + "/" + String.format("test%02d", i + 1) + ".in", input);
             createSampleFile(sampleFileName + "/" + String.format("test%02d", i + 1) + ".out", output);
         }
-        return true;
     }
 
     //    创建文件

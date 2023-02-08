@@ -15,12 +15,13 @@ public class CodeGenerator {
 
     public static void main(String[] args) {
 //        generate("problem_tags");
+        generate("sys_problem_case");
 
     }
 
 
     private static void generate(String tableName) {
-        FastAutoGenerator.create("jdbc:mysql://43.143.121.162:3306/jol?serverTimezone=GMT%2b8", "root", "123456")
+        FastAutoGenerator.create("jdbc:mysql://localhost:3306/jol?serverTimezone=GMT%2b8", "root", "")
                 .globalConfig(builder -> {
                     builder
 //                            .author("zime") // 设置作者

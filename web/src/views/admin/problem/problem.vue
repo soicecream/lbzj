@@ -78,9 +78,9 @@
           <el-col :md="12" :xs="24">
             <el-form-item label="标签">
               <!--              显示已添加的标签-->
-              <el-tag v-for="tag in problemTags" closable :close-transition="false" :key="tag.name" size="small"
-                      @close="closeTag(tag.name)" style="margin-right: 7px;margin-top:4px">
-                {{ tag.name }}
+              <el-tag v-for="tag in problemTags" closable :close-transition="false" :key="tag.value" size="small"
+                      @close="closeTag(tag.value)" style="margin-right: 7px;margin-top:4px">
+                {{ tag.value }}
               </el-tag>
 
               <!-- 输入时建议，回车，选择，光标消失触发更新 -->
@@ -184,20 +184,20 @@
           <!--          样例输入-->
           <div v-show="!isUploadCase">
             <el-form-item v-for="(sample, index) in problemSamples" :key="'sample' + index">
-              <Accordion :title="'测试样例' + (sample.index)" :isOpen="sample.isOpen" :index="index"
+              <Accordion :title="'后台测试样例' + (index + 1)" :isOpen="sample.isOpen" :index="index"
                          @changeVisible="changeSampleVisible">
                 <el-button type="danger" size="small" icon="el-icon-delete" slot="header" @click="deleteSample(index)">
                   删除
                 </el-button>
                 <el-row :gutter="20">
                   <el-col :xs="24" :md="12">
-                    <el-form-item label="测试样例输入" required>
-                      <el-input :rows="5" type="textarea" placeholder="测试样例输入" v-model="sample.input"/>
+                    <el-form-item label="后台测试样例输入" required>
+                      <el-input :rows="5" type="textarea" placeholder="后台测试样例输入" v-model="sample.input"/>
                     </el-form-item>
                   </el-col>
                   <el-col :xs="24" :md="12">
-                    <el-form-item label="测试样例输出" required>
-                      <el-input :rows="5" type="textarea" placeholder="测试样例输出" v-model="sample.output"/>
+                    <el-form-item label="后台测试样例输出" required>
+                      <el-input :rows="5" type="textarea" placeholder="后台测试样例输出" v-model="sample.output"/>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -212,8 +212,8 @@
         </el-row>
 
         <!--        提交-->
-        <el-button type="primary" @click="submit()" size="small">保存</el-button>
-        <el-button type="primary" @click.native="clearInput()" size="small">重置表单</el-button>
+        <el-button type="primary" @click="submit" size="small">保存</el-button>
+        <el-button type="primary" @click.native="clearInput" size="small">重置表单</el-button>
       </el-form>
     </el-card>
   </div>
@@ -225,7 +225,7 @@ import Editor from "@/components/admin/editor";
 
 
 import utils from "@/utils/utils";
-import {fetchProblem, getSample, insertOrUpdate} from "@/api/problem";
+import {fetchAdminProblem, fetchProblem, getSample, insertOrUpdate} from "@/api/problem";
 import tagsApi from '@/api/tags'
 
 
@@ -276,20 +276,26 @@ export default {
 
       testCaseUploaded: false,
 
+      problemDtoRes: {},
+
 
     }
   },
 
-  mounted() {
-    this.routeName = this.$route.name;
+  created() {
+    this.routeProblemId = this.$route.params.problemId
     this.mode = "add";
-    if (this.routeName === "admin-edit-problem") {
+    if (this.routeProblemId === undefined) {
+    } else {
       this.mode = "edit";
       this.pid = this.$route.params.problemId
       this.init_problem_information()
-      this.init_sample()
     }
     this.init_tags_all()
+  },
+
+  mounted() {
+
 
   },
 
@@ -299,18 +305,31 @@ export default {
     // 加载题目信息
     init_problem_information() {
       if (this.pid) {
-        fetchProblem(this.pid).then(res => {
-          const data = res.data
+        fetchAdminProblem(this.pid).then(res => {
+          const data = res.data.problem
           if (data.examples) {
             data.examples = utils.stringToExamples(data.examples)
             for (var i = 0; i < data.examples.length; i++) {
               data.examples[i].isOpen = true
             }
           }
-          if (!data.hint) {
-            data.hint = ""
-          }
           this.problem = data
+          this.problemTags = res.data.tagsList
+
+
+          if (this.problemTags === undefined) {
+            this.problemTags = Object.assign([], []);
+          }
+          
+
+          this.problemSamples = res.data.samples
+          this.isUploadCase = true
+          if (this.problemSamples === undefined) {
+            this.problemSamples = Object.assign({}, {})
+          } else {
+            this.isUploadCase = false
+          }
+
         })
       }
     },
@@ -321,26 +340,6 @@ export default {
           this.allTagsTmp = res.data
         }
       })
-    },
-    // 获取本题标签
-    init_tags() {
-      tagsApi.getProblemTags(this.pid).then(res => {
-        if(res.status === 200) {
-          this.problemTags = res.data
-        }
-      })
-      
-    },
-    // 获取本题后台测试样例
-    init_sample() {
-      if (this.pid) {
-        getSample(this.pid).then(res => {
-          // console.log(res)
-          if (res.status === 200) {
-            this.problemSamples = res.data
-          }
-        })
-      }
     },
 
 
@@ -374,17 +373,23 @@ export default {
       this.tagInput = item.value;
     },
     addTag(item) {
-      let newTag = {name: this.tagInput,};
+      let newTag = {value: this.tagInput,};
       if (this.tagInput) {
         for (var i = 0; i < this.problemTags.length; i++) {
-          if (this.problemTags[i].name == this.tagInput) {
+          if (this.problemTags[i].value == this.tagInput) {
             this.$message.warning("添加标签失败")
             this.tagInput = "";
             return;
           }
         }
+        for (var i = 0; i < this.allTagsTmp.length; i++) {
+          if (this.tagInput == this.allTagsTmp[i].value) {
+            newTag.id = this.allTagsTmp[i].id
+            newTag.color = this.allTagsTmp[i].color
+          }
+        }
         this.problemTags.push(newTag);
-        this.inputVisible = false;
+        this.inputVisible = false
         this.tagInput = "";
       }
     },
@@ -434,15 +439,19 @@ export default {
         problemDto.problem = Object.assign({}, this.problem)
         problemDto.problem.examples = utils.examplesToString(this.problem.examples)
 
-        problemDto.tags = this.problemTags
+        problemDto.tagsList = this.problemTags
         problemDto.samples = this.problemSamples
+
+        problemDto.isUploadCase = this.isUploadCase
+
+        console.log(this.problemTags)
 
         insertOrUpdate(problemDto).then(res => {
           if (res.status === 200) {
             this.$message.success("ok")
 
             this.clearInput()
-            this.$router.push('/admin/problem/list')
+            this.$router.push('/admin/prolist')
           } else {
             this.$message.error(res.message)
           }

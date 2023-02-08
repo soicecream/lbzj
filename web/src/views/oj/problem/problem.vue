@@ -19,14 +19,14 @@
 
                   <!--                标签-->
                   <span v-if="!problemData.defunct">
-                  <el-tag effect="plain" size="small" class="mouse-turns-hands">暂无标签</el-tag>
-                </span>
+                    <el-tag effect="plain" size="small" class="mouse-turns-hands">暂无标签</el-tag>
+                  </span>
                   <div class="problem-tag">
                     <el-popover v-if="problemData.tags.length > 0" placement="right-start" trigger="hover">
                       <el-tag slot="reference" effect="plain" size="small" class="mouse-turns-hands">显示标签</el-tag>
-                      <el-tag v-for="(tag, i) in problemData.tags" :key="i" :color="tag.color ? tag.color : '#409eff'"
+                      <el-tag v-for="(tag, index) in problemData.tags" :key="index" :color="tag.color ? tag.color : '#409eff'"
                               style="margin-right: 5px; margin-top: 2px;" effect="dark" size="small">
-                        {{ tag.name }}
+                        {{ tag.value }}
                       </el-tag>
                     </el-popover>
                     <el-tag v-else effect="plain" size="small" class="mouse-turns-hands">显示标签</el-tag>
@@ -254,10 +254,7 @@ export default {
         defunct: true, // 题目是否可用
 
         problemCount: {},
-        tags: [
-          {color: "", name: "基础",},
-          {color: "", name: "easy",},
-        ],
+        tags: [],
         languages: ["c++", "java", "python2", "python3"],
         codeTemplate: {},
         isRemote: true,
@@ -349,6 +346,7 @@ export default {
           let s = res.data.problem
           s.examples = utils.stringToExamples(s.examples)
           this.problemData.problem = s
+          console.log(this.problemData.tags)
         } else {
           this.$message.error("题目不存在，请确认题目")
         }

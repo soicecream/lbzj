@@ -28,7 +28,6 @@ public class ProblemTagsServiceImpl extends ServiceImpl<ProblemTagsMapper, Probl
     @Autowired
     private TagsService tagsService;
 
-    @Override
     public List<Tags> getProblemTags(Integer problemId) {
         QueryWrapper<ProblemTags> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("problem_id", problemId);
@@ -47,21 +46,15 @@ public class ProblemTagsServiceImpl extends ServiceImpl<ProblemTagsMapper, Probl
         return tagsList;
     }
 
-    @Override
-    public Boolean CreateOrUpdate(Integer problemId, List<Integer> tags) {
-        QueryWrapper<ProblemTags> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("problem_id", problemId);
-        remove(queryWrapper);
+    public Boolean CreateOrUpdate(List<Integer> tags, Integer problemId) {
+        remove(new QueryWrapper<ProblemTags>().eq("problem_id", problemId));
 
         List<ProblemTags> list = new ArrayList<>();
-        ProblemTags problemTags = new ProblemTags();
-        problemTags.setProblemId(problemId);
-        for (int i : tags) {
-            problemTags.setTagsId(i);
-            list.add(problemTags);
+        for (int tagsId : tags) {
+            list.add(new ProblemTags().setProblemId(problemId).setTagsId(tagsId));
         }
 
-        return saveOrUpdateBatch(list);
+        return saveBatch(list);
     }
 
 

@@ -17,7 +17,4 @@ import java.util.List;
  */
 public interface IProblemTagsService extends IService<ProblemTags> {
 
-    Boolean CreateOrUpdate(Integer problemId, List<Integer> tags);
-
-    List<Tags> getProblemTags(Integer problemId);
 }

@@ -19,8 +19,7 @@
       <el-table-column label="总提交数" prop="submit" align="center" width="150px"/>
       <el-table-column label="开放" width="200px" align="center">
         <template slot-scope="{row}">
-          <el-switch v-model="row.defunct" active-color="#13ce66" inactive-color="#ff4949"
-                     @change="changedeFunct(row)"/>
+          <el-switch v-model="row.defunct" active-color="#13ce66" inactive-color="#ff4949" @change="changeEnabel(row)"/>
         </template>
       </el-table-column>
       <el-table-column label="编辑" width="100px" align="center">
@@ -146,7 +145,7 @@
 import utils from "@/utils/utils";
 
 import Pagination from '@/components/Pagination'
-import {delPro, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
+import {changEnable, delPro, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
 
 
 export default {
@@ -260,7 +259,7 @@ export default {
       if (problemId) {
         this.$router.push('/admin/pro/edit/' + problemId)
       } else {
-        this.$router.push('/admin/pro')
+        this.$router.push('/admin/pro/create')
       }
     },
     // closeProblem_dialog() {
@@ -289,8 +288,11 @@ export default {
     // },
 
     // 修改状态
-    changedeFunct(row) {
-      insertOrUpdate(row).then(res => {
+    changeEnabel(row) {
+      changEnable(row).then(res => {
+        if(res.status === 200) {
+          this.$message.success("修改成功")
+        }
       })
     },
 

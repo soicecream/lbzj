@@ -53,6 +53,7 @@ public class ProblemController {
     public JsonResult<List<Problem>> getProblems() {
         return JsonResult.success(problemService.list());
     }
+
     /*
      * 问题列表接口
      * 2022年9月11日18:21:12
@@ -75,6 +76,11 @@ public class ProblemController {
     @GetMapping("getSample/{id}")
     public JsonResult getSample(@PathVariable Integer id) throws IOException {
         return JsonResult.success(problemService.getSample(id));
+    }
+
+    @PostMapping("chang/enable")
+    public JsonResult changEnable(@RequestBody Problem problem) {
+        return JsonResult.success(problemService.updateById(problem));
     }
 
     @PostMapping("")
