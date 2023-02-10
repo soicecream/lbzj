@@ -3,27 +3,15 @@ import request from '@/utils/request'
 
 //page和limit作为路由地址发送，不对后面查询的字段做修改，便于后端对数据库进行查询，减少冗余
 export function fetchProblemsList(page, limit, listQuery) {
-    return request({
-        url: `/problem/pageProblemsCondition/${page}/${limit}`,
-        method: 'post',
-        data: listQuery
-    })
+    return request.post(`/problem/pageProblemsCondition/${page}/${limit}`, listQuery)
 }
 
 export function fetchProblem(id) {
-    return request.get('/problem/getProblemById/' + id)
-    // return request({
-    //     url: `/problem/getProblemById/${id}`,
-    //     method: 'get'
-    // })
+    return request.get(`/problem/getProblemById/${id}`)
 }
 
 export function fetchAdminProblem(id) {
-    return request.get('/problem/admin/getProblemById/' + id)
-    // return request({
-    //     url: `/problem/getProblemById/${id}`,
-    //     method: 'get'
-    // })
+    return request.get(`/problem/admin/getProblemById/${id}`)
 }
 
 export function getAdminprolist(page, limit, listQuery) {
@@ -40,7 +28,6 @@ export function getFile(id) {
         method: 'get',
     })
 }
-
 
 
 export function updatePro(pro) {
@@ -69,6 +56,14 @@ export function insertOrUpdate(problem) {
         method: 'post',
         data: problem,
     })
+}
+
+export function uploadSampleFile(data) {
+    return request.post('/problem/upload/sample', data)
+}
+
+export function downloadSample(id) {
+    return request.get(`problem/download/sample/${id}`)
 }
 
 export function delPro(ids) {

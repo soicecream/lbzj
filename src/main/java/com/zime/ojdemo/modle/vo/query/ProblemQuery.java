@@ -8,4 +8,6 @@ public class ProblemQuery {
     String userId;
     Integer degree;
     String id;
+
+    String title;
 }

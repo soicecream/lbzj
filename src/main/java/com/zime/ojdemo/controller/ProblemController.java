@@ -1,6 +1,10 @@
 package com.zime.ojdemo.controller;
 
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
@@ -10,12 +14,17 @@ import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 import com.zime.ojdemo.service.ProblemService;
+import com.zime.ojdemo.service.impl.ProblemServiceImpl;
 import com.zime.ojdemo.service.impl.ProblemTagsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +40,9 @@ public class ProblemController {
 
     @Autowired
     private ProblemService problemService;
+
+    @Autowired
+    ProblemServiceImpl IProblemService;
 
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
@@ -84,7 +96,7 @@ public class ProblemController {
     }
 
     @PostMapping("")
-    public JsonResult<Boolean> CreateOrUpdate(@RequestBody AdminProblemDto problemDto) throws IOException {
+    public JsonResult CreateOrUpdate(@RequestBody AdminProblemDto problemDto) throws IOException {
         Problem problem = problemDto.getProblem();
         if (problem.getProblemId() == null) {
             List<Problem> problemList = problemService.getProblemListByTitles(problem.getTitle());
@@ -96,6 +108,17 @@ public class ProblemController {
             return JsonResult.error("后台测试样例不能为空");
         }
         return JsonResult.success(problemService.CreateOrUpdate(problemDto));
+    }
+
+    @PostMapping("upload/sample")
+    public JsonResult uploadProblemSample(MultipartFile file) throws IOException {
+        return problemService.uploadSampleFile(file);
+    }
+
+    @GetMapping("download/sample/{id}")
+    public void downloadSample(@PathVariable Integer id, HttpServletResponse response) throws IOException {
+        System.err.println("id:" + id);
+        problemService.downloadSample(id, response);
     }
 
     @PostMapping("delPro")

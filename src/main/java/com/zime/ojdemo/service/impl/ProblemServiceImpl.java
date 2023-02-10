@@ -1,9 +1,13 @@
 package com.zime.ojdemo.service.impl;
 
+import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zime.ojdemo.entity.*;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
+import com.zime.ojdemo.entity.Dto.ProblemCaseDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
@@ -17,22 +21,30 @@ import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
 import io.netty.util.CharsetUtil;
 import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * <p>
@@ -183,9 +195,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
         //判断条件值是否为空，如果不为空拼接条件
 //        wrapper.orderByAsc("in_date");
-//        wrapper.orderByAsc("problem_id");
+        wrapper.orderByAsc("problem_id");
         if (degree != null) {
             wrapper.eq("degree", degree);
+        }
+        if (problemQuery.getTitle() != null) {
+            wrapper.like("title", problemQuery.getTitle());
         }
         page(pageProblem, wrapper);
         long total = pageProblem.getTotal();
@@ -209,7 +224,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         boolean addTags = createOrUpdateTags(problemDto.getTagsList(), problemId);
 
 //        存后台测试样例
-        boolean addSample = createOrUpdateSample(problemDto.getSamples(), problemId);
+        boolean addSample = true;
+        if (problemDto.getIsUploadCase()) {
+
+        } else {
+            addSample = createOrUpdateSample(problemDto.getSamples(), problemId);
+        }
 
         return addProblem && addTags && addSample;
     }
@@ -227,6 +247,125 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return removeByIds(ids);
     }
 
+    //    上传后台测试样例
+    @Override
+    public JsonResult uploadSampleFile(MultipartFile file) throws IOException {
+        String originalFileName = file.getOriginalFilename();
+        String type = FileUtil.extName(originalFileName);
+        if (type == null) {
+            return JsonResult.error(400, "文件类型有问题，请确认文件类型");
+        } else if (!type.equals("zip")) {
+            return JsonResult.error(400, "文件类型请选择zip");
+        }
+        long size = file.getSize();
+        if (size == 0) {
+            return JsonResult.error(400, "暂无文件，请选择文件");
+        }
+
+
+//        文件夹
+        String fileDir = samplesPathUrl + "/" + "uploadFileCache";
+//        zip解压路劲
+        String filePath = fileDir + "/" + file.getOriginalFilename();
+
+//        文件夹若不存在则新建
+        FileUtil.mkdir(fileDir);
+
+//        上传
+        try {
+            file.transferTo(new File(filePath));
+        } catch (IOException e) {
+            return JsonResult.error(400, "服务器异常：评测数据上传失败！");
+        }
+
+//        解压到指定文件夹下
+        ZipUtil.unzip(filePath, fileDir);
+//        删除zip
+        FileUtil.del(filePath);
+
+//        检查文件是否为空
+        File textCaseFileList = new File(fileDir);
+        File[] files = textCaseFileList.listFiles();
+        if (files == null || files.length == 0) {
+            FileUtil.del(fileDir);
+            return JsonResult.error("评测数据压缩包里文件不能为空");
+        }
+
+
+        TreeMap<String, ProblemCaseDto> treeMap = new TreeMap<>();
+        for (File i : files) {
+            String Name = i.getName();
+            String name = Name.substring(0, Name.lastIndexOf("."));
+            String suffix = FileUtil.extName(Name);
+
+            treeMap.putIfAbsent(name, new ProblemCaseDto());
+            if (suffix.equals("in")) {
+                treeMap.get(name).setInputName(Name);
+                treeMap.get(name).setInput(readSampleFile(i.toPath().toString()));
+            } else if (suffix.equals("out")) {
+                treeMap.get(name).setOutputName(Name);
+                treeMap.get(name).setOutput(readSampleFile(i.toPath().toString()));
+            } else {
+                return JsonResult.error(400, "zip中的数据格式有误, 请确认是否为 *.in, *.out");
+            }
+        }
+
+        List<ProblemCaseDto> problemCaseDtoList = new ArrayList<>();
+        for (String i : treeMap.keySet()) {
+            problemCaseDtoList.add(treeMap.get(i));
+        }
+
+//        用完就丢
+        FileUtil.del(fileDir);
+
+        return JsonResult.success(problemCaseDtoList);
+    }
+
+    //    下载后台测试样例
+    @Override
+    public void downloadSample(Integer problemId, HttpServletResponse response) throws IOException {
+        String fileDir = samplesPathUrl + "/" + String.format("%05d", problemId);
+        File file = new File(fileDir);
+
+//        本地为空 去数据库找
+        if (!file.exists()) {
+            List<ProblemCase> list = problemCaseService.list(new QueryWrapper<ProblemCase>().eq("problem_id", problemId));
+
+            if (CollectionUtils.isEmpty(list)) {
+                JsonResult.error(400, "该题目的后台测试数据为空");
+            }
+
+//            将数据库中的数据 导入到服务器中
+            init_ProblemSampleCase(list, problemId);
+        }
+
+        System.err.println("----------------------------------------------------------- start");
+
+        String fileName = "problem-" + String.format("%05d", problemId) + "-testCase" + ".zip";
+        String zipFileName = samplesPathUrl + "/" + fileName;
+//        将对应的文件夹的文件压缩成.zip
+        ZipUtil.zip(fileDir, zipFileName);
+
+        File zipFile = new File(zipFileName);
+
+        System.err.println("----------------------------------------------------------- toZipOk");
+
+//        设置输出流的格式
+        ServletOutputStream os = response.getOutputStream();
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+//        任意类型的二进制流数据
+        response.setContentType("application/octet-stream");
+
+//        读取文件的字节流
+        os.write(FileUtil.readBytes(zipFile));
+        os.flush();
+        os.close();
+
+        System.err.println("----------------------------------------------------------- end");
+
+//        删除临时文件
+//        FileUtil.del(zipFile);
+    }
 
 //    ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -329,7 +468,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     //    导入问题后台测试数据
     public void init_ProblemSampleCase(List<ProblemCase> samples, Integer problemId) throws IOException {
-        String sampleFileName = samplesPathUrl + "" + String.format("%05d", problemId);
+        String sampleFileName = samplesPathUrl + "/" + String.format("%05d", problemId);
         for (int i = 0; i < samples.size(); i++) {
             String input = samples.get(i).getInput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
             String output = samples.get(i).getOutput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");

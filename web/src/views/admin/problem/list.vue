@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-input v-model="input" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
-    <el-button icon="el-icon-search" circle></el-button>
+    <el-input v-model="listQuery.title" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
+    <el-button icon="el-icon-search" circle @click="getList"></el-button>
 
     <div>
       <el-button type="success" size="mini" icon="el-icon-plus" @click="to_Problem_createOrEdit(null)">添加</el-button>
@@ -22,16 +22,19 @@
           <el-switch v-model="row.defunct" active-color="#13ce66" inactive-color="#ff4949" @change="changeEnabel(row)"/>
         </template>
       </el-table-column>
-      <el-table-column label="编辑" width="100px" align="center">
+      <el-table-column label="操作" width="250" align="center">
         <template slot-scope="{row}">
-          <el-button @click="to_Problem_createOrEdit(row.problemId)" size="mini" type="primary" icon="el-icon-edit"
-                     circle/>
-        </template>
-      </el-table-column>
-      <el-table-column label="删除" width="100px" align="center">
-        <template slot-scope="{row}">
-          <el-button @click="delete_problems(row.problemId)" size="mini" type="primary" icon="el-icon-delete-solid"
-                     circle/>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button @click="to_createOrEdit(row.problemId)" size="mini" type="primary" icon="el-icon-edit"/>
+          </el-tooltip>
+
+          <el-tooltip class="item" effect="dark" content="下载测试样例" placement="top">
+            <el-button @click="downloadSample(row.problemId)" size="mini" type="success" icon="el-icon-download"/>
+          </el-tooltip>
+
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button @click="delete_problems(row.problemId)" size="mini" type="danger" icon="el-icon-delete-solid"/>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -114,30 +117,6 @@
     </span>
     </el-dialog>
 
-    <!--    测试数据-->
-    <div>
-      <!--    <el-dialog title="文件列表" :visible.sync="problemFiles_dialog" width="50%">-->
-      <!--      <el-table border :data="files" @selection-change="">-->
-      <!--        <el-table-column label="文件名" prop="name" align="center" width="100px"/>-->
-      <!--        <el-table-column label="大小" min-width="150px" align="center">-->
-      <!--          <template slot-scope="{row}">-->
-      <!--            <diV>{{ row.size }} bytes</diV>-->
-      <!--          </template>-->
-      <!--        </el-table-column>-->
-      <!--        <el-table-column label="修改日期" width="180px" align="center">-->
-      <!--          <template slot-scope="{row}">-->
-      <!--            {{ timeToDate(row.time) }}-->
-      <!--          </template>-->
-      <!--        </el-table-column>-->
-      <!--        <el-table-column label="编辑" width="100px" align="center">-->
-      <!--          <template slot-scope="{row}">-->
-      <!--            <el-button @click="updateFile" size="mini" type="primary" icon="el-icon-edit"> 编辑</el-button>-->
-      <!--          </template>-->
-      <!--        </el-table-column>-->
-      <!--      </el-table>-->
-      <!--    </el-dialog>-->
-    </div>
-
   </div>
 </template>
 
@@ -145,7 +124,7 @@
 import utils from "@/utils/utils";
 
 import Pagination from '@/components/Pagination'
-import {changEnable, delPro, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
+import {changEnable, delPro, downloadSample, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
 
 
 export default {
@@ -255,55 +234,26 @@ export default {
     },
 
     // 打开关闭 问题添加修改弹窗
-    to_Problem_createOrEdit(problemId) {
+    to_createOrEdit(problemId) {
       if (problemId) {
         this.$router.push('/admin/pro/edit/' + problemId)
       } else {
         this.$router.push('/admin/pro/create')
       }
     },
-    // closeProblem_dialog() {
-    //   this.resetProblem_dialog()
-    //
-    //   this.problem_dialog = false
-    // },
-
-    // // 添加删除样例
-    // addSample() {
-    //   this.problem.samples.push({input: "", output: ""})
-    // },
-    // removeSample(index) {
-    //   if (index != -1) {
-    //     this.problem.samples.splice(index, 1)
-    //   }
-    // },
-
-    // // 保存 新增或修改
-    // problem_form_ok() {
-    //   this.problem.samples = utils.examplesToString(this.problem.samples)
-    //   insertOrUpdate(this.problem).then(res => {
-    //     this.closeProblem_dialog()
-    //     this.getList()
-    //   })
-    // },
 
     // 修改状态
     changeEnabel(row) {
       changEnable(row).then(res => {
-        if(res.status === 200) {
+        if (res.status === 200) {
           this.$message.success("修改成功")
         }
       })
     },
 
-    // // 重置
-    // resetProblem_dialog() {
-    //   if (this.$refs.problem) {
-    //     this.$refs.problem.resetFields()
-    //
-    //     this.problem.samples = this.problem_samples_init
-    //   }
-    // },
+    downloadSample(id) {
+      window.open(`http://localhost/api/problem/download/sample/${id}`)
+    },
 
     // 时间戳 => yyyy-MM-dd HH:mm:ss
     timeToDate(time) {

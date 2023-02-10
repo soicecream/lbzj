@@ -7,10 +7,13 @@ import com.zime.ojdemo.entity.Problem;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.entity.ProblemCase;
 import com.zime.ojdemo.modle.vo.PageList;
+import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 import org.springframework.security.core.parameters.P;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,7 @@ import java.util.List;
 public interface ProblemService extends IService<Problem> {
 
     ProblemDto getProblem(int id);
+
     AdminProblemDto AdminGetProblem(int id) throws IOException;
 
     PageList pageProblemsCondition(long current, long limit, ProblemQuery problemQuery);
@@ -45,5 +49,7 @@ public interface ProblemService extends IService<Problem> {
     List<ProblemCase> getSample(Integer id) throws IOException;
 
 
+    JsonResult uploadSampleFile(MultipartFile file) throws IOException;
 
+    void downloadSample(Integer id, HttpServletResponse response) throws IOException;
 }

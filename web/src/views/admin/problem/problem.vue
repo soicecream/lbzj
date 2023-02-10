@@ -145,44 +145,41 @@
 
           <!--          手动输入 还是 上传文件-->
           <el-form-item required>
-            <el-switch v-model="isUploadCase" active-text="上传文件" inactive-text="输入文件" style="margin: 10px 0"/>
+            <el-switch v-model="upload.is" active-text="上传文件" inactive-text="输入文件" style="margin: 10px 0"/>
           </el-form-item>
 
           <!--          文件上传-->
-          <div v-show="isUploadCase">
+          <div v-show="upload.is">
             <el-col :span="24">
-              <el-form-item :error="error.testcase">
-                <el-upload :action="uploadFileUrl+'?mode='+problem.judgeCaseMode" name="file" :show-file-list="true"
-                           :on-success="uploadSucceeded" :on-error="uploadFailed">
+              <el-form-item>
+                <el-upload action="" :show-file-list="false" :limit="1" accept=".zip" :http-request="uploadImport">
                   <el-button size="small" type="primary" icon="el-icon-upload">选择文件</el-button>
                 </el-upload>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <!--              <vxe-table ref="xTable" stripe auto-resize :data="problem.testCaseScore" align="center"-->
-              <!--                         :sort-config="{trigger: 'cell', defaultSort: {field: 'groupNum', order: 'asc'}, orders: ['desc', 'asc', null], sortMethod: customSortMethod}">-->
-              <!--                <vxe-table-column field="index" title="#" width="60"/>-->
-              <!--                <vxe-table-column field="input" title="输入文件名" min-width="100"/>-->
-              <!--                <vxe-table-column field="output" title="输出文件名" min-width="100"/>-->
-              <!--                <vxe-table-column-->
-              <!--                    v-if="problem.judgeCaseMode == JUDGE_CASE_MODE.SUBTASK_LOWEST || problem.judgeCaseMode == JUDGE_CASE_MODE.SUBTASK_AVERAGE"-->
-              <!--                    field="groupNum" title="$t('m.Sample_Group_Num')" sortable min-width="100">-->
-              <!--                  <template v-slot="{ row }">-->
-              <!--                    <el-input size="small" v-model="row.groupNum" @change="sortTestCaseList" type="number"/>-->
-              <!--                  </template>-->
-              <!--                </vxe-table-column>-->
-              <!--                <vxe-table-column field="score" title="$t('m.Score')" v-if="problem.type == 1" min-width="100">-->
-              <!--                  <template v-slot="{ row }">-->
-              <!--                    <el-input size="small" placeholder="$t('m.Score')" v-model="row.score"-->
-              <!--                              :disabled="problem.type != 1" type="number"/>-->
-              <!--                  </template>-->
-              <!--                </vxe-table-column>-->
-              <!--              </vxe-table>-->
+              <el-table :data="upload.data">
+                <el-table-column label="#"></el-table-column>
+                <el-table-column label="输入文件名">
+                  <template slot-scope="{row}">
+                    <span style="margin-left: 10px" @click="showContents(row.inputName, row.input)">
+                      {{ row.inputName }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="输出文件名">
+                  <template slot-scope="{row}">
+                    <span style="margin-left: 10px" @click="showContents(row.outputName, row.output)">
+                      {{ row.outputName }}
+                    </span>
+                  </template>
+                </el-table-column>
+              </el-table>
             </el-col>
           </div>
 
           <!--          样例输入-->
-          <div v-show="!isUploadCase">
+          <div v-show="!upload.is">
             <el-form-item v-for="(sample, index) in problemSamples" :key="'sample' + index">
               <Accordion :title="'后台测试样例' + (index + 1)" :isOpen="sample.isOpen" :index="index"
                          @changeVisible="changeSampleVisible">
@@ -216,6 +213,14 @@
         <el-button type="primary" @click.native="clearInput" size="small">重置表单</el-button>
       </el-form>
     </el-card>
+
+    <!--    文件上传的表格显示数据-->
+    <el-dialog :title="dialog.title" :visible.sync="dialog.visible" width="30%">
+      <span>{{ dialog.contents }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialog.visible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -225,7 +230,7 @@ import Editor from "@/components/admin/editor";
 
 
 import utils from "@/utils/utils";
-import {fetchAdminProblem, fetchProblem, getSample, insertOrUpdate} from "@/api/problem";
+import {fetchAdminProblem, fetchProblem, getSample, insertOrUpdate, uploadSampleFile} from "@/api/problem";
 import tagsApi from '@/api/tags'
 
 
@@ -239,6 +244,7 @@ export default {
   data() {
     return {
       pid: null, // 题目id，如果为创建模式则为null
+      mode: "", // 该题目是编辑或者创建
       problem: {
         problemId: "",
         title: "", // 标题
@@ -252,32 +258,30 @@ export default {
         examples: [], // 样例
         defunct: 0, // 题目状态
       }, // 题目信息
-      problemTags: [], // 题目标签
-      tagInput: "",
-      allTagsTmp: [], // 所有标签
-
-      isUploadCase: true, // 是否文件上传
-
-      PROBLEM_LEVEL: {}, // 题目难度
-      inputVisible: false, //
-      error: {},
-      uploadFileUrl: "", // 上传文件的路径
-
-      problemSamples: [], // 判题机样例
-      sampleIndex: 1, // 判题机样例长度
-
       rules: {
         title: {required: true, message: "标题不能为空", trigger: "blur",},
         timeLimit: {required: true, message: "时间限制不能为空", trigger: "blur",},
         memoryLimit: {required: true, message: "空间限制不能为空", trigger: "blur",},
       },
+      problemTags: [], // 题目标签
+      inputVisible: false, // 标签的光标
+      tagInput: "", // 标签输入框
+      allTagsTmp: [], // 所有标签
 
-      mode: "", // 该题目是编辑或者创建
+      // 文件上传
+      upload: {
+        is: true, // 是否上传
+        data: [], // 返回的数据
+      },
+      // 弹窗
+      dialog: {
+        visible: false,
+        title: "",
+        contents: "",
+      },
 
-      testCaseUploaded: false,
-
-      problemDtoRes: {},
-
+      problemSamples: [], // 判题机样例
+      sampleIndex: 1, // 判题机样例长度
 
     }
   },
@@ -294,13 +298,6 @@ export default {
     this.init_tags_all()
   },
 
-  mounted() {
-
-
-  },
-
-  watch: {},
-
   methods: {
     // 加载题目信息
     init_problem_information() {
@@ -312,22 +309,22 @@ export default {
             for (var i = 0; i < data.examples.length; i++) {
               data.examples[i].isOpen = true
             }
+          } else {
+            data.examples = Object.assign([], [])
           }
-          this.problem = data
+          this.problem = Object.assign({}, data)
           this.problemTags = res.data.tagsList
 
-
-          if (this.problemTags === undefined) {
+          if (this.problemTags === undefined || this.problemTags.length === 0) {
             this.problemTags = Object.assign([], []);
           }
-          
 
           this.problemSamples = res.data.samples
-          this.isUploadCase = true
-          if (this.problemSamples === undefined) {
-            this.problemSamples = Object.assign({}, {})
+          this.upload.is = true
+          if (this.problemSamples === undefined || this.problemSamples.length === 0) {
+            this.problemSamples = Object.assign([], [])
           } else {
-            this.isUploadCase = false
+            this.upload.is = false
           }
 
         })
@@ -343,17 +340,24 @@ export default {
     },
 
 
-    // 上传返回
-    uploadSucceeded(res) {
-      if (res.status !== 200) {
-        this.$message.error(res.msg)
-        this.testCaseUploaded = false;
-        return false
-      }
-      this.$message.success("上传成功")
+    // 上传
+    uploadImport(param) {
+      let formData = new FormData()
+      formData.append("file", param.file)
+
+      uploadSampleFile(formData).then(res => {
+        if (res.status === 200) {
+          this.upload.data = res.data
+          this.$message.success("上传成功")
+        } else {
+          this.$message.error(res.message)
+        }
+      })
     },
-    uploadFailed() {
-      this.$message.error("上传失败")
+    showContents(title, contents) {
+      this.dialog.visible = true
+      this.dialog.title = title
+      this.dialog.contents = contents
     },
 
     // 标签
@@ -442,7 +446,7 @@ export default {
         problemDto.tagsList = this.problemTags
         problemDto.samples = this.problemSamples
 
-        problemDto.isUploadCase = this.isUploadCase
+        problemDto.isUploadCase = this.upload.is
 
         console.log(this.problemTags)
 
@@ -474,18 +478,17 @@ export default {
       this.problem.description = ""
       this.problem.input = ""
       this.problem.output = ""
-      this.problem.examples = []
+      this.problem.examples = Object.assign([], [])
       this.problem.timeLimit = "1000"
       this.problem.memoryLimit = "256"
       this.problem.difficulty = ""
       this.problem.hint = ""
       this.problem.defunct = 0
+      this.problemSamples = Object.assign([], [])
     },
-
 
   },
 
-  computed: {},
 
 };
 </script>
