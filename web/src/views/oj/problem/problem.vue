@@ -144,13 +144,55 @@
             <el-tab-pane name="mySubmit" label="我的提交">
               <div id="js-submission">
                 <el-table :data="myState.list">
-                  <el-table-column label="提交时间" prop="inDate"/>
-                  <el-table-column label="状态" prop="result"/>
-                  <el-table-column label="运行时间" prop="time"/>
-                  <el-table-column label="运行内存" prop="memory"/>
-                  <el-table-column label="语言">
+                  <el-table-column label="提交编号" prop="solutionId" align="center" width="100px">
                     <template slot-scope="{row}">
-                      <div>{{ row.language | lang }}</div>
+                      <div>
+                        {{ row.solutionId }}
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="结果" width="250px" align="center">
+                    <template slot-scope="{row}">
+                      <div>
+                        <el-button :type="row.result| resultType" :loading="row.result | resultLoad" size="small">
+                          {{ row.result | resultName }}
+                        </el-button>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="内存" width="125px" align="center">
+                    <template slot-scope="{row}">
+                      <div>
+                        {{ row.memory | memory }}
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="耗时" width="125px" align="center">
+                    <template slot-scope="{row}">
+                      <div>
+                        {{ row.time | time }}
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="语言" width="125px" align="center">
+                    <template slot-scope="{row}">
+                      <div>
+                        {{ row.language | lang }}
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="代码长度" width="150px" align="center">
+                    <template slot-scope="{row}">
+                      <div>
+                        {{ row.codeLength | codeLength }}
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="提交时间" width="200px" align="center">
+                    <template slot-scope="{row}">
+                      <div>
+                        {{ row.inDate | toTime }}
+                      </div>
                     </template>
                   </el-table-column>
                 </el-table>
