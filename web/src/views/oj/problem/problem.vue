@@ -144,14 +144,7 @@
             <el-tab-pane name="mySubmit" label="我的提交">
               <div id="js-submission">
                 <el-table :data="myState.list">
-                  <el-table-column label="提交编号" prop="solutionId" align="center" width="100px">
-                    <template slot-scope="{row}">
-                      <div>
-                        {{ row.solutionId }}
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="结果" width="250px" align="center">
+                  <el-table-column label="结果" align="center" width="200">
                     <template slot-scope="{row}">
                       <div>
                         <el-button :type="row.result| resultType" :loading="row.result | resultLoad" size="small">
@@ -160,35 +153,28 @@
                       </div>
                     </template>
                   </el-table-column>
-                  <el-table-column label="内存" width="125px" align="center">
+                  <el-table-column label="内存" align="center" width="150">
                     <template slot-scope="{row}">
                       <div>
                         {{ row.memory | memory }}
                       </div>
                     </template>
                   </el-table-column>
-                  <el-table-column label="耗时" width="125px" align="center">
+                  <el-table-column label="耗时" align="center" width="150">
                     <template slot-scope="{row}">
                       <div>
                         {{ row.time | time }}
                       </div>
                     </template>
                   </el-table-column>
-                  <el-table-column label="语言" width="125px" align="center">
+                  <el-table-column label="语言" align="center" width="150">
                     <template slot-scope="{row}">
                       <div>
                         {{ row.language | lang }}
                       </div>
                     </template>
                   </el-table-column>
-                  <el-table-column label="代码长度" width="150px" align="center">
-                    <template slot-scope="{row}">
-                      <div>
-                        {{ row.codeLength | codeLength }}
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="提交时间" width="200px" align="center">
+                  <el-table-column label="提交时间" align="center" width="250">
                     <template slot-scope="{row}">
                       <div>
                         {{ row.inDate | toTime }}
@@ -279,6 +265,7 @@ import CodeMirror from "@/components/oj/CodeMirror";
 import {fetchProblem} from "@/api/problem";
 import {fetchSubmissionsList, saveSubmission} from "@/api/submission";
 import {getWorkid} from "@/utils/auth";
+import {JUDGE_STATUS, Languages} from "@/utils/constants";
 
 export default {
   name: "problem",
@@ -639,6 +626,33 @@ export default {
       }
     },
 
+  },
+
+  filters: {
+    memory: function (kb) {
+      return kb + 'KB'
+    },
+    time: function (t) {
+      return t + 'ms'
+    },
+    codeLength: function (len) {
+      return len + 'bytes'
+    },
+    resultName: function (num) {
+      return JUDGE_STATUS[num + ""].name
+    },
+    resultType: function (num) {
+      return JUDGE_STATUS[num + ""].type
+    },
+    resultLoad: function (num) {
+      return JUDGE_STATUS[num + ""].loading
+    },
+    lang: function (num) {
+      return Languages[num + ""].lang
+    },
+    toTime: function (t) {
+      return new Date(t).toLocaleString();
+    }
   },
 
   watch: {

@@ -95,31 +95,6 @@ export default {
         return (solved / submit * 100.0).toFixed(2) + "%"
       return 0 + "%";
     },
-
-    memory: function (kb) {
-      return kb + 'KB'
-    },
-    time: function (t) {
-      return t + 'ms'
-    },
-    codeLength: function (len) {
-      return len + 'bytes'
-    },
-    resultName: function (num) {
-      return JUDGE_STATUS[num + ""].name
-    },
-    resultType: function (num) {
-      return JUDGE_STATUS[num + ""].type
-    },
-    resultLoad: function (num) {
-      return JUDGE_STATUS[num + ""].loading
-    },
-    lang: function (num) {
-      return Languages[num + ""].lang
-    },
-    toTime: function (t) {
-      return new Date(t).toLocaleString();
-    }
   },
   methods: {
     getList() {
