@@ -27,22 +27,21 @@ public class SolutionController {
 
 
     /*
-    * 提交列表接口
-    * 2022年9月11日18:23:05
-    * */
+     * 提交列表接口
+     * 2022年9月11日18:23:05
+     * */
     @PostMapping("pageSubmissionsCondition/{current}/{limit}")
-    public JsonResult<PageList> pageSolutionsCondition(@PathVariable long current, @PathVariable long limit,
-                                                       @RequestBody(required = false) SolutionQuery SolutionQuery) {
+    public JsonResult pageSolutionsCondition(@PathVariable long current, @PathVariable long limit, @RequestBody(required = false) SolutionQuery SolutionQuery) {
         return JsonResult.success(solutionService.pageSolutionsCondition(current, limit, SolutionQuery));
     }
 
     /*
-    * 上传提交接口
-    * 2022年9月11日18:23:20
-    * */
+     * 上传提交接口
+     * 2022年9月11日18:23:20
+     * */
     @PostMapping("saveSubmission")
     public JsonResult<Boolean> saveSolution(HttpServletRequest request, @RequestBody(required = false) SolutionAndSourceCode solutionAndSourceCode) throws ParseException {
-        return JsonResult.success(solutionService.save(request,solutionAndSourceCode));
+        return JsonResult.success(solutionService.save(request, solutionAndSourceCode));
     }
 
 }

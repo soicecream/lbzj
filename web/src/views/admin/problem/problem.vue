@@ -23,7 +23,7 @@
           </el-col>
         </el-row>
 
-        <!--        时间限制 空间限制 栈限制 难度-->
+        <!--        时间限制 空间限制 难度-->
         <el-row :gutter="20">
           <el-col :md="6" :xs="24">
             <el-form-item prop="timeLimit" label="时间限制(ms)" required>
@@ -37,10 +37,9 @@
           </el-col>
           <el-col :md="6" :xs="24">
             <el-form-item label="难度" required>
-              <el-select class="difficulty-select" placeholder="问题难度" v-model="problem.difficulty">
-                <el-option label="简单" :value="1"></el-option>
-                <el-option label="中等" :value="2"></el-option>
-                <el-option label="困难" :value="3"></el-option>
+              <el-select class="difficulty-select" placeholder="问题难度" v-model="problem.degree">
+                <el-option v-for="(dif, index) in problemDifficulty" :key="dif" :label="dif"
+                           :value="index + 1"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -263,6 +262,7 @@ export default {
         timeLimit: {required: true, message: "时间限制不能为空", trigger: "blur",},
         memoryLimit: {required: true, message: "空间限制不能为空", trigger: "blur",},
       },
+      problemDifficulty: ['简单', '中等', '一般', '困难', '地狱'],
       problemTags: [], // 题目标签
       inputVisible: false, // 标签的光标
       tagInput: "", // 标签输入框

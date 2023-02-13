@@ -12,6 +12,7 @@ import com.zime.ojdemo.modle.vo.query.SolutionQuery;
 import com.zime.ojdemo.service.SolutionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.service.SourceCodeService;
+import com.zime.ojdemo.untils.SecurityUntils;
 import com.zime.ojdemo.untils.TokenServie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author zime
@@ -54,9 +55,9 @@ public class SolutionServiceImpl extends ServiceImpl<SolutionMapper, Solution> i
         该函数不需要写事务，而且数据库引擎不支持
      */
 //    @Transactional()//事务注解
-    public boolean save(HttpServletRequest request,SolutionAndSourceCode solutionAndSourceCode) throws ParseException {
+    public boolean save(HttpServletRequest request, SolutionAndSourceCode solutionAndSourceCode) throws ParseException {
 
-        LoginUser user=tokenServie.getLoginUser(request);
+        LoginUser user = tokenServie.getLoginUser(request);
         SourceCode sourceCode = new SourceCode();
         sourceCode.setSource(solutionAndSourceCode.getSource());
         boolean flag1 = sourceCodeService.save(sourceCode);
@@ -82,26 +83,33 @@ public class SolutionServiceImpl extends ServiceImpl<SolutionMapper, Solution> i
         solution.setJudger(solutionAndSourceCode.getJudger());
         solution.setCourseId(solutionAndSourceCode.getCourseId());
         boolean flag2 = super.save(solution);
-        return flag1&&flag2;
+        return flag1 && flag2;
     }
 
-    public PageList pageSolutionsCondition(long current, long limit, SolutionQuery solutionQuery){
-        Page<Solution> pageSolution = new Page<>(current, limit);
-        QueryWrapper<Solution> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("in_date");
-        //调用方法时候，底层封装，把分页所有数据封装到pageUsers对象里面
-        if(solutionQuery.getUserId()!=null&&!solutionQuery.getUserId().equals("")) wrapper.eq("user_id",solutionQuery.getUserId());
+    public Page<Solution> pageSolutionsCondition(long current, long limit, SolutionQuery solutionQuery) {
+        QueryWrapper<Solution> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("solution_id");
 
-        if(solutionQuery.getContestId()!=null) wrapper.eq("contest_id",solutionQuery.getContestId());
-        if(solutionQuery.getProblemId()!=null&&!solutionQuery.getProblemId().equals("")) wrapper.eq("problem_id",solutionQuery.getProblemId());
-        if(solutionQuery.getLanguage()!=null&&solutionQuery.getLanguage()!=-1) wrapper.eq("language",solutionQuery.getLanguage());
-        if(solutionQuery.getResult()!=null&&solutionQuery.getResult()!=12) wrapper.eq("result",solutionQuery.getResult());
-        page(pageSolution, wrapper);
-        long total = pageSolution.getTotal();
-        List<Solution> records = pageSolution.getRecords();
-        PageList pageList = new PageList();
-        pageList.setTotal(total);
-        pageList.setRows(records);
-        return pageList;
+        if (!solutionQuery.getIsAll()) {
+//            将当前用户添加
+            LoginUser user = SecurityUntils.getLoginUser();
+            System.err.println(user);
+            queryWrapper.eq("user_id", user.getUsername());
+        } else if (solutionQuery.getNick() != null && !solutionQuery.getNick().equals("")) {
+            queryWrapper.like("nick", solutionQuery.getNick());
+        }
+
+//        处理搜索
+        if (solutionQuery.getProblemId() != null && !solutionQuery.getProblemId().equals("")) {
+            queryWrapper.eq("problem_id", solutionQuery.getProblemId());
+        }
+        if (solutionQuery.getLanguage() != null && !solutionQuery.getLanguage().equals("")) {
+            queryWrapper.eq("language", solutionQuery.getLanguage());
+        }
+        if (solutionQuery.getResult() != null && !solutionQuery.getResult().equals("")) {
+            queryWrapper.eq("result", solutionQuery.getResult());
+        }
+
+        return page(new Page<Solution>(current, limit), queryWrapper);
     }
 }

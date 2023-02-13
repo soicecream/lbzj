@@ -5,9 +5,16 @@ import lombok.Data;
 
 @Data
 public class ProblemQuery {
-    String userId;
-    Integer degree;
+
     String id;
+    String userId;
+
+    Integer problemId;
 
     String title;
+
+    Integer degree;
+
+    Boolean defunct;
+
 }

@@ -1,5 +1,6 @@
 package com.zime.ojdemo.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zime.ojdemo.controller.ProblemController;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
@@ -34,7 +35,7 @@ public interface ProblemService extends IService<Problem> {
 
     PageList pageProblemsCondition(long current, long limit, ProblemQuery problemQuery);
 
-    PageList getProList(long current, long limit, ProblemQuery problemQuery);
+    Page<Problem> adminGetProList(long current, long limit, ProblemQuery problemQuery);
 
     Boolean CreateOrUpdate(AdminProblemDto problem) throws IOException;
 
@@ -52,4 +53,6 @@ public interface ProblemService extends IService<Problem> {
     JsonResult uploadSampleFile(MultipartFile file) throws IOException;
 
     void downloadSample(Integer id, HttpServletResponse response) throws IOException;
+
+
 }

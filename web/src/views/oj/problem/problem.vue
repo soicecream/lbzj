@@ -5,7 +5,7 @@
 
         <!--        题目信息-->
         <el-col :sm="24" :md="12" :lg="12" class="problem-left" id="problem-left">
-          <el-tabs v-model="activeName" type="border-card">
+          <el-tabs v-model="activeName" type="border-card" @tab-click="tabsClick">
 
             <el-tab-pane name="problemDetail">
               <span slot="label"><i class="el-icon-receiving"/> 题目描述</span>
@@ -24,7 +24,8 @@
                   <div class="problem-tag">
                     <el-popover v-if="problemData.tags.length > 0" placement="right-start" trigger="hover">
                       <el-tag slot="reference" effect="plain" size="small" class="mouse-turns-hands">显示标签</el-tag>
-                      <el-tag v-for="(tag, index) in problemData.tags" :key="index" :color="tag.color ? tag.color : '#409eff'"
+                      <el-tag v-for="(tag, index) in problemData.tags" :key="index"
+                              :color="tag.color ? tag.color : '#409eff'"
                               style="margin-right: 5px; margin-top: 2px;" effect="dark" size="small">
                         {{ tag.value }}
                       </el-tag>
@@ -140,13 +141,25 @@
               </div>
             </el-tab-pane>
 
-            <el-tab-pane label="我的提交">
+            <el-tab-pane name="mySubmit" label="我的提交">
               <div id="js-submission">
-
+                <el-table :data="myState.list">
+                  <el-table-column label="提交时间" prop="inDate"/>
+                  <el-table-column label="状态" prop="result"/>
+                  <el-table-column label="运行时间" prop="time"/>
+                  <el-table-column label="运行内存" prop="memory"/>
+                  <el-table-column label="语言">
+                    <template slot-scope="{row}">
+                      <div>{{ row.language | lang }}</div>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <pagination :total="myState.total" :page.sync="myState.pageNum" :limit.sync="myState.pageSize"
+                            @pagination="init_mySubmit"/>
               </div>
             </el-tab-pane>
 
-            <el-tab-pane label="问题讨论"></el-tab-pane>
+            <el-tab-pane name="discuss" label="问题讨论"></el-tab-pane>
 
           </el-tabs>
         </el-col>
@@ -222,7 +235,7 @@ import utils from "@/utils/utils";
 
 import CodeMirror from "@/components/oj/CodeMirror";
 import {fetchProblem} from "@/api/problem";
-import {saveSubmission} from "@/api/submission";
+import {fetchSubmissionsList, saveSubmission} from "@/api/submission";
 import {getWorkid} from "@/utils/auth";
 
 export default {
@@ -317,6 +330,18 @@ export default {
         courseId: 0,
         source: this.code
       },
+
+
+      myState: {
+        list: [],
+        pageSize: 10,
+        pageNum: 1,
+        total: 0,
+        listQuery: {
+          isAll: false,
+
+        },
+      },
     }
   },
 
@@ -338,7 +363,6 @@ export default {
   methods: {
 
     init() {
-
       fetchProblem(this.$route.params.id).then(res => {
         if (res.data) {
           this.problemData.problem = res.data.problem
@@ -346,10 +370,15 @@ export default {
           let s = res.data.problem
           s.examples = utils.stringToExamples(s.examples)
           this.problemData.problem = s
-          console.log(this.problemData.tags)
         } else {
           this.$message.error("题目不存在，请确认题目")
         }
+      })
+    },
+    init_mySubmit() {
+      fetchSubmissionsList(this.myState.pageNum, this.myState.pageSize, this.myState.listQuery).then(res => {
+        this.myState.list = res.data.records
+        this.myState.total = res.data.total
       })
     },
 
@@ -360,6 +389,9 @@ export default {
 
     // 题目全部提交
     problem_all_submission() {
+
+    },
+    problem_my_submission() {
 
     },
 
@@ -559,6 +591,11 @@ export default {
 
     },
 
+    tabsClick(tab, event) {
+      if (tab.name === 'mySubmit') {
+        this.init_mySubmit()
+      }
+    },
 
   },
 

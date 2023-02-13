@@ -76,8 +76,8 @@ public class ProblemController {
     }
 
     @PostMapping("adminprolist/{current}/{limit}")
-    public JsonResult<PageList> pageAdminProlist(@PathVariable long current, @PathVariable long limit, @RequestBody(required = false) ProblemQuery problemQuery) {
-        return JsonResult.success(problemService.getProList(current, limit, problemQuery));
+    public JsonResult pageAdminProlist(@PathVariable long current, @PathVariable long limit, @RequestBody(required = false) ProblemQuery problemQuery) {
+        return JsonResult.success(problemService.adminGetProList(current, limit, problemQuery));
     }
 
     @GetMapping("getFile/{id}")

@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 
+import './assets/gloable.css'
+
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -35,7 +37,6 @@ Vue.use(Clipboard)
 // import Fragment from 'vue-fragment'
 //
 // Vue.use(Fragment.Plugin)
-
 
 
 Vue.config.productionTip = false // 作为产品时，减少不必要的警告提示

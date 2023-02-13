@@ -10,4 +10,9 @@ public class SolutionQuery {
     String contestId;
     String courseId;
     Integer result;
+
+    String nick;
+
+    Boolean isAll;
+
 }

@@ -1,6 +1,5 @@
 package com.zime.ojdemo.service.impl;
 
-import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -19,13 +18,8 @@ import com.zime.ojdemo.service.ProblemService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
-import io.netty.util.CharsetUtil;
-import org.apache.poi.ss.formula.functions.T;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -38,13 +32,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * <p>
@@ -141,13 +132,15 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
         //判断条件值是否为空，如果不为空拼接条件
 //        wrapper.orderByAsc("in_date");
-        wrapper.orderByDesc("id");
+
         if (degree != null) {
             wrapper.eq("degree", degree);
         }
         if (!StringUtils.isEmpty(id)) {
             wrapper.eq("title", id).or().eq("problem_id", id);
         }
+        wrapper.eq("defunct", 1);
+
         page(pageProblem, wrapper);
 
         long total = pageProblem.getTotal();
@@ -155,29 +148,40 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
         List<ProblemListResult> results = new LinkedList<>();
         for (Problem a : records) {
+            System.err.println(a);
             ProblemListResult problemListResult = new ProblemListResult();
             problemListResult.setProblemId(a.getProblemId());
             problemListResult.setAccepted(a.getAccepted());
-//            problemListResult.setDegree(a.getDegree());
+            problemListResult.setDegree(a.getDegree());
 //            problemListResult.setOrdernum(a.getOrdernum());
             problemListResult.setSubmit(a.getSubmit());
             problemListResult.setSolved(a.getSolved());
             problemListResult.setTitle(a.getTitle());
             problemListResult.setDefunct(a.getDefunct());
             problemListResult.setState(0);
+
             QueryWrapper<Solution> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("problem_id", a.getProblemId());
             problemListResult.setSubmit((int) solutionService.count(queryWrapper));
 
             queryWrapper.eq("user_id", problemQuery.getUserId());
             queryWrapper.last("limit 1");
+
             Solution solution = solutionService.getOne(queryWrapper);
-            if (solution != null) problemListResult.setState(-1);
+            if (solution != null) {
+                problemListResult.setState(-1);
+            }
             queryWrapper.eq("result", 4);
+
+            queryWrapper.orderByDesc("problem_id");
+
             solution = solutionService.getOne(queryWrapper);
-            if (solution != null) problemListResult.setState(1);
+            if (solution != null) {
+                problemListResult.setState(1);
+            }
             results.add(problemListResult);
         }
+
 
         PageList pageList = new PageList();
         pageList.setTotal(total);
@@ -186,29 +190,26 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     @Override
-    public PageList getProList(long current, long limit, ProblemQuery problemQuery) {
+    public Page<Problem> adminGetProList(long current, long limit, ProblemQuery problemQuery) {
         Page<Problem> pageProblem = new Page<>(current, limit);
         QueryWrapper<Problem> wrapper = new QueryWrapper<>();
 
-        Integer degree = problemQuery.getDegree();
-        String id = problemQuery.getId();
-
         //判断条件值是否为空，如果不为空拼接条件
-//        wrapper.orderByAsc("in_date");
         wrapper.orderByAsc("problem_id");
-        if (degree != null) {
-            wrapper.eq("degree", degree);
+        if (problemQuery.getProblemId() != null) {
+            wrapper.eq("problem_id", problemQuery.getProblemId());
         }
         if (problemQuery.getTitle() != null) {
             wrapper.like("title", problemQuery.getTitle());
         }
-        page(pageProblem, wrapper);
-        long total = pageProblem.getTotal();
-        List<Problem> records = pageProblem.getRecords();
-        PageList pageList = new PageList();
-        pageList.setTotal(total);
-        pageList.setRows(records);
-        return pageList;
+        if (problemQuery.getDegree() != null) {
+            wrapper.eq("degree", problemQuery.getDegree());
+        }
+        if (problemQuery.getDefunct() != null) {
+            wrapper.eq("defunct", problemQuery.getDefunct());
+        }
+
+        return page(new Page<>(current, limit), wrapper);
     }
 
     //    先存问题 再存标签 最后存后台测试样例
