@@ -73,3 +73,19 @@ export function delPro(ids) {
         data: ids
     })
 }
+
+export function uploadVideo(problemId, data) {
+    return request.post(`/problem/upload/video/${problemId}`, data)
+}
+
+export function getVideo(problemId) {
+    return request.post(`/problem/get/video/${problemId}`)
+}
+
+export function adminGetVideo(problemId) {
+    return request.get(`/problem/admin/get/video/${problemId}`)
+}
+
+export function deleteVideo(problemId) {
+    return request.post(`/problem/delete/video/${problemId}`)
+}

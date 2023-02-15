@@ -7,6 +7,7 @@
         <el-col :sm="24" :md="12" :lg="12" class="problem-left" id="problem-left">
           <el-tabs v-model="activeName" type="border-card" @tab-click="tabsClick">
 
+            <!--            题目-->
             <el-tab-pane name="problemDetail">
               <span slot="label"><i class="el-icon-receiving"/> 题目描述</span>
 
@@ -35,16 +36,24 @@
 
                   <!--                菜单-->
                   <div class="problem-menu">
+                    <!--                    视频-->
                     <span>
-                      <el-link @click="problem_statistics" type="primary" :underline="false">
-                        <i class="el-icon-pie-chart"/> 题目统计
+                      <el-link @click="to_problem_video" v-if="problemData.problem.videoDefunct" type="primary" :underline="false">
+                        <i class="el-icon-video-camera-solid"/> 视频讲解
                       </el-link>
                     </span>
-                    <span>
-                      <el-link @click="problem_all_submission" type="primary" :underline="false">
-                        <i class="el-icon-s-data"/> 全部提交
-                      </el-link>
-                    </span>
+                    <!--                    题目统计-->
+                    <!--                    <span>-->
+                    <!--                      <el-link @click="problem_statistics" type="primary" :underline="false">-->
+                    <!--                        <i class="el-icon-pie-chart"/> 题目统计-->
+                    <!--                      </el-link>-->
+                    <!--                    </span>-->
+                    <!--                    &lt;!&ndash;                    全部提交&ndash;&gt;-->
+                    <!--                    <span>-->
+                    <!--                      <el-link @click="problem_all_submission" type="primary" :underline="false">-->
+                    <!--                        <i class="el-icon-s-data"/> 全部提交-->
+                    <!--                      </el-link>-->
+                    <!--                    </span>-->
                   </div>
 
                   <!--                题目说明-->
@@ -141,7 +150,9 @@
               </div>
             </el-tab-pane>
 
-            <el-tab-pane name="mySubmit" label="我的提交">
+            <!--            我的提交-->
+            <el-tab-pane name="mySubmit">
+              <span slot="label"><i class="el-icon-time"/> 我的提交</span>
               <div id="js-submission">
                 <el-table :data="myState.list">
                   <el-table-column label="结果" align="center" width="200">
@@ -186,8 +197,6 @@
                             @pagination="init_mySubmit"/>
               </div>
             </el-tab-pane>
-
-            <el-tab-pane name="discuss" label="问题讨论"></el-tab-pane>
 
           </el-tabs>
         </el-col>
@@ -262,6 +271,8 @@
 import utils from "@/utils/utils";
 
 import CodeMirror from "@/components/oj/CodeMirror";
+import pagination from "@/components/Pagination";
+
 import {fetchProblem} from "@/api/problem";
 import {fetchSubmissionsList, saveSubmission} from "@/api/submission";
 import {getWorkid} from "@/utils/auth";
@@ -271,7 +282,7 @@ export default {
   name: "problem",
 
   components: {
-    CodeMirror,
+    CodeMirror, pagination
   },
 
   data() {
@@ -300,6 +311,7 @@ export default {
         languages: ["c++", "java", "python2", "python3"],
         codeTemplate: {},
         isRemote: true,
+
       },
       trainingID: null,
 
@@ -394,11 +406,14 @@ export default {
     init() {
       fetchProblem(this.$route.params.id).then(res => {
         if (res.data) {
+          console.log(res)
           this.problemData.problem = res.data.problem
           this.problemData.tags = res.data.tagsList
           let s = res.data.problem
           s.examples = utils.stringToExamples(s.examples)
           this.problemData.problem = s
+
+          this.problemData.video = res.data.video
         } else {
           this.$message.error("题目不存在，请确认题目")
         }
@@ -416,11 +431,16 @@ export default {
       this.problem_statistics_dialog = true
     },
 
-    // 题目全部提交
+    // 题目提交
     problem_all_submission() {
 
     },
     problem_my_submission() {
+
+    },
+
+    // 视频讲解
+    to_problem_video() {
 
     },
 

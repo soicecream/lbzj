@@ -38,8 +38,7 @@
           <el-col :md="6" :xs="24">
             <el-form-item label="难度" required>
               <el-select class="difficulty-select" placeholder="问题难度" v-model="problem.degree">
-                <el-option v-for="(dif, index) in problemDifficulty" :key="dif" :label="dif"
-                           :value="index + 1"></el-option>
+                <el-option v-for="(dif, index) in problemDifficulty" :key="dif" :label="dif" :value="index"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -231,6 +230,7 @@ import Editor from "@/components/admin/editor";
 import utils from "@/utils/utils";
 import {fetchAdminProblem, fetchProblem, getSample, insertOrUpdate, uploadSampleFile} from "@/api/problem";
 import tagsApi from '@/api/tags'
+import {DEGREE} from "@/utils/constants";
 
 
 export default {
@@ -250,7 +250,7 @@ export default {
         description: "", // 描述
         timeLimit: "1000", // 时间限制
         memoryLimit: "256", // 空间限制
-        difficulty: "", // 难度
+        degree: "未知", // 难度
         input: "", // 输入描述
         output: "", // 输出描述
         hint: "", // 提示
@@ -262,7 +262,7 @@ export default {
         timeLimit: {required: true, message: "时间限制不能为空", trigger: "blur",},
         memoryLimit: {required: true, message: "空间限制不能为空", trigger: "blur",},
       },
-      problemDifficulty: ['简单', '中等', '一般', '困难', '地狱'],
+      problemDifficulty: DEGREE.title,
       problemTags: [], // 题目标签
       inputVisible: false, // 标签的光标
       tagInput: "", // 标签输入框
@@ -440,6 +440,9 @@ export default {
       } else {
 
         let problemDto = {}
+        if (this.problem.degree === '未知') {
+          this.problem.degree = 0
+        }
         problemDto.problem = Object.assign({}, this.problem)
         problemDto.problem.examples = utils.examplesToString(this.problem.examples)
 
@@ -447,8 +450,13 @@ export default {
         problemDto.samples = this.problemSamples
 
         problemDto.isUploadCase = this.upload.is
-
-        console.log(this.problemTags)
+        if (problemDto.isUploadCase) {
+          let res = Object.assign([], [])
+          for (var i = 0; i < this.upload.data.length; i++) {
+            res.push({input: this.upload.data[i].input, output: this.upload.data[i].output})
+          }
+          problemDto.uploadCase = Object.assign([], res)
+        }
 
         insertOrUpdate(problemDto).then(res => {
           if (res.status === 200) {
@@ -462,7 +470,8 @@ export default {
         })
       }
     },
-    // 判断输入
+
+    // 判断、清空输入
     checkInput(s, message) {
       if (!s) {
         this.$message.error(message)
@@ -470,8 +479,6 @@ export default {
       }
       return true;
     },
-
-    // 清空输入
     clearInput() {
       this.$refs.form.resetFields()
       this.problem.title = ""
@@ -481,7 +488,7 @@ export default {
       this.problem.examples = Object.assign([], [])
       this.problem.timeLimit = "1000"
       this.problem.memoryLimit = "256"
-      this.problem.difficulty = ""
+      this.problem.degree = "未知"
       this.problem.hint = ""
       this.problem.defunct = 0
       this.problemSamples = Object.assign([], [])

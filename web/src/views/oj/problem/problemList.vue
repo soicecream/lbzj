@@ -68,9 +68,9 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import {fetchProblemsList, getProlist} from "@/api/problem";
+import {fetchProblemsList} from "@/api/problem";
 import {removeWorkid} from '@/utils/auth'
-import {JUDGE_STATUS, Languages} from "@/utils/constants";
+import {JUDGE_STATUS, Languages, DEGREE} from "@/utils/constants";
 
 export default {
   name: 'ProblemList',
@@ -85,8 +85,7 @@ export default {
       page: 1,
       total: 10,
       listQuery: {},
-      degreeOptions: ['简单', '中等', '一般', '困难', '地狱'],
-      degreeColor: {1: '#99A9BF', 2: '#e3f72a', 3: '#f79b2a', 4: '#ff5100', 5: '#FF0000'},
+      degreeColor: DEGREE.color,
     }
   },
   filters: {
@@ -98,13 +97,9 @@ export default {
   },
   methods: {
     getList() {
-      // getProlist(this.page, this.limit, this.listQuery).then(response => {
       fetchProblemsList(this.page, this.limit, this.listQuery).then(res => {
-        console.log(res)
         this.list = res.data.rows
         this.total = res.data.total
-        // this.list = response.data
-        // this.total = response.data.length
       })
     },
     ToPage(id) {

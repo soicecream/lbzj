@@ -1,30 +1,23 @@
 package com.zime.ojdemo.controller;
 
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.Problem;
 import com.zime.ojdemo.modle.vo.PageList;
-import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
+import com.zime.ojdemo.modle.vo.query.ProblemQuery;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 import com.zime.ojdemo.service.ProblemService;
 import com.zime.ojdemo.service.impl.ProblemServiceImpl;
 import com.zime.ojdemo.service.impl.ProblemTagsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +35,7 @@ public class ProblemController {
     private ProblemService problemService;
 
     @Autowired
-    ProblemServiceImpl IProblemService;
+    private ProblemServiceImpl IProblemService;
 
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
@@ -110,6 +103,7 @@ public class ProblemController {
         return JsonResult.success(problemService.CreateOrUpdate(problemDto));
     }
 
+
     @PostMapping("upload/sample")
     public JsonResult uploadProblemSample(MultipartFile file) throws IOException {
         return problemService.uploadSampleFile(file);
@@ -117,9 +111,33 @@ public class ProblemController {
 
     @GetMapping("download/sample/{id}")
     public void downloadSample(@PathVariable Integer id, HttpServletResponse response) throws IOException {
-        System.err.println("id:" + id);
         problemService.downloadSample(id, response);
     }
+
+
+    @PostMapping("upload/video/{problemId}")
+    public JsonResult uploadVideo(@PathVariable Integer problemId, MultipartFile file) throws IOException {
+        return problemService.uploadVideo(problemId, file);
+    }
+
+
+    @JsonIgnore
+    @PostMapping("get/video/{problemId}")
+    public JsonResult getVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
+        return problemService.getVideo(problemId, response);
+    }
+
+    @PostMapping("admin/get/video/{problemId}")
+    public JsonResult adminGetVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
+        return problemService.adminGetVideo(problemId, response);
+    }
+
+
+    @PostMapping("delete/video/{problemId}")
+    public JsonResult deleteVideo(@PathVariable Integer problemId) {
+        return problemService.deleteVideo(problemId);
+    }
+
 
     @PostMapping("delPro")
     public JsonResult<Boolean> delPro(@RequestBody ArrayList<Integer> ids) {

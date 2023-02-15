@@ -4,22 +4,23 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zime.ojdemo.entity.*;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemCaseDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
+import com.zime.ojdemo.entity.*;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
-import com.zime.ojdemo.modle.vo.result.ProblemListResult;
 import com.zime.ojdemo.modle.vo.query.ProblemQuery;
+import com.zime.ojdemo.modle.vo.result.ProblemListResult;
 import com.zime.ojdemo.modle.vo.result.fileResult;
 import com.zime.ojdemo.service.ProblemService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -27,7 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -60,9 +63,8 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Autowired
     private ProblemCaseServiceImpl problemCaseService;
 
-
     private String samplesPathUrl = "D:\\毕设\\lbzj\\samples\\";
-
+    private String vedioPathUrl = "D:\\毕设\\lbzj\\vedio\\";
 
     @Override
     public ProblemDto getProblem(int id) {
@@ -90,7 +92,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     //    获取后台测试数据
     public List<ProblemCase> getSample(Integer id) throws IOException {
-        String sampleFileName = samplesPathUrl + "\\" + String.format("%05d", id);
+        String sampleFileName = samplesPathUrl + "\\" + FileNameFormat(id);
         File problemSample = new File(sampleFileName);
         File files[] = problemSample.listFiles();
         TreeMap<String, ProblemCase> treeMap = new TreeMap<>();
@@ -213,6 +215,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     }
 
     //    先存问题 再存标签 最后存后台测试样例
+    @Override
     public Boolean CreateOrUpdate(AdminProblemDto problemDto) throws IOException {
         Problem problem = problemDto.getProblem();
 
@@ -227,7 +230,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //        存后台测试样例
         boolean addSample = true;
         if (problemDto.getIsUploadCase()) {
-
+            addSample = createOrUpdateSample(problemDto.getUploadCase(), problemId);
         } else {
             addSample = createOrUpdateSample(problemDto.getSamples(), problemId);
         }
@@ -238,12 +241,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     public Boolean delPro(ArrayList<Integer> ids) {
         boolean f = true;
         for (int i : ids) {
-            String sampleFileName = samplesPathUrl + "" + String.format("%05d", i);
+            String sampleFileName = samplesPathUrl + "" + FileNameFormat(i);
             File problemSampleFile = new File(sampleFileName);
 //          判断文件夹是否存在 存在则删除
             if (problemSampleFile.isDirectory()) {
                 deleteFile(problemSampleFile);
             }
+            f = problemCaseService.remove(new QueryWrapper<ProblemCase>().eq("problem_id", i));
+            f = problemTagsService.remove(new QueryWrapper<ProblemTags>().eq("problem_id", i));
+//            f = problemVideoService.deleteVideos(i);
+        }
+        if (f) {
+            JsonResult.error(400, "删除失败");
+            return false;
         }
         return removeByIds(ids);
     }
@@ -325,7 +335,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     //    下载后台测试样例
     @Override
     public void downloadSample(Integer problemId, HttpServletResponse response) throws IOException {
-        String fileDir = samplesPathUrl + "/" + String.format("%05d", problemId);
+        String fileDir = samplesPathUrl + "/" + FileNameFormat(problemId);
         File file = new File(fileDir);
 
 //        本地为空 去数据库找
@@ -340,33 +350,133 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             init_ProblemSampleCase(list, problemId);
         }
 
-        System.err.println("----------------------------------------------------------- start");
-
-        String fileName = "problem-" + String.format("%05d", problemId) + "-testCase" + ".zip";
+        String fileName = "problem-" + FileNameFormat(problemId) + "-testCase" + ".zip";
         String zipFileName = samplesPathUrl + "/" + fileName;
 //        将对应的文件夹的文件压缩成.zip
         ZipUtil.zip(fileDir, zipFileName);
 
         File zipFile = new File(zipFileName);
 
-        System.err.println("----------------------------------------------------------- toZipOk");
-
-//        设置输出流的格式
-        ServletOutputStream os = response.getOutputStream();
-        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-//        任意类型的二进制流数据
-        response.setContentType("application/octet-stream");
-
-//        读取文件的字节流
-        os.write(FileUtil.readBytes(zipFile));
-        os.flush();
-        os.close();
-
-        System.err.println("----------------------------------------------------------- end");
+        GETFILE(zipFile, response);
 
 //        删除临时文件
-//        FileUtil.del(zipFile);
+        FileUtil.del(zipFile);
     }
+
+    //    上传视频
+    @Override
+    public JsonResult uploadVideo(Integer problemId, MultipartFile file) throws IOException {
+        if (problemId == null) {
+            return JsonResult.error(400, "参数错误");
+        }
+        String originalFileName = file.getOriginalFilename();
+        String type = FileUtil.extName(originalFileName);
+        if (type == null) {
+            return JsonResult.error(400, "文件类型有问题，请确认文件类型");
+        } else if (!type.equals("mp4")) {
+            return JsonResult.error(400, "文件类型请选择mp4");
+        }
+        long size = file.getSize();
+        if (size == 0) {
+            return JsonResult.error(400, "暂无文件，请选择文件");
+        }
+
+//        文件夹
+        String fileDir = vedioPathUrl;
+//        文件名
+        String fileName = "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+//        mp4的路劲
+        String filePath = fileDir + "/" + fileName;
+        File uploadFile = new File(filePath);
+
+//        文件夹若不存在则新建
+        File parentFile = uploadFile.getParentFile();
+        if (!parentFile.exists()) {
+            FileUtil.mkdir(fileDir);
+        }
+        file.transferTo(uploadFile);
+
+        Problem problem = getProblemById(problemId);
+        problem.setVideoIsUpload(true);
+        update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
+
+        return JsonResult.success("ok");
+    }
+
+    //    获取视频
+    @Override
+    public JsonResult getVideo(Integer problemId, HttpServletResponse response) throws IOException {
+        if (problemId == null) {
+            return JsonResult.error(400, "参数错误");
+        }
+        Problem problem = getProblemById(problemId);
+        if (!problem.getVideoDefunct() || !problem.getVideoDefunct()) {
+            return JsonResult.error(400, "获取失败");
+        }
+
+        String fileNamePath = vedioPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+        File file = new File(fileNamePath);
+        if (file.length() == 0) {
+            problem.setVideoIsUpload(false);
+            update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
+            return JsonResult.error(400, "获取失败");
+        }
+        GETFILE(file, response);
+
+        return JsonResult.success("ok");
+    }
+
+    @Override
+    public JsonResult adminGetVideo(Integer problemId, HttpServletResponse response) throws IOException {
+        if (problemId == null) {
+            return JsonResult.error(400, "参数错误");
+        }
+
+        Problem problem = getProblemById(problemId);
+
+        String fileNamePath = vedioPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+        File file = new File(fileNamePath);
+        if (file.length() == 0) {
+            problem.setVideoIsUpload(false);
+            problem.setVideoDefunct(false);
+            update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
+            return JsonResult.error(400, "获取失败");
+        } else {
+            if (!problem.getVideoIsUpload()) {
+                problem.setVideoIsUpload(true);
+                update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
+            }
+        }
+        GETFILE(file, response);
+
+        return JsonResult.success("ok");
+    }
+
+
+    //    删除视频
+    @Override
+    public JsonResult deleteVideo(Integer problemId) {
+        if (problemId == null) {
+            return JsonResult.error(400, "参数错误");
+        }
+
+        System.err.println("--------------" + problemId);
+
+        Problem problem = getProblemById(problemId);
+        problem.setVideoIsUpload(false);
+        problem.setVideoDefunct(false);
+
+        boolean f = update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
+        if (!f) {
+            return JsonResult.error(400, "删除失败");
+        }
+
+        String fileNamePath = vedioPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+        FileUtil.del(fileNamePath);
+
+        return JsonResult.success("ok");
+    }
+
 
 //    ----------------------------------------------------------------------------------------------------------------------------------
 
@@ -407,7 +517,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     // 存后台测试数据
     public Boolean createOrUpdateSample(List<ProblemCase> problemCaseList, Integer problemId) throws IOException {
         // 删除
-        String sampleFileName = samplesPathUrl + "" + String.format("%05d", problemId);
+        String sampleFileName = samplesPathUrl + "" + FileNameFormat(problemId);
         File problemSampleFile = new File(sampleFileName);
 //        判断文件夹是否存在 存在则删除
         if (problemSampleFile.isDirectory()) {
@@ -423,6 +533,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         }
         // 存数据库中
         return problemCaseService.createOrUpdate(problemCaseList, problemId);
+    }
+
+    public String FileNameFormat(int id) {
+        return String.format("%05d", id);
     }
 
 
@@ -469,13 +583,13 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     //    导入问题后台测试数据
     public void init_ProblemSampleCase(List<ProblemCase> samples, Integer problemId) throws IOException {
-        String sampleFileName = samplesPathUrl + "/" + String.format("%05d", problemId);
+        String sampleFileName = samplesPathUrl + "/" + FileNameFormat(problemId);
         for (int i = 0; i < samples.size(); i++) {
             String input = samples.get(i).getInput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
             String output = samples.get(i).getOutput().replaceAll("\r\n", "\n").replaceAll("\r", "\n");
 
-            createSampleFile(sampleFileName + "/" + String.format("test%02d", i + 1) + ".in", input);
-            createSampleFile(sampleFileName + "/" + String.format("test%02d", i + 1) + ".out", output);
+            createSampleFile(sampleFileName + "/" + FileNameFormat(i + 1) + ".in", input);
+            createSampleFile(sampleFileName + "/" + FileNameFormat(i + 1) + ".out", output);
         }
     }
 
@@ -498,6 +612,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             stringBuilder.append(i);
         }
         return stringBuilder.toString();
+    }
+
+    //    前端获取文件
+    public void GETFILE(File uploadFile, HttpServletResponse response) throws IOException {
+//        设置输出流的格式
+        ServletOutputStream os = response.getOutputStream();
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(uploadFile.getName(), "UTF-8"));
+        response.setContentType("application/octet-stream");
+
+        // 读取文件的字节流
+        os.write(FileUtil.readBytes(uploadFile));
+        os.flush();
+        os.close();
     }
 
 }

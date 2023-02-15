@@ -77,4 +77,7 @@ public class Problem implements Serializable {
 
     private String author;
 
+    private Boolean videoIsUpload;
+    private Boolean videoDefunct;
+
 }

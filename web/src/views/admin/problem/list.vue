@@ -1,11 +1,12 @@
 <template>
   <div>
+    <!--    搜索-->
     <div style="padding: 10px 0">
       <el-input v-model="listQuery.problemId" placeholder="请输入题目id" clearable style="width: 150px;"/>
       <el-input v-model="listQuery.title" placeholder="请输入题目标题" class="ml-5" clearable style="width: 150px;"/>
 
       <el-select v-model="listQuery.degree" placeholder="请选择题目难度" class="ml-5" clearable style="width: 150px;">
-        <el-option v-for="(item, index) in problemDifficulty" :key="item" :label="item" :value="index"/>
+        <el-option v-for="(item, index) in degrees.title" :key="item" :label="item" :value="index"/>
       </el-select>
 
       <el-select v-model="listQuery.defunct" placeholder="请选择题目状态" clearable class="mrl-5" style="width: 150px;">
@@ -17,8 +18,9 @@
       <el-button type="warning" @click="reset"> 重置</el-button>
     </div>
 
+    <!--    操作-->
     <div>
-      <el-button type="success" size="mini" icon="el-icon-plus" @click="to_Problem_createOrEdit(null)">添加</el-button>
+      <el-button type="success" size="mini" icon="el-icon-plus" @click="to_createOrEdit(null)">添加</el-button>
       <el-button type="danger" size="mini" icon="el-icon-delete" @click="delete_dialog=true">删除</el-button>
       <el-button size="mini" type="info" icon="el-icon-download">导入</el-button>
       <el-button type="warning" size="mini" icon="el-icon-upload2">导出</el-button>
@@ -32,27 +34,70 @@
       <el-table-column label="标题" prop="title" align="center" min-width="300"/>
       <el-table-column label="难度" align="center" min-width="100">
         <template slot-scope="{row}">
-          {{ problemDifficulty[row.degree] }}
+          <span :style="{'color': degrees.color[row.degree]}">
+          {{ degrees.title[row.degree] }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column label="总提交数" prop="submit" align="center" width="100"/>
-      <el-table-column label="开放" width="100" align="center">
+      <el-table-column label="状态" width="100" align="center">
         <template slot-scope="{row}">
           <el-switch v-model="row.defunct" active-color="#13ce66" inactive-color="#ff4949" @change="changeEnabel(row)"/>
         </template>
       </el-table-column>
+      <el-table-column label="视频状态" width="100" align="center">
+        <template slot-scope="{row}">
+          <el-switch v-model="row.videoDefunct" @change="changeEnabel(row)" :disabled="!row.videoIsUpload"
+                     active-color="#13ce66" inactive-color="#ff4949"/>
+        </template>
+      </el-table-column>
+
       <el-table-column label="操作" width="250" align="center">
         <template slot-scope="{row}">
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+          <el-tooltip effect="dark" content="编辑问题" placement="top">
             <el-button @click="to_createOrEdit(row.problemId)" size="mini" type="primary" icon="el-icon-edit"/>
           </el-tooltip>
 
-          <el-tooltip class="item" effect="dark" content="下载测试样例" placement="top">
+          <el-tooltip effect="dark" content="下载测试样例" placement="top">
             <el-button @click="downloadSample(row.problemId)" size="mini" type="success" icon="el-icon-download"/>
           </el-tooltip>
 
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button @click="delete_problems(row.problemId)" size="mini" type="danger" icon="el-icon-delete-solid"/>
+          <el-tooltip effect="dark" content="删除问题" placement="top">
+            <el-popconfirm confirm-button-text='确定' cancel-button-text='我再想想' icon="el-icon-info" icon-color="#ff0000"
+                           title="您确定删除吗？" class="ml-10" @confirm="delete_problems(row.problemId)">
+              <template #reference>
+                <el-button size="mini" type="danger" icon="el-icon-delete-solid"/>
+              </template>
+            </el-popconfirm>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="视频操作" width="250" align="center">
+        <template slot-scope="{row}">
+
+          <el-tooltip effect="dark" content="上传视频" placement="top">
+            <el-button @click="to_video_upload(row.problemId)" size="mini" type="primary" icon="el-icon-edit"/>
+          </el-tooltip>
+
+
+          <el-tooltip effect="dark" :content="'预览视频' + (row.videoIsUpload ? '' : '前 请先上传')" placement="top">
+            <el-button @click="video_preview(row.problemId)" :disabled="!row.videoIsUpload" size="mini" type="warning"
+                       icon="el-icon-view"/>
+          </el-tooltip>
+
+          <el-tooltip effect="dark" content="下载视频" placement="top">
+            <el-button @click="video_download(row.problemId)" :disabled="!row.videoIsUpload" size="mini" type="success"
+                       icon="el-icon-download"/>
+          </el-tooltip>
+
+          <el-tooltip effect="dark" content="删除视频" placement="top">
+            <el-popconfirm @confirm="video_delete(row.problemId)" confirm-button-text='确定' cancel-button-text='我再想想'
+                           icon="el-icon-info" icon-color="#ff0000" title="您确定删除吗？" class="ml-10">
+              <template #reference>
+                <el-button :disabled="!row.videoIsUpload" size="mini" type="danger" icon="el-icon-delete-solid"/>
+              </template>
+            </el-popconfirm>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -71,6 +116,27 @@
     </span>
     </el-dialog>
 
+    <!--    视频上传-->
+    <el-dialog title="视频上传" :visible.sync="video.dialog.upload" width="30%">
+      <div class="importDialog-content">
+        <el-upload action="" :http-request="video_upload" drag :limit="1" :auto-upload="false" accept=".mp4"
+                   ref="importVideo">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">只能上传mp4文件</div>
+          <div class="el-upload__tip" slot="tip">用已覆盖的形式上传</div>
+        </el-upload>
+      </div>
+      <span slot="footer">
+        <el-button @click="video_upload_close">取 消</el-button>
+        <el-button type="primary" @click="video_upload_ok">确定上传</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="视频预览" :visible.sync="video.dialog.preview" width="30%">
+      <d-player ref="player" id="dplayer" :options="video.options"></d-player>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -78,7 +144,17 @@
 import utils from "@/utils/utils";
 
 import Pagination from '@/components/Pagination'
-import {changEnable, delPro, downloadSample, getAdminprolist, getFile, insertOrUpdate} from "@/api/problem";
+import {
+  adminGetVideo,
+  changEnable,
+  delPro, deleteVideo,
+  downloadSample,
+  getAdminprolist,
+  getFile, getVideo,
+  insertOrUpdate,
+  uploadSampleFile, uploadVideo,
+} from "@/api/problem";
+import {DEGREE} from "@/utils/constants";
 
 
 export default {
@@ -99,8 +175,40 @@ export default {
       delete_dialog: false,
 
       delrow: {},
-      problemDifficulty: ['未知', '简单', '中等', '一般', '困难', '地狱'],
+      degrees: DEGREE,
 
+      video: {
+        dialog: {
+          upload: false,
+          preview: false,
+        },
+        problemId: null,
+
+        options: {
+          container: document.getElementById("dplayer"), //播放器容器
+          theme: "#b7daff", // 风格颜色，例如播放条，音量条的颜色
+          loop: false, // 是否自动循环
+          lang: "zh-cn", // 语言，'en', 'zh-cn', 'zh-tw'
+          screenshot: true, // 是否允许截图（按钮），点击可以自动将截图下载到本地
+          hotkey: true, // 是否支持热键，调节音量，播放，暂停等
+          preload: "auto", // 自动预加载
+          volume: 0.7, // 初始化音量
+          playbackSpeed: [0.5, 1, 1.5, 2], //可选的播放速度，可自定义
+          video: {
+            url: '', // 播放视频的路径
+            defaultQuality: 0, // 默认是高清
+            quality: [
+              // 设置多个质量的视频
+              {
+                name: "高清",
+                url: '',
+                type: "auto", // 'auto', 'hls', 'flv', 'dash', 'webtorrent', 'normal' 或 其他自定义类型
+              }
+            ],
+          },
+        },
+
+      }
 
     }
   },
@@ -114,12 +222,13 @@ export default {
     // 获取信息
     getList() {
       getAdminprolist(this.pageNum, this.pageSize, this.listQuery).then(res => {
-        console.log(res)
+        // console.log(res.data.records)
         this.problemList = res.data.records
         this.total = res.data.total
       })
     },
 
+    // 重置
     reset() {
       Object.keys(this.listQuery).forEach(key => (this.listQuery[key] = ""))
       this.getList()
@@ -146,11 +255,6 @@ export default {
       })
     },
 
-    // 难度选择
-    pdtype() {
-
-    },
-
     // 打开关闭 问题添加修改弹窗
     to_createOrEdit(problemId) {
       if (problemId) {
@@ -169,8 +273,12 @@ export default {
       })
     },
 
+    // 下载后台测试样例
     downloadSample(id) {
-      window.open(`http://localhost/api/problem/download/sample/${id}`)
+      // downloadSample(id).then(res => {
+      //   console.log(res)
+      // })
+      // window.open(`http://localhost/api/problem/download/sample/${id}`)
     },
 
     // 时间戳 => yyyy-MM-dd HH:mm:ss
@@ -193,6 +301,55 @@ export default {
       } else {
         return ''
       }
+    },
+
+    // 视频操作
+    to_video_upload(problemId) {
+      this.video.problemId = problemId
+      this.video.dialog.upload = true
+    },
+    video_upload_ok() {
+      this.$refs.importVideo.submit()
+    },
+    video_upload_close() {
+      this.video.problemId = null
+      this.video.dialog.upload = false
+    },
+    video_upload(param) {
+      let formData = new FormData()
+      formData.append("file", param.file)
+
+      uploadVideo(this.video.problemId, formData).then(res => {
+        if (res.status === 200) {
+          this.$message.success("上传成功")
+          this.video_upload_close()
+          this.getList()
+        } else {
+          this.$message.error(res.message)
+        }
+      })
+    },
+
+    video_preview(problemId) {
+      this.video.problemId = problemId
+      this.video.dialog.preview = true
+
+      // adminGetVideo(problemId).then(res => {
+      //   // console.log(res)
+      // })
+    },
+    video_download(problemId) {
+      // window.open(`http://localhost/api/problem/admin/get/video/${problemId}`)
+    },
+    video_delete(problemId) {
+      deleteVideo(problemId).then(res => {
+        if (res.status === 200) {
+          this.$message.success("删除成功")
+          this.getList()
+        } else {
+          this.$message.error(res.message)
+        }
+      })
     },
 
   }

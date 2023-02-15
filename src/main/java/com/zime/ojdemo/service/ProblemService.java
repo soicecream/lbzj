@@ -55,4 +55,13 @@ public interface ProblemService extends IService<Problem> {
     void downloadSample(Integer id, HttpServletResponse response) throws IOException;
 
 
+    JsonResult uploadVideo(Integer problemId, MultipartFile file) throws IOException;
+
+    JsonResult getVideo(Integer problemId, HttpServletResponse response) throws IOException;
+
+    JsonResult adminGetVideo(Integer problemId, HttpServletResponse response) throws IOException;
+
+
+    JsonResult deleteVideo(Integer problemId);
+
 }

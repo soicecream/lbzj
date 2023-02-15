@@ -19,6 +19,7 @@ public class AdminProblemDto {
     private List<Tags> tagsList;
 
     private Boolean isUploadCase;
+    private List<ProblemCase> uploadCase;
 
     private List<ProblemCase> samples;
 
