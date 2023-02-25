@@ -16,6 +16,7 @@ public class CodeGenerator {
     public static void main(String[] args) {
 //        generate("problem_tags");
 //        generate("sys_problem_case");
+//        generate("sys_notice");
 
     }
 

@@ -4,7 +4,7 @@
       <NavBar :user="user" :isAdmin="isAdmin" ref="navBar"/>
     </el-header>
     <el-main class="oj-content">
-      <router-view @refreshUser="getUser"/>
+      <router-view @refreshUser="getUser" :key="key"/>
     </el-main>
   </el-container>
 </template>
@@ -22,6 +22,11 @@ export default {
     return {
       user: {},
       isAdmin: true,
+    }
+  },
+  computed: {
+    key() {
+      return `${this.$route.name}${new Date()}`
     }
   },
 

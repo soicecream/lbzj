@@ -66,10 +66,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     public Users getuser(HttpServletRequest request,String id){
+        System.err.println("--------------" + id);
         QueryWrapper<Users> s = new QueryWrapper<>();
         if(id==null||id.equals("undefined")) {
             LoginUser loginUser = tokenServie.getLoginUser(request);
             s.eq("user_id", loginUser.getUserId());
+            System.err.println("--------------------------------------------------------------");
         }
         else s.eq("user_id",Long.valueOf(id));
         return getOne(s);

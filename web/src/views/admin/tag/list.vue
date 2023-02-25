@@ -39,7 +39,8 @@
                 style="margin-top: -20px;float: right" @pagination="getList"/>
 
     <!--    添加 修改-->
-    <el-dialog title="重命名" :visible.sync="form_dialog" width="30%" @close="clearTags_Form">
+    <el-dialog :title="(dialog_ADD ? '新建' : '编辑') + '标签'" :visible.sync="form_dialog" width="30%"
+               @close="clearTags_Form">
       <el-form :model="tags_from" :rules="form_rules" ref="tags_from">
         <el-form-item label="标题名称" prop="value">
           <el-input v-model="tags_from.value" clearable/>
@@ -73,7 +74,7 @@ import utils from "@/utils/utils";
 
 import Pagination from '@/components/Pagination'
 
-import tagsApi from '@/api/tags'
+import tagsApi from '@/api/tagsApi'
 
 export default {
   name: 'tags',
@@ -99,6 +100,7 @@ export default {
       deleteRow: {},
 
       tags_from: {},
+      dialog_ADD: true,
       form_rules: {
         value: [
           {required: true, message: '请输入标签名', trigger: 'blur'},
@@ -130,8 +132,10 @@ export default {
     createOrEdit(row) {
       this.form_dialog = true
       this.clearTags_Form()
+      this.dialog_ADD = true
       if (row) {
         this.tags_from = Object.assign({}, row)
+        this.dialog_ADD = false
       }
     },
     form_ok() {

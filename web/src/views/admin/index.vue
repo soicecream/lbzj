@@ -4,7 +4,7 @@
       <admin-nav-bar></admin-nav-bar>
     </el-aside>
     <el-main width="70%">
-      <router-view></router-view>
+      <router-view :key="key"></router-view>
     </el-main>
 
   </el-container>
@@ -19,6 +19,11 @@ export default {
   data () {
     return {
       count: 0
+    }
+  },
+  computed: {
+    key() {
+      return `${this.$route.name}${new Date()}`
     }
   },
   methods: {

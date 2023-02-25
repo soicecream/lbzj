@@ -11,7 +11,7 @@
  Target Server Version : 80029
  File Encoding         : 65001
 
- Date: 15/02/2023 17:52:16
+ Date: 25/02/2023 15:26:40
 */
 
 SET NAMES utf8mb4;
@@ -63,15 +63,16 @@ CREATE TABLE `problem`  (
   `video_is_upload` int(0) NULL DEFAULT 0 COMMENT '视频是否上传 (0:未上传 1:已上传)',
   `video_defunct` int(0) NULL DEFAULT 0 COMMENT '视频是否可用 (0:禁用 1:可用)',
   PRIMARY KEY (`problem_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1015 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1016 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of problem
 -- ----------------------------
 INSERT INTO `problem` VALUES (1000, '输出Hello Programming!', '打印输出Hello Programming!', '无', '输出Hello Programming!', '无', 'Hello Programming!', '<input></input><output>Hello Programming!</output>', '0', '', NULL, '2021-12-26 17:00:00', 1.000, 128, 1, 3, 1, 0, 1, 1, 'admin', 0, 0);
 INSERT INTO `problem` VALUES (1001, '输出两个句子', '按下面格式输出以下句子:\r\nThe big bug flies away,\r\nThe big bat cries.', '无', 'The big bug flies away,\r\nThe big bat cries.', '无', 'The big bug flies away,\r\nThe big bat cries.', '<input></input><output>The big bug flies away,\nThe big bat cries.</output>', '0', '', '基础输出', '2021-12-26 17:00:00', 1.000, 128, 1, 1, 1, 0, 2, 1, 'admin', 0, 0);
-INSERT INTO `problem` VALUES (1002, 'a+b', '1', 'string', '1', '1 2', '3', '', '0', NULL, '基础输入、输出', '2021-12-26 17:00:00', 1.000, 128, 1, 2, 1, 0, 4, 1, 'admin', 0, 0);
-INSERT INTO `problem` VALUES (1003, '背诗1', '过年了，喜欢诗词的老爸对彤彤说，背出《山村咏怀》这首诗中的每一个数字，就给她对应数字张数的百元钞票作为红包，假设彤彤目前的红包里的百元钞票有n张，她背对了第一个数字，试编一个程序，输入n的值，输出背对第一个数字时，彤彤红包中的百元钞票张数。\r\n  山村咏怀\r\n       邵雍\r\n一去二三里，\r\n烟村四五家。\r\n亭台六七座，\r\n八九十枝花。', '输入一个整数n，代表目前红包里的百元钞票张数。', '在一行输出一个整数，表示背对第一个数字后获得百元钞票张数。', '34', '35', '<input></input><output></output>', '0', NULL, '基础变量', '2021-12-26 17:00:00', 1.000, 128, 1, 1, 1, 0, 5, 1, 'admin', 0, 0);
+INSERT INTO `problem` VALUES (1002, 'a+b=?', '给定$a$和$b$，求出$a+b$的和', '输入两个整数 $a,b$ ( $0<=a,b<=1^{9}$ )', '输出 $a+b$ 的和', '1 2', '3', '<input>1 1</input><output>2</output>', '0', NULL, '基础输入、输出', '2021-12-26 17:00:00', 1.000, 128, 1, 2, 1, 0, 4, 1, 'admin', 0, 0);
+INSERT INTO `problem` VALUES (1003, '背诗1', '过年了，喜欢诗词的老爸对彤彤说，背出《山村咏怀》这首诗中的每一个数字，就给她对应数字张数的百元钞票作为红包，假设彤彤目前的红包里的百元钞票有n张，她背对了第一个数字，试编一个程序，输入n的值，输出背对第一个数字时，彤彤红包中的百元钞票张数。\r\n  山村咏怀\r\n       邵雍\r\n一去二三里，\r\n烟村四五家。\r\n亭台六七座，\r\n八九十枝花。', '输入一个整数n，代表目前红包里的百元钞票张数。', '在一行输出一个整数，表示背对第一个数字后获得百元钞票张数。', '34', '35', '<input>1</input><output>1</output>', '0', NULL, '基础变量', '2021-12-26 17:00:00', 1.000, 128, 1, 1, 1, 0, 5, 1, 'admin', 0, 0);
+INSERT INTO `problem` VALUES (1015, 'a+b', '输入a和b, 问 $a+b$ 的和为多少', '输入两个整数 a和b $(0 <= a,b <= 1^{9})$', '请输出a+b的和', NULL, NULL, '<input>1 1</input><output>2</output>', '0', 'a+b啊', NULL, NULL, 1000.000, 256, 1, 0, 0, 0, 0, 1, NULL, 0, 0);
 
 -- ----------------------------
 -- Table structure for problem_tags
@@ -228,7 +229,7 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1017 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1016 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -262,6 +263,31 @@ INSERT INTO `sys_menu` VALUES (1015, '修改问题', 3, 0, '/admin/pro/edit/:pro
 INSERT INTO `sys_menu` VALUES (1016, '删除问题', 105, 0, '', NULL, NULL, 1, 0, '', '0', '0', NULL, '#', '', NULL, '', NULL, '');
 
 -- ----------------------------
+-- Table structure for sys_notice
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_notice`;
+CREATE TABLE `sys_notice`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '标题',
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '内容',
+  `creator_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建者id',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `updator_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新者id',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
+  `state` int(0) NULL DEFAULT 0 COMMENT '状态(0:禁用, 1:启用)',
+  `is_set_top` int(0) NULL DEFAULT 0 COMMENT '置顶(0:禁用, 1:启用)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sys_notice
+-- ----------------------------
+INSERT INTO `sys_notice` VALUES (1, '常用oj地址', '常用oj地址：\n[牛客](https://ac.nowcoder.com/)\n[洛谷](https://www.luogu.com.cn/)', '1', '2023-02-19 10:22:09', '1', '2023-02-22 22:46:35', 1, 1);
+INSERT INTO `sys_notice` VALUES (6, '1', '1', '1', '2023-02-19 10:22:11', '1', '2023-02-19 10:22:09', 1, 0);
+INSERT INTO `sys_notice` VALUES (7, '2', '2', '2', '2023-02-19 10:22:08', '1', '2023-02-23 21:01:33', 1, 1);
+INSERT INTO `sys_notice` VALUES (8, '3', '3', '1', '2023-02-19 10:22:13', '1', '2023-02-19 10:22:09', 1, 0);
+
+-- ----------------------------
 -- Table structure for sys_problem_case
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_problem_case`;
@@ -269,7 +295,7 @@ CREATE TABLE `sys_problem_case`  (
   `problem_id` int(0) NULL DEFAULT NULL COMMENT '问题的id',
   `input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '输入',
   `output` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '输出'
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_problem_case
@@ -277,9 +303,7 @@ CREATE TABLE `sys_problem_case`  (
 INSERT INTO `sys_problem_case` VALUES (1001, '', 'The big bug flies away,\nThe big bat cries.');
 INSERT INTO `sys_problem_case` VALUES (1002, '2 4', '6');
 INSERT INTO `sys_problem_case` VALUES (1003, '1', '1');
-INSERT INTO `sys_problem_case` VALUES (1003, '1', '1');
-INSERT INTO `sys_problem_case` VALUES (1003, '1', '1');
-INSERT INTO `sys_problem_case` VALUES (1003, '1', '1');
+INSERT INTO `sys_problem_case` VALUES (1015, '1 1', '2');
 
 -- ----------------------------
 -- Table structure for sys_role
@@ -301,7 +325,7 @@ CREATE TABLE `sys_role`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`role_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '角色信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role
@@ -320,7 +344,7 @@ CREATE TABLE `sys_role_menu`  (
   `role_id` bigint(0) NOT NULL COMMENT '角色ID',
   `menu_id` bigint(0) NOT NULL COMMENT '菜单ID',
   PRIMARY KEY (`role_id`, `menu_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '角色和菜单关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色和菜单关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role_menu
@@ -399,7 +423,7 @@ CREATE TABLE `sys_user_role`  (
   `user_id` bigint(0) NOT NULL COMMENT '用户ID',
   `role_id` bigint(0) NOT NULL COMMENT '角色ID',
   PRIMARY KEY (`user_id`, `role_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '用户和角色关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户和角色关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user_role
@@ -474,7 +498,7 @@ CREATE TABLE `work`  (
   `open` tinyint(0) NOT NULL,
   `notice` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
   PRIMARY KEY (`workid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of work

@@ -92,6 +92,25 @@ export const constantRoutes = [
         name:'userdata',
         component: () => import('@/views/oj/user/userData'),
       },
+
+      {
+        path: '/admin/notice/list',
+        name: 'admin-notice-list',
+        component: () => import('@/views/admin/notice/list'),
+      },
+
+      {
+        path: '/notice/list',
+        name: 'notice-list',
+        component: () => import('@/views/oj/notice/list')
+      },
+      {
+        path: '/notice/:noticeId',
+        name: 'notice-information',
+        component: () => import('@/views/oj/notice/notice')
+      }
+
+
     ],
     hidden:true
   },

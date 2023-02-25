@@ -193,7 +193,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Override
     public Page<Problem> adminGetProList(long current, long limit, ProblemQuery problemQuery) {
-        Page<Problem> pageProblem = new Page<>(current, limit);
         QueryWrapper<Problem> wrapper = new QueryWrapper<>();
 
         //判断条件值是否为空，如果不为空拼接条件

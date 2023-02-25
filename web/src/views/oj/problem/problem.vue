@@ -38,8 +38,14 @@
                   <div class="problem-menu">
                     <!--                    视频-->
                     <span>
-                      <el-link @click="to_problem_video" v-if="problemData.problem.videoDefunct" type="primary" :underline="false">
+                      <el-link @click="to_problem_video" v-if="problemData.problem.videoDefunct" type="primary"
+                               :underline="false">
                         <i class="el-icon-video-camera-solid"/> 视频讲解
+                      </el-link>
+                    </span>
+                    <span>
+                      <el-link @click="to_update" v-if="isAdmin" type="primary" :underline="false">
+                        <i class="el-icon-edit"/> 修改
                       </el-link>
                     </span>
                     <!--                    题目统计-->
@@ -95,19 +101,19 @@
                   <!--                描述-->
                   <div>
                     <p class="title">题目描述</p>
-                    <p v-html="problemData.problem.description" class="content-title"/>
+                    <Markdown :content="problemData.problem.description" class="content-title"/>
                   </div>
 
                   <!--                输入-->
                   <div v-if="problemData.problem.input">
                     <p class="title">输入描述</p>
-                    <p v-html="problemData.problem.input" class="content-title"/>
+                    <Markdown :content="problemData.problem.input" class="content-title"/>
                   </div>
 
                   <!--                输出-->
                   <div v-if="problemData.problem.output">
                     <p class="title">输出描述</p>
-                    <p v-html="problemData.problem.output" class="content-title"/>
+                    <Markdown :content="problemData.problem.output" class="content-title"/>
                   </div>
 
                   <!--                样例-->
@@ -142,7 +148,7 @@
                   <div v-if="problemData.problem.hint">
                     <p class="title"> 提示 </p>
                     <el-card>
-                      <p v-html="problemData.problem.hint" class="content-title"/>
+                      <Markdown :content="problemData.problem.hint" class="content-title"/>
                     </el-card>
                   </div>
 
@@ -272,6 +278,7 @@ import utils from "@/utils/utils";
 
 import CodeMirror from "@/components/oj/CodeMirror";
 import pagination from "@/components/Pagination";
+import Markdown from "@/components/oj/Markdown";
 
 import {fetchProblem} from "@/api/problem";
 import {fetchSubmissionsList, saveSubmission} from "@/api/submission";
@@ -282,7 +289,7 @@ export default {
   name: "problem",
 
   components: {
-    CodeMirror, pagination
+    CodeMirror, pagination, Markdown,
   },
 
   data() {
@@ -324,14 +331,7 @@ export default {
 
 
       language: "c++",
-      code: "#include <iostream>\n" +
-          "\n" +
-          "using namespace std;\n" +
-          "\n" +
-          "int main(){\n" +
-          "    cout << \"The big bug flies away, The big bat cries.\";\n" +
-          "    return 0;\n" +
-          "}",
+      code: "#include <iostream>\n" + "\n" + "using namespace std;\n" + "\n" + "int main(){\n" + "    cout << \"The big bug flies away, The big bat cries.\";\n" + "    return 0;\n" + "}",
 
 
       theme: "solarized",
@@ -383,6 +383,8 @@ export default {
 
         },
       },
+
+      isAdmin: false,
     }
   },
 
@@ -394,19 +396,13 @@ export default {
       this.resizeWatchHeight();
     };
 
-  },
-
-  created() {
     this.init();
-
   },
 
   methods: {
-
     init() {
       fetchProblem(this.$route.params.id).then(res => {
         if (res.data) {
-          console.log(res)
           this.problemData.problem = res.data.problem
           this.problemData.tags = res.data.tagsList
           let s = res.data.problem
@@ -442,6 +438,11 @@ export default {
     // 视频讲解
     to_problem_video() {
 
+    },
+
+    // 管理员修改此题目
+    to_update() {
+      this.$router.push('/admin/pro/edit/' + this.$route.params.id)
     },
 
     //复制样例
@@ -697,6 +698,10 @@ a {
 
 /deep/ .el-card__body, .el-main {
   padding: 0px 20px;
+}
+
+/deep/ .v-note-wrapper {
+  min-height: auto;
 }
 
 #problem-main {

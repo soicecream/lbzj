@@ -8,13 +8,14 @@
       <el-menu-item index=""><i class="el-icon-s-platform"></i>课程</el-menu-item>
       <el-menu-item index="/state"><i class="el-icon-s-marketing"></i>状态</el-menu-item>
       <el-menu-item index="/ranking"><i class="el-icon-s-data"></i>排名</el-menu-item>
-      <el-menu-item index="7"><i class="el-icon-question"></i>常见问题</el-menu-item>
+      <el-menu-item index="/notice/list"><i class="el-icon-s-data"></i>公告</el-menu-item>
+      <el-menu-item index="/admin/notice/list"><i class="el-icon-question"></i>常见问题</el-menu-item>
 
       <!--      操作用户-->
       <el-menu-item-group class="user-menus">
         <el-dropdown trigger="click">
           <el-button type="text" style="display: flex;">
-            <el-image  :src="require('@/assets/img/image/'+user.avatar)" class="zimeUserImage"/>
+            <el-image :src="require('@/assets/img/image/'+user.avatar)" class="zimeUserImage"/>
             <i class="el-icon-caret-bottom"/>
           </el-button>
           <el-dropdown-menu>
@@ -26,12 +27,12 @@
               <el-link type="text" @click="to_userdata" :underline="false">个人设置</el-link>
             </el-dropdown-item>
 
-            <el-dropdown-item  divided v-if="admin>0">
-              <el-link type="text" @click="to_admin_page" :underline="false" >后台管理</el-link>
+            <el-dropdown-item divided v-if="admin>0">
+              <el-link type="text" @click="to_admin_page" :underline="false">后台管理</el-link>
             </el-dropdown-item>
 
             <el-dropdown-item divided>
-              <el-link type="text" @click="logout" :underline="false" >退出登录</el-link>
+              <el-link type="text" @click="logout" :underline="false">退出登录</el-link>
             </el-dropdown-item>
 
           </el-dropdown-menu>
@@ -53,16 +54,16 @@ export default {
   data() {
     return {
       activeIndex: this.$route.path,
-      user:{},
-      admin:store.getters.permissions.length
+      user: {},
+      admin: store.getters.permissions.length
 
     }
   },
   created() {
-    getuser().then(res=>{
-      this.user=res.data
+    getuser().then(res => {
+      this.user = res.data
     })
-    console.log(this.admin>0)
+    console.log(this.admin > 0)
   },
   methods: {
 
@@ -83,10 +84,10 @@ export default {
 
     // 退出用户
     logout() {
-      logout().then(res=>{
+      logout().then(res => {
         this.$message.success("退出成功")
         removeToken()
-        this.$store.commit('SET_ROUTES',{routes:[]})
+        this.$store.commit('SET_ROUTES', {routes: []})
         this.$store.commit('SET_ROLES', [])
         this.$store.commit('SET_PERMISSIONS', [])
         this.$router.push('/login')

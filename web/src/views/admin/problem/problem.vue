@@ -229,7 +229,7 @@ import Editor from "@/components/admin/editor";
 
 import utils from "@/utils/utils";
 import {fetchAdminProblem, fetchProblem, getSample, insertOrUpdate, uploadSampleFile} from "@/api/problem";
-import tagsApi from '@/api/tags'
+import tagsApi from '@/api/tagsApi'
 import {DEGREE} from "@/utils/constants";
 
 
@@ -270,7 +270,7 @@ export default {
 
       // 文件上传
       upload: {
-        is: true, // 是否上传
+        is: false, // 是否上传
         data: [], // 返回的数据
       },
       // 弹窗
