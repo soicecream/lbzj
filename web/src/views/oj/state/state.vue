@@ -114,6 +114,10 @@ export default {
       list: null,
       listQuery: {
         isAll: true,
+        problemId: '',
+        nickName: '',
+        result: '',
+        language: '',
         sort: "-time",
       },
       listLoading: true,
@@ -175,7 +179,14 @@ export default {
     },
 
     reset() {
-      Object.keys(this.listQuery).forEach(key => (this.listQuery[key] = ""))
+      this.listQuery = Object.assign({}, {
+        isAll: true,
+        problemId: '',
+        nickName: '',
+        result: '',
+        language: '',
+        sort: "-time",
+      });
       this.getList()
     },
   }

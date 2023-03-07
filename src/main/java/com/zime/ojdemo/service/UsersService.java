@@ -4,6 +4,7 @@ import com.zime.ojdemo.entity.Solution;
 import com.zime.ojdemo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.modle.vo.*;
+import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.query.UserQuery;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,5 +38,8 @@ public interface UsersService extends IService<Users> {
     Boolean addUser(Users user);
 
     Boolean imageUpload(MultipartFile file, String userid) throws IllegalStateException;
+
+
+    JsonResult getTenTopUser();
 
 }

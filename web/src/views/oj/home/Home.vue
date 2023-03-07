@@ -40,6 +40,7 @@
 
 <script>
 import noticeApi from "@/api/noticeApi";
+import {getTenTopUser} from "@/api/user";
 
 export default {
   name: "oj-Home",
@@ -69,6 +70,7 @@ export default {
 
   created() {
     this.getHomeNotice()
+    this.getTenTopUser()
 
   },
 
@@ -82,6 +84,12 @@ export default {
         }
       })
     },
+    getTenTopUser() {
+      getTenTopUser().then(res => {
+        console.log(res)
+      })
+    },
+
     goToNotice(noticeId) {
       this.$router.push('/notice/' + noticeId)
     },
