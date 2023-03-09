@@ -41,5 +41,4 @@ public interface UsersService extends IService<Users> {
 
 
     JsonResult getTenTopUser();
-
 }

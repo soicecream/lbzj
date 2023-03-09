@@ -93,8 +93,8 @@ public class UsersController {
     }
 
 
-    @PostMapping("get/top")
-    private JsonResult getTenTopUser() {
+    @GetMapping("get/top")
+    public JsonResult getTenTopUser() {
         return usersService.getTenTopUser();
     }
 

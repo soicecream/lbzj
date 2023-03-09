@@ -101,7 +101,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return save(user);
     }
 
-
     private String filePath = "D:\\java1\\lbzj\\web\\src\\assets\\img\\image/";
 
     public Boolean imageUpload(MultipartFile file, String userid) throws IllegalStateException {
@@ -145,10 +144,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public JsonResult getTenTopUser() {
-//        QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("is_rank", 1);
-//        page(new Page<>(1, 10), queryWrapper);
-        return null;
+        QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_rank", 1);
+        queryWrapper.gt("submit", 0);
+        queryWrapper.orderByDesc("submit");
+
+        return JsonResult.success(page(new Page<>(1, 10), queryWrapper));
     }
+
 
 }

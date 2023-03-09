@@ -85,7 +85,7 @@ export function formuser(user,password) {
 }
 
 export function getTenTopUser() {
-  return request.post('/users/get/top')
+  return request.get('/users/get/top')
 }
 
 
