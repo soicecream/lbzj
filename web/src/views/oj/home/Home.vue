@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row :gutter="20">
-      <el-col :md="15" :sm="24">
+      <el-col :md="14" :sm="24">
         <el-card>
           <div slot="header" class="clearfix">
             <span><i class="el-icon-data-board"/> 最新公告</span>
@@ -25,11 +25,25 @@
         </el-card>
       </el-col>
 
-      <el-col :md="9" :sm="24" class="phone-margin">
+      <el-col :md="10" :sm="24" class="phone-margin">
         <el-card :class="contests.length ? 'card-top' : ''">
           <div slot="header" class="clearfix">
-            <span><i class="el-icon-s-data"/> 最近一周过题榜单</span>
+            <span><i class="el-icon-s-data"/> 排名 </span>
           </div>
+
+          <el-table :data="topTenUser">
+            <el-table-column label="#">
+              <template slot-scope="scope">
+                {{ scope.$index + 1 }}
+              </template>
+            </el-table-column>
+            <el-table-column label="用户名">
+              <template slot-scope="{row}">
+                <span @click="toUser(row.id)" class="notice-list-to">{{ row.userName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="个性签名" prop="introduce"></el-table-column>
+          </el-table>
 
         </el-card>
       </el-col>
@@ -53,6 +67,8 @@ export default {
 
       contests: [],
       srcHight: "440px",
+
+      topTenUser: [],
 
 
     }
@@ -87,6 +103,12 @@ export default {
     getTenTopUser() {
       getTenTopUser().then(res => {
         console.log(res)
+        if (res.status === 200) {
+          this.topTenUser = res.data.records
+          console.log(this.topTenUser)
+        } else {
+          this.$message.error(res.message)
+        }
       })
     },
 

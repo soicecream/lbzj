@@ -152,5 +152,4 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return JsonResult.success(page(new Page<>(1, 10), queryWrapper));
     }
 
-
 }
