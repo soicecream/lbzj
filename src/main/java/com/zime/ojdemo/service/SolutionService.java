@@ -5,6 +5,7 @@ import com.zime.ojdemo.entity.Solution;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.entity.SolutionAndSourceCode;
 import com.zime.ojdemo.modle.vo.PageList;
+import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.query.SolutionQuery;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,4 +27,5 @@ public interface SolutionService extends IService<Solution> {
 
     Page<Solution> pageSolutionsCondition(long current, long limit, SolutionQuery SolutionQuery);
 
+    JsonResult getSubmitAWeek();
 }

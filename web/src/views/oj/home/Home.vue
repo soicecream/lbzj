@@ -20,8 +20,14 @@
             </el-table-column>
             <el-table-column label="创建时间" prop="createTime" width="200" align="center"/>
           </el-table>
+        </el-card>
 
+        <el-card class="card-top">
+          <div slot="header" class="clearfix">
+            <span><i class="el-icon-data-line"/> 最近一周提交统计 </span>
+          </div>
 
+          <div id="echarts-card" class="echarts"/>
         </el-card>
       </el-col>
 
@@ -55,6 +61,9 @@
 <script>
 import noticeApi from "@/api/noticeApi";
 import {getTenTopUser} from "@/api/user";
+import {getSubmitAWeek} from "@/api/submission";
+
+import * as echarts from 'echarts';
 
 export default {
   name: "oj-Home",
@@ -69,6 +78,67 @@ export default {
       srcHight: "440px",
 
       topTenUser: [],
+
+      options: {
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "cross",
+            label: {
+              backgroundColor: "#6a7985",
+            },
+          },
+        },
+        legend: {
+          data: ['通过', '总数'],
+        },
+        grid: {
+          left: "3%",
+          right: "4%",
+          bottom: "3%",
+          containLabel: true,
+        },
+        xAxis: [
+          {
+            type: "category",
+            boundaryGap: false,
+            data: [],
+          },
+        ],
+        yAxis: [
+          {
+            type: "value",
+          },
+        ],
+        series: [
+          {
+            name: '通过',
+            type: "line",
+            stack: "Total",
+            areaStyle: {},
+            emphasis: {
+              focus: "series",
+            },
+            color: "#91cc75",
+            data: [0, 0, 0, 0, 0, 0, 0],
+          },
+          {
+            name: '总数',
+            type: "line",
+            stack: "Total",
+            label: {
+              show: true,
+              position: "top",
+            },
+            areaStyle: {},
+            emphasis: {
+              focus: "series",
+            },
+            color: "#73c0de",
+            data: [0, 0, 0, 0, 0, 0, 0],
+          },
+        ],
+      },
 
 
     }
@@ -88,6 +158,24 @@ export default {
     this.getHomeNotice()
     this.getTenTopUser()
 
+
+  },
+
+  mounted() {
+    getSubmitAWeek().then(res => {
+      if (res.status === 200) {
+        this.options.xAxis[0].data = res.data.dateStrList
+        this.options.series[0].data = res.data.acCountList
+        this.options.series[1].data = res.data.totalCountList
+
+        var myChart = echarts.init(document.getElementById('echarts-card'))
+        myChart.setOption(this.options)
+
+      } else {
+        this.$message.error(res.message)
+      }
+    })
+
   },
 
   methods: {
@@ -102,18 +190,12 @@ export default {
     },
     getTenTopUser() {
       getTenTopUser().then(res => {
-        console.log(res)
         if (res.status === 200) {
           this.topTenUser = res.data.records
-          console.log(this.topTenUser)
         } else {
           this.$message.error(res.message)
         }
       })
-    },
-
-    goToNotice(noticeId) {
-      this.$router.push('/notice/' + noticeId)
     },
 
     toMarkdown(text) {
@@ -126,7 +208,6 @@ export default {
     toUser(userId) {
       this.$router.push(`/user/${userId}`)
     },
-
 
   },
 
@@ -155,7 +236,11 @@ export default {
   .phone-margin {
     margin-top: 20px;
   }
+}
 
+.echarts {
+  height: 400px;
+  width: 100%;
 }
 
 

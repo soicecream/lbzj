@@ -17,3 +17,7 @@ export function saveSubmission(solutionAndSourceCode) {
     data : solutionAndSourceCode
   })
 }
+
+export function getSubmitAWeek() {
+  return request.post('/submission/get/submitAWeek')
+}

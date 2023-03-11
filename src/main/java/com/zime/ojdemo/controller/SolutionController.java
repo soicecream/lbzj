@@ -44,5 +44,10 @@ public class SolutionController {
         return JsonResult.success(solutionService.save(request, solutionAndSourceCode));
     }
 
+    @PostMapping("get/submitAWeek")
+    public JsonResult getSubmitAWeek() {
+        return solutionService.getSubmitAWeek();
+    }
+
 }
 

@@ -145,6 +145,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Override
     public JsonResult getTenTopUser() {
         QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("user_id", "user_name", "introduce");
         queryWrapper.eq("is_rank", 1);
         queryWrapper.gt("submit", 0);
         queryWrapper.orderByDesc("submit");

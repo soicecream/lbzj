@@ -10,6 +10,7 @@
   "dependencies": {
     "@iktakahiro/markdown-it-katex": "^4.0.1",
     "core-js": "^3.8.3",
+    "echarts": "^5.4.1",
     "element-ui": "^2.15.9",
     "highlight.js": "^11.7.0",
     "js-cookie": "^3.0.1",
