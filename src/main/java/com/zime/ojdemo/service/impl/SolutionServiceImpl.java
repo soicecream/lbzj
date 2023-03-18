@@ -136,73 +136,42 @@ public class SolutionServiceImpl extends ServiceImpl<SolutionMapper, Solution> i
     // ----------------------------------------------------------------------------------------------
 
     private SubmissionStatisticsResult buildSubmissionStatisticsResult(List<Solution> judgeList) {
-        long acTodayCount = 0;
-        long acOneDayAgoCount = 0;
-        long acTwoDaysAgoCount = 0;
-        long acThreeDaysAgoCount = 0;
-        long acFourDaysAgoCount = 0;
-        long acFiveDaysAgoCount = 0;
-        long acSixDaysAgoCount = 0;
-
-        long totalTodayCount = 0;
-        long totalOneDayAgoCount = 0;
-        long totalTwoDaysAgoCount = 0;
-        long totalThreeDaysAgoCount = 0;
-        long totalFourDaysAgoCount = 0;
-        long totalFiveDaysAgoCount = 0;
-        long totalSixDaysAgoCount = 0;
+        int n = 7;
+        Long ac[] = new Long[n + 10], total[] = new Long[n + 10];
+        String[] day = new String[n];
 
 
         Date date = new Date();
-        String todayStr = DateUtil.format(date, "MM-dd");
-        String oneDayAgoStr = DateFormatUtils.format(DateUtil.offsetDay(date, -1), "MM-dd");
-        String twoDaysAgoStr = DateFormatUtils.format(DateUtil.offsetDay(date, -2), "MM-dd");
-        String threeDaysAgoStr = DateFormatUtils.format(DateUtil.offsetDay(date, -3), "MM-dd");
-        String fourDaysAgoStr = DateFormatUtils.format(DateUtil.offsetDay(date, -4), "MM-dd");
-        String fiveDaysAgoStr = DateFormatUtils.format(DateUtil.offsetDay(date, -5), "MM-dd");
-        String sixDaysAgoStr = DateFormatUtils.format(DateUtil.offsetDay(date, -6), "MM-dd");
+        TreeMap<String, Integer> findDate = new TreeMap<>();
+        for (int i = 0; i < n; i++) {
+            String s = DateFormatUtils.format(DateUtil.offsetDay(date, -i), "MM-dd");
+            day[6 - i] = s;
+            findDate.put(s, 6 - i);
+            ac[i] = 0l;
+            total[i] = 0l;
+        }
 
         if (!CollectionUtils.isEmpty(judgeList)) {
             Map<String, List<Solution>> map = judgeList.stream().collect(Collectors.groupingBy(o -> DateUtil.format(o.getInDate(), "MM-dd")));
-            for (Map.Entry<String, List<Solution>> entry : map.entrySet()) {
-                if (Objects.equals(entry.getKey(), todayStr)) {
-                    totalTodayCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acTodayCount += count;
-                } else if (Objects.equals(entry.getKey(), oneDayAgoStr)) {
-                    totalOneDayAgoCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acOneDayAgoCount += count;
-                } else if (Objects.equals(entry.getKey(), twoDaysAgoStr)) {
-                    totalTwoDaysAgoCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acTwoDaysAgoCount += count;
-                } else if (Objects.equals(entry.getKey(), threeDaysAgoStr)) {
-                    totalThreeDaysAgoCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acThreeDaysAgoCount += count;
-                } else if (Objects.equals(entry.getKey(), fourDaysAgoStr)) {
-                    totalFourDaysAgoCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acFourDaysAgoCount += count;
-                } else if (Objects.equals(entry.getKey(), fiveDaysAgoStr)) {
-                    totalFiveDaysAgoCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acFiveDaysAgoCount += count;
-                } else if (Objects.equals(entry.getKey(), sixDaysAgoStr)) {
-                    totalSixDaysAgoCount += entry.getValue().size();
-                    long count = entry.getValue().parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
-                    acSixDaysAgoCount += count;
+            for (String NowDay : map.keySet()) {
+                if (findDate.containsKey(NowDay)) {
+                    List<Solution> solutionList = map.get(NowDay);
+                    int x = findDate.get(NowDay);
+
+                    total[x] += solutionList.size();
+                    long count = solutionList.parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED)).count();
+                    ac[x] += count;
                 }
             }
         }
 
         SubmissionStatisticsResult submissionStatisticsResult = new SubmissionStatisticsResult();
-        submissionStatisticsResult.setDateStrList(Arrays.asList(sixDaysAgoStr, fiveDaysAgoStr, fourDaysAgoStr, threeDaysAgoStr, twoDaysAgoStr, oneDayAgoStr, todayStr));
 
-        submissionStatisticsResult.setAcCountList(Arrays.asList(acSixDaysAgoCount, acFiveDaysAgoCount, acFourDaysAgoCount, acThreeDaysAgoCount, acTwoDaysAgoCount, acOneDayAgoCount, acTodayCount));
+        submissionStatisticsResult.setDateStrList(Arrays.asList(day));
 
-        submissionStatisticsResult.setTotalCountList(Arrays.asList(totalSixDaysAgoCount, totalFiveDaysAgoCount, totalFourDaysAgoCount, totalThreeDaysAgoCount, totalTwoDaysAgoCount, totalOneDayAgoCount, totalTodayCount));
+        submissionStatisticsResult.setAcCountList(Arrays.asList(ac));
+
+        submissionStatisticsResult.setTotalCountList(Arrays.asList(total));
 
         return submissionStatisticsResult;
     }
