@@ -83,7 +83,7 @@ export function getVideo(problemId) {
 }
 
 export function adminGetVideo(problemId) {
-    return request.get(`/problem/admin/get/video/${problemId}`)
+    return request.post(`/problem/admin/get/video/${problemId}`)
 }
 
 export function deleteVideo(problemId) {

@@ -63,7 +63,8 @@
           </el-tooltip>
 
           <el-tooltip effect="dark" content="删除问题" placement="top">
-            <el-popconfirm confirm-button-text='确定' cancel-button-text='我再想想' icon="el-icon-info" icon-color="#ff0000"
+            <el-popconfirm confirm-button-text='确定' cancel-button-text='我再想想' icon="el-icon-info"
+                           icon-color="#ff0000"
                            title="您确定删除吗？" class="ml-10" @confirm="delete_problems(row.problemId)">
               <template #reference>
                 <el-button size="mini" type="danger" icon="el-icon-delete-solid"/>
@@ -92,7 +93,8 @@
           </el-tooltip>
 
           <el-tooltip effect="dark" content="删除视频" placement="top">
-            <el-popconfirm @confirm="video_delete(row.problemId)" confirm-button-text='确定' cancel-button-text='我再想想'
+            <el-popconfirm @confirm="video_delete(row.problemId)" confirm-button-text='确定'
+                           cancel-button-text='我再想想'
                            icon="el-icon-info" icon-color="#ff0000" title="您确定删除吗？" class="ml-10">
               <template #reference>
                 <el-button :disabled="!row.videoIsUpload" size="mini" type="danger" icon="el-icon-delete-solid"/>
@@ -133,7 +135,8 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="视频预览" :visible.sync="video.dialog.preview" width="30%">
+    <el-dialog title="视频预览" :visible.sync="video.dialog.preview" width="30%"
+               @visible-change="videoDialogVisibleChange">
       <d-player ref="player" id="dplayer" :options="video.options"></d-player>
     </el-dialog>
 
@@ -142,6 +145,7 @@
 
 <script>
 import utils from "@/utils/utils";
+import axios from "axios";
 
 import Pagination from '@/components/Pagination'
 import {
@@ -155,6 +159,8 @@ import {
   uploadSampleFile, uploadVideo,
 } from "@/api/problem";
 import {DEGREE} from "@/utils/constants";
+import request from "@/utils/request";
+import {getToken} from "@/utils/auth";
 
 
 export default {
@@ -330,14 +336,44 @@ export default {
       })
     },
 
-    video_preview(problemId) {
-      this.video.problemId = problemId
-      this.video.dialog.preview = true
-
-      // adminGetVideo(problemId).then(res => {
-      //   // console.log(res)
-      // })
+    videoDialogVisibleChange(visible) {
+      if (visible) {
+        const player = this.$refs.player;
+        if (!player.dp) { // dp是DPlayer对象，若存在则表示已经初始化过了，不需要再初始化
+          player.initPlayer();
+        }
+      }
     },
+    video_preview(problemId) {
+      this.video.dialog.preview = true
+      this.video.problemId = problemId
+
+      axios({
+        url: 'http://localhost:8080/problem/video',
+        method: 'GET',
+        responseType: 'blob',
+        headers: {
+          'Authorization': getToken(),
+          'Access-Control-Allow-Origin': '*',
+        }
+      })
+          .then(response => {
+            const blobUrl = URL.createObjectURL(response.data)
+            this.video.options.video.url = blobUrl
+            this.$nextTick(() => { // 在DOM渲染完成之后再调用，确保能够获取到dplayer的DOM元素
+              const player = this.$refs.player;
+              if (player.dp) {
+                player.dp.switchVideo({
+                  url: blobUrl,
+                });
+              }
+            })
+          })
+          .catch(error => {
+            console.log(error)
+          })
+    },
+
     video_download(problemId) {
       // window.open(`http://localhost/api/problem/admin/get/video/${problemId}`)
     },

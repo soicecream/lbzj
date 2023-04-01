@@ -293,8 +293,8 @@ INSERT INTO `sys_notice` VALUES (8, '3', '3', '1', '2023-02-19 10:22:13', '1', '
 DROP TABLE IF EXISTS `sys_problem_case`;
 CREATE TABLE `sys_problem_case`  (
   `problem_id` int(0) NULL DEFAULT NULL COMMENT '问题的id',
-  `input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '输入',
-  `output` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '输出'
+  `input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '输入',
+  `output` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '输出'
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------

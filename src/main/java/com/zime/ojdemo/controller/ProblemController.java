@@ -13,11 +13,13 @@ import com.zime.ojdemo.service.ProblemService;
 import com.zime.ojdemo.service.impl.ProblemServiceImpl;
 import com.zime.ojdemo.service.impl.ProblemTagsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +41,32 @@ public class ProblemController {
 
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("video")
+    public void getVideo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String videoPath = "D:\\毕设\\lbzj\\vedio\\" + "problem-vedio-" + String.format("%05d", 1000) + ".mp4";
+        System.err.println(videoPath);
+
+        // 设置响应头
+//        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentType("video/mp4");
+        response.setHeader("Content-Disposition", "inline; filename=video.mp4");
+
+        // 读取视频文件并输出
+        FileInputStream in = new FileInputStream(new File(videoPath));
+        OutputStream out = response.getOutputStream();
+        byte[] buffer = new byte[4096];
+        int length;
+        while ((length = in.read(buffer)) > 0) {
+            out.write(buffer, 0, length);
+        }
+        out.flush();
+        out.close();
+        in.close();
+    }
+
 
     /*
      * 根据id获取问题接口
