@@ -42,7 +42,6 @@ public class ProblemController {
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
 
-    @CrossOrigin(origins = "*")
     @GetMapping("video")
     public void getVideo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -50,7 +49,6 @@ public class ProblemController {
         System.err.println(videoPath);
 
         // 设置响应头
-//        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setContentType("video/mp4");
         response.setHeader("Content-Disposition", "inline; filename=video.mp4");
 
@@ -155,7 +153,7 @@ public class ProblemController {
         return problemService.getVideo(problemId, response);
     }
 
-    @PostMapping("admin/get/video/{problemId}")
+    @GetMapping("admin/get/video/{problemId}")
     public JsonResult adminGetVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
         return problemService.adminGetVideo(problemId, response);
     }

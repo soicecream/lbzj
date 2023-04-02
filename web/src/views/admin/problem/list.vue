@@ -354,7 +354,6 @@ export default {
         responseType: 'blob',
         headers: {
           'Authorization': getToken(),
-          'Access-Control-Allow-Origin': '*',
         }
       })
           .then(response => {
