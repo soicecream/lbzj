@@ -348,29 +348,17 @@ export default {
       this.video.dialog.preview = true
       this.video.problemId = problemId
 
-      axios({
-        url: 'http://localhost:8080/problem/video',
-        method: 'GET',
-        responseType: 'blob',
-        headers: {
-          'Authorization': getToken(),
-        }
+      adminGetVideo(problemId).then(res => {
+        const blobUrl = URL.createObjectURL(res)
+        this.video.options.video.url = blobUrl
+        // 在DOM渲染完成之后再调用，确保能够获取到dplayer的DOM元素
+        this.$nextTick(() => {
+          const player = this.$refs.player
+          if (player.dp) {
+            player.dp.switchVideo({url: blobUrl})
+          }
+        })
       })
-          .then(response => {
-            const blobUrl = URL.createObjectURL(response.data)
-            this.video.options.video.url = blobUrl
-            this.$nextTick(() => { // 在DOM渲染完成之后再调用，确保能够获取到dplayer的DOM元素
-              const player = this.$refs.player;
-              if (player.dp) {
-                player.dp.switchVideo({
-                  url: blobUrl,
-                });
-              }
-            })
-          })
-          .catch(error => {
-            console.log(error)
-          })
     },
 
     video_download(problemId) {

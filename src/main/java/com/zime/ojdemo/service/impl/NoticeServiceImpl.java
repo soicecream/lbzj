@@ -38,8 +38,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     @Override
     public JsonResult createOrUpdate(Notice notice) {
         LoginUser user = SecurityUntils.getLoginUser();
+        List<Notice> list = getByTitleList(notice.getTitle());
         if (notice.getId() == null) {
-            List<Notice> list = getByTitleList(notice.getTitle());
             if (list.size() != 0) {
                 return JsonResult.error(400, "公告标题已重复");
             }
@@ -49,7 +49,6 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
             notice.setUpdateTime(new Date());
             return JsonResult.success(save(notice));
         } else {
-            List<Notice> list = getByTitleList(notice.getTitle());
             if (list.size() > 0 && list.get(0).getId() != notice.getId()) {
                 return JsonResult.error(400, "公告标题已重复");
             }

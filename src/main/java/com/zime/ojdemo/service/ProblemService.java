@@ -57,9 +57,9 @@ public interface ProblemService extends IService<Problem> {
 
     JsonResult uploadVideo(Integer problemId, MultipartFile file) throws IOException;
 
-    JsonResult getVideo(Integer problemId, HttpServletResponse response) throws IOException;
+    void getVideo(Integer problemId, HttpServletResponse response) throws IOException;
 
-    JsonResult adminGetVideo(Integer problemId, HttpServletResponse response) throws IOException;
+    void adminGetVideo(Integer problemId, HttpServletResponse response) throws IOException;
 
 
     JsonResult deleteVideo(Integer problemId);

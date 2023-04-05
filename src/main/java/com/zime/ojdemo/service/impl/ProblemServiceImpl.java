@@ -2,13 +2,16 @@ package com.zime.ojdemo.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemCaseDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.*;
+import com.zime.ojdemo.exception.ServiceException;
 import com.zime.ojdemo.mapper.ProblemMapper;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
@@ -20,6 +23,7 @@ import com.zime.ojdemo.service.SolutionService;
 import com.zime.ojdemo.untils.Io;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,17 +32,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
+import java.rmi.ServerException;
+import java.util.*;
 
 /**
  * <p>
@@ -63,8 +63,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Autowired
     private ProblemCaseServiceImpl problemCaseService;
 
-    private String samplesPathUrl = "D:\\毕设\\lbzj\\samples\\";
-    private String vedioPathUrl = "D:\\毕设\\lbzj\\vedio\\";
+    @Value("${files.sample.path}")
+    private String samplesPathUrl;
+    @Value("${files.video.path}")
+    private String videoPathUrl;
 
     @Override
     public ProblemDto getProblem(int id) {
@@ -381,7 +383,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         }
 
 //        文件夹
-        String fileDir = vedioPathUrl;
+        String fileDir = videoPathUrl;
 //        文件名
         String fileName = "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
 //        mp4的路劲
@@ -404,51 +406,57 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     //    获取视频
     @Override
-    public JsonResult getVideo(Integer problemId, HttpServletResponse response) throws IOException {
+    public void getVideo(Integer problemId, HttpServletResponse response) throws IOException {
+        System.err.println("get video");
         if (problemId == null) {
-            return JsonResult.error(400, "参数错误");
-        }
-        Problem problem = getProblemById(problemId);
-        if (!problem.getVideoDefunct() || !problem.getVideoDefunct()) {
-            return JsonResult.error(400, "获取失败");
+            throw new ServiceException(400, "参数错误");
         }
 
-        String fileNamePath = vedioPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+        File videoPath = new File(videoPathUrl);
+        if (!videoPath.exists()) {
+            throw new ServiceException(400, "文件夹为空, 请确认文件夹");
+        }
+        Problem problem = getProblemById(problemId);
+        System.err.println(problem.getVideoDefunct() + " " + problem.getVideoIsUpload());
+        if (!problem.getVideoDefunct() || !problem.getVideoIsUpload()) {
+            throw new ServiceException(400, "获取失败");
+        }
+        String fileNamePath = videoPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
         File file = new File(fileNamePath);
         if (file.length() == 0) {
             problem.setVideoIsUpload(false);
             update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
-            return JsonResult.error(400, "获取失败");
+            throw new ServiceException(400, "获取失败");
         }
-        GETFILE(file, response);
-
-        return JsonResult.success("ok");
+        getProblemVideo(file, response);
     }
 
     @Override
-    public JsonResult adminGetVideo(Integer problemId, HttpServletResponse response) throws IOException {
+    public void adminGetVideo(Integer problemId, HttpServletResponse response) throws IOException {
         if (problemId == null) {
-            return JsonResult.error(400, "参数错误");
+            throw new ServiceException(400, "参数错误");
         }
 
         Problem problem = getProblemById(problemId);
 
-        String fileNamePath = vedioPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+        File videoPath = new File(videoPathUrl);
+        if (!videoPath.exists()) {
+            throw new ServiceException(400, "文件夹为空, 请确认文件夹");
+        }
+
+        String fileNamePath = videoPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
         File file = new File(fileNamePath);
         if (file.length() == 0) {
             problem.setVideoIsUpload(false);
             problem.setVideoDefunct(false);
             update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
-            return JsonResult.error(400, "获取失败");
-        } else {
-            if (!problem.getVideoIsUpload()) {
-                problem.setVideoIsUpload(true);
-                update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
-            }
+            throw new ServiceException(400, "获取失败");
         }
-        GETFILE(file, response);
-
-        return JsonResult.success("ok");
+        if (!problem.getVideoIsUpload()) {
+            problem.setVideoIsUpload(true);
+            update(problem, new QueryWrapper<Problem>().eq("problem_id", problemId));
+        }
+        getProblemVideo(file, response);
     }
 
 
@@ -459,8 +467,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             return JsonResult.error(400, "参数错误");
         }
 
-        System.err.println("--------------" + problemId);
-
         Problem problem = getProblemById(problemId);
         problem.setVideoIsUpload(false);
         problem.setVideoDefunct(false);
@@ -470,7 +476,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             return JsonResult.error(400, "删除失败");
         }
 
-        String fileNamePath = vedioPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
+        String fileNamePath = videoPathUrl + "problem-vedio-" + FileNameFormat(problemId) + ".mp4";
         FileUtil.del(fileNamePath);
 
         return JsonResult.success("ok");
@@ -613,17 +619,36 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return stringBuilder.toString();
     }
 
+
     //    前端获取文件
-    public void GETFILE(File uploadFile, HttpServletResponse response) throws IOException {
+    public void GETFILE(File file, HttpServletResponse response) throws IOException {
 //        设置输出流的格式
         ServletOutputStream os = response.getOutputStream();
-        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(uploadFile.getName(), "UTF-8"));
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
         response.setContentType("application/octet-stream");
 
         // 读取文件的字节流
-        os.write(FileUtil.readBytes(uploadFile));
+        os.write(FileUtil.readBytes(file));
         os.flush();
         os.close();
+    }
+
+    public void getProblemVideo(File file, HttpServletResponse response) throws IOException {
+        // 设置响应头
+        response.setContentType("video/mp4");
+        response.setHeader("Content-Disposition", "inline; filename=video.mp4");
+
+        // 读取视频文件并输出
+        FileInputStream in = new FileInputStream(file);
+        OutputStream out = response.getOutputStream();
+        byte[] buffer = new byte[4096];
+        int length;
+        while ((length = in.read(buffer)) > 0) {
+            out.write(buffer, 0, length);
+        }
+        out.flush();
+        out.close();
+        in.close();
     }
 
 }

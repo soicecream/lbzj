@@ -83,7 +83,9 @@
                       难度:
                       <!--                    <el-tag :color="problemData.problem.difficulty">{{ problemData.problem.difficulty }}</el-tag>-->
                       <el-tag>
-                        {{ problemData.problem.degree === 1 ? '简单' : problemData.problem.degree === 2 ? '中等' : '困难' }}
+                        {{
+                          problemData.problem.degree === 1 ? '简单' : problemData.problem.degree === 2 ? '中等' : '困难'
+                        }}
                       </el-tag>
                     </div>
 
@@ -211,7 +213,8 @@
         <div class="problem-resize" title="收缩侧边栏" id="js-center">
           <span>⋮</span>
           <span>
-            <el-tooltip v-if="!toResetWatch" :content="toWatchProblem ? '查看题目内容' : '只看题目内容' " placement="right">
+            <el-tooltip v-if="!toResetWatch" :content="toWatchProblem ? '查看题目内容' : '只看题目内容' "
+                        placement="right">
               <el-button icon="el-icon-caret-right" circle class="right-fold fold" size="mini"
                          @click.stop="onlyWatchProblem"/>
             </el-tooltip>
@@ -402,7 +405,7 @@ export default {
   methods: {
     init() {
       fetchProblem(this.$route.params.id).then(res => {
-        if (res.data) {
+        if (res.status === 200) {
           this.problemData.problem = res.data.problem
           this.problemData.tags = res.data.tagsList
           let s = res.data.problem
@@ -411,7 +414,7 @@ export default {
 
           this.problemData.video = res.data.video
         } else {
-          this.$message.error("题目不存在，请确认题目")
+          this.$message.error(res.message)
         }
       })
     },
@@ -437,12 +440,12 @@ export default {
 
     // 视频讲解
     to_problem_video() {
-
+      this.$router.push(`/problem/video/${(this.$route.params.id)}`)
     },
 
     // 管理员修改此题目
     to_update() {
-      this.$router.push('/admin/pro/edit/' + this.$route.params.id)
+      this.$router.push(`/admin/pro/edit/${this.$route.params.id}`)
     },
 
     //复制样例

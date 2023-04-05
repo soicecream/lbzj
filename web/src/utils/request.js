@@ -4,22 +4,22 @@ import { getToken } from '@/utils/auth'
 import router from "@/router";
 // create an axios instance
 const service = axios.create({
-  baseURL: '/api', // url = base url + request url
-  // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 10000 // request timeout
+    baseURL: '/api', // url = base url + request url
+    // withCredentials: true, // send cookies when cross-domain requests
+    timeout: 10000 // request timeout
 })
 // request interceptor
 service.interceptors.request.use(
     config => {
-      // do something before request is sent
+        // do something before request is sent
 
-      config.headers['Authorization'] = getToken()
-      return config
+        config.headers['Authorization'] = getToken()
+        return config
     },
     error => {
-      // do something with request error
-      console.log(error) // for debug
-      return Promise.reject(error)
+        // do something with request error
+        console.log(error) // for debug
+        return Promise.reject(error)
     }
 )
 
@@ -36,8 +36,8 @@ service.interceptors.response.use(
      * You can also judge the status by HTTP Status Code
      */
     response => {
-      const res = response.data
-      if(res.status==undefined) return res;
+        const res = response.data
+        if(res.status==undefined) return res;
 
         if (res.status === 403) {
             MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
@@ -46,31 +46,31 @@ service.interceptors.response.use(
                     type: 'warning'
                 }
             ).then(() => {
-              router.push('/login')
+                router.push('/login')
             }).catch(() => {});
             return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
         }
         else if (res.status !== 200) {
 
-        Message({
-          message: res.message || 'Error',
-          type: 'error',
-          duration: 5 * 1000
-        })
-        return Promise.reject(new Error(res.message || 'Error'))
-      } else {
-        return res
-      }
+            Message({
+                message: res.message || 'Error',
+                type: 'error',
+                duration: 5 * 1000
+            })
+            return Promise.reject(new Error(res.message || 'Error'))
+        } else {
+            return res
+        }
     },
     error => {
-      console.log('err' + error)
+        console.log('err', error)
         // for debug
-      Message({
-        message: error.message,
-        type: 'error',
-        duration: 5 * 1000
-      })
-      return Promise.reject(error)
+        Message({
+            message: error.message,
+            type: 'error',
+            duration: 5 * 1000
+        })
+        return Promise.reject(error)
     }
 )
 

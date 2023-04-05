@@ -20,15 +20,13 @@
 </template>
 
 <script>
+import {getVideo} from "@/api/problem";
+
 export default {
-  name: 'course',
-  created() {
-    this.problemID = this.$route.params.id.toString()
-    this.options.video.quality[0].url = require('@/assets/video/' + this.problemID + '.mp4')
-  },
+  name: 'problem-video',
   data() {
     return {
-      problemID: '',
+      problemId: '',
       options: {
         container: document.getElementById("dplayer"), //播放器容器
         theme: "#b7daff", // 风格颜色，例如播放条，音量条的颜色
@@ -56,7 +54,27 @@ export default {
       count: 0
     }
   },
-  methods: {}
+  created() {
+    this.video_preview()
+
+  },
+  methods: {
+    video_preview() {
+      this.problemId = this.$route.params.id
+
+      getVideo(this.problemId).then(res => {
+        const blobUrl = URL.createObjectURL(res)
+        this.options.video.url = blobUrl
+        // 在DOM渲染完成之后再调用，确保能够获取到dplayer的DOM元素
+        this.$nextTick(() => {
+          const player = this.$refs.player
+          if (player.dp) {
+            player.dp.switchVideo({url: blobUrl})
+          }
+        })
+      })
+    },
+  }
 }
 </script>
 

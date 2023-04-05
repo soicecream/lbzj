@@ -83,5 +83,9 @@ mybatis-plus:
 files:
   upload:
     path: D:\毕设\lbzj\files\
+  sample:
+    path: D:\毕设\lbzj\samples\
+  video:
+    path: D:\毕设\lbzj\vedio\
 
 

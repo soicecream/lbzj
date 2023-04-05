@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zime.ojdemo.entity.Dto.AdminProblemDto;
 import com.zime.ojdemo.entity.Dto.ProblemDto;
 import com.zime.ojdemo.entity.Problem;
+import com.zime.ojdemo.exception.ServiceException;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.query.ProblemQuery;
@@ -41,30 +42,6 @@ public class ProblemController {
 
     @Autowired
     private ProblemTagsServiceImpl problemTagsService;
-
-    @GetMapping("video")
-    public void getVideo(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String videoPath = "D:\\毕设\\lbzj\\vedio\\" + "problem-vedio-" + String.format("%05d", 1000) + ".mp4";
-        System.err.println(videoPath);
-
-        // 设置响应头
-        response.setContentType("video/mp4");
-        response.setHeader("Content-Disposition", "inline; filename=video.mp4");
-
-        // 读取视频文件并输出
-        FileInputStream in = new FileInputStream(new File(videoPath));
-        OutputStream out = response.getOutputStream();
-        byte[] buffer = new byte[4096];
-        int length;
-        while ((length = in.read(buffer)) > 0) {
-            out.write(buffer, 0, length);
-        }
-        out.flush();
-        out.close();
-        in.close();
-    }
-
 
     /*
      * 根据id获取问题接口
@@ -147,15 +124,17 @@ public class ProblemController {
     }
 
 
-    @JsonIgnore
-    @PostMapping("get/video/{problemId}")
-    public JsonResult getVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
-        return problemService.getVideo(problemId, response);
+    @GetMapping("get/video/{problemId}")
+    public void getVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
+        System.err.println();
+        System.err.println();
+        System.err.println("ok");
+        problemService.getVideo(problemId, response);
     }
 
     @GetMapping("admin/get/video/{problemId}")
-    public JsonResult adminGetVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
-        return problemService.adminGetVideo(problemId, response);
+    public void adminGetVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
+        problemService.adminGetVideo(problemId, response);
     }
 
 

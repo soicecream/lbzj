@@ -16,25 +16,20 @@ export function fetchAdminProblem(id) {
 
 export function getAdminprolist(page, limit, listQuery) {
     return request({
-        url: `/problem/adminprolist/${page}/${limit}`,
-        method: 'post',
-        data: listQuery
+        url: `/problem/adminprolist/${page}/${limit}`, method: 'post', data: listQuery
     })
 }
 
 export function getFile(id) {
     return request({
-        url: `/problem/getFile/${id}`,
-        method: 'get',
+        url: `/problem/getFile/${id}`, method: 'get',
     })
 }
 
 
 export function updatePro(pro) {
     return request({
-        url: `/problem/updatePro`,
-        method: 'post',
-        data: pro
+        url: `/problem/updatePro`, method: 'post', data: pro
     })
 }
 
@@ -44,17 +39,13 @@ export function changEnable(data) {
 
 export function addPro(pro) {
     return request({
-        url: `/problem/addPro`,
-        method: 'post',
-        data: pro
+        url: `/problem/addPro`, method: 'post', data: pro
     })
 }
 
 export function insertOrUpdate(problem) {
     return request({
-        url: `/problem/`,
-        method: 'post',
-        data: problem,
+        url: `/problem/`, method: 'post', data: problem,
     })
 }
 
@@ -68,9 +59,7 @@ export function downloadSample(id) {
 
 export function delPro(ids) {
     return request({
-        url: `/problem/delPro`,
-        method: 'post',
-        data: ids
+        url: `/problem/delPro`, method: 'post', data: ids
     })
 }
 
@@ -79,11 +68,19 @@ export function uploadVideo(problemId, data) {
 }
 
 export function getVideo(problemId) {
-    return request.post(`/problem/get/video/${problemId}`)
+    return request({
+        url: `/problem/get/video/${problemId}`,
+        method: 'get',
+        responseType: 'blob',
+    })
 }
 
 export function adminGetVideo(problemId) {
-    return request.post(`/problem/admin/get/video/${problemId}`)
+    return request({
+        url: `/problem/admin/get/video/${problemId}`,
+        method: 'get',
+        responseType: 'blob',
+    })
 }
 
 export function deleteVideo(problemId) {
