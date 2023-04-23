@@ -29,7 +29,7 @@ export const JUDGE_STATUS = {
     },
     '4': {
         name: '正确',
-        short: 'TLE',
+        short: 'AC',
         loading: false,
         type: 'success',
         show: true,
@@ -43,7 +43,7 @@ export const JUDGE_STATUS = {
     },
     '6': {
         name: '答案错误',
-        short: 'RE',
+        short: 'WA',
         loading: false,
         type: 'danger',
         show: true,

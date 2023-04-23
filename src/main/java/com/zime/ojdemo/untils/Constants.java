@@ -8,24 +8,25 @@ public class Constants {
      */
     public enum Judge {
         STATUS_NOT_SUBMITTED(-10, "Not Submitted", null),
-        STATUS_SUBMITTED_UNKNOWN_RESULT(-5, "Submitted Unknown Result", null),
-        STATUS_CANCELLED(-4, "Cancelled", "ca"),
-        STATUS_PRESENTATION_ERROR(-3, "Presentation Error", "pe"),
-        STATUS_COMPILE_ERROR(-2, "Compile Error", "ce"),
-        STATUS_WRONG_ANSWER(-1, "Wrong Answer", "wa"),
-        STATUS_ACCEPTED(0, "Accepted", "ac"),
-        STATUS_TIME_LIMIT_EXCEEDED(1, "Time Limit Exceeded", "tle"),
-        STATUS_MEMORY_LIMIT_EXCEEDED(2, "Memory Limit Exceeded", "mle"),
-        STATUS_RUNTIME_ERROR(3, "Runtime Error", "re"),
-        STATUS_SYSTEM_ERROR(4, "System Error", "se"),
-        STATUS_PENDING(5, "Pending", null),
-        STATUS_COMPILING(6, "Compiling", null),
-        STATUS_JUDGING(7, "Judging", null),
-        STATUS_PARTIAL_ACCEPTED(8, "Partial Accepted", "pa"),
-        STATUS_SUBMITTING(9, "Submitting", null),
-        STATUS_SUBMITTED_FAILED(10, "Submitted Failed", null),
-        STATUS_NULL(15, "No Status", null),
-        JUDGE_SERVER_SUBMIT_PREFIX(-1002, "Judge SubmitId-ServerId:", null);
+
+        STATUS_PENDING(0, "Pending", null),
+        STATUS_LINE_UP(1, "Line Up", null),
+        STATUS_COMPILING(2, "Compiling", null),
+        STATUS_JUDGING(3, "Judging", null),
+        STATUS_ACCEPTED(4, "Accepted", "AC"),
+        STATUS_PRESENTATION_ERROR(5, "Presentation Error", "PE"),
+        STATUS_WRONG_ANSWER(6, "Wrong Answer", "WA"),
+        STATUS_TIME_LIMIT_EXCEEDED(7, "Time Limit Exceeded", "TLE"),
+        STATUS_MEMORY_LIMIT_EXCEEDED(8, "Memory Limit Exceeded", "MLE"),
+        STATUS_OUTPUT_OVERRUN(9, "Output overrun", "OE"),
+        STATUS_RUNTIME_ERROR(10, "Runtime Error", "RE"),
+        STATUS_COMPILE_ERROR(11, "Compile Error", "CE"),
+
+        STATUS_SYSTEM_ERROR(12, "System Error", "SE"),
+        STATUS_PARTIAL_ACCEPTED(13, "Partial Accepted", "PA"),
+        STATUS_SUBMITTING(14, "Submitting", null),
+        STATUS_SUBMITTED_FAILED(15, "Submitted Failed", null),
+        STATUS_NULL(16, "No Status", null);
 
         private Judge(Integer status, String name, String columnName) {
             this.status = status;

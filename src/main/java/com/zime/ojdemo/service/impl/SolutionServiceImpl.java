@@ -159,7 +159,7 @@ public class SolutionServiceImpl extends ServiceImpl<SolutionMapper, Solution> i
                     int x = findDate.get(NowDay);
 
                     total[x] += solutionList.size();
-                    long count = solutionList.parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED)).count();
+                    long count = solutionList.parallelStream().filter(judge -> Objects.equals(judge.getResult(), Constants.Judge.STATUS_ACCEPTED.getStatus())).count();
                     ac[x] += count;
                 }
             }
