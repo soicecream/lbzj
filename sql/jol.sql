@@ -11,7 +11,7 @@
  Target Server Version : 80029
  File Encoding         : 65001
 
- Date: 25/02/2023 15:26:40
+ Date: 24/04/2023 23:08:00
 */
 
 SET NAMES utf8mb4;
@@ -53,23 +53,23 @@ CREATE TABLE `problem`  (
   `in_date` datetime(0) NULL DEFAULT NULL COMMENT '加入时间',
   `time_limit` decimal(10, 3) NOT NULL COMMENT '时间限制',
   `memory_limit` int(0) NOT NULL DEFAULT 0 COMMENT '空间限制',
-  `defunct` int(0) NULL DEFAULT 0 COMMENT '状态',
-  `accepted` int(0) NULL DEFAULT 0 COMMENT '解决数',
-  `submit` int(0) NULL DEFAULT 0 COMMENT '提交数',
-  `solved` int(0) NULL DEFAULT 0 COMMENT '解答（未用）',
-  `degree` int(0) NULL DEFAULT 1 COMMENT '难度',
-  `ordernum` int(0) NULL DEFAULT 1,
+  `defunct` int(0) NOT NULL DEFAULT 0 COMMENT '状态',
+  `accepted` int(0) NOT NULL DEFAULT 0 COMMENT '解决数',
+  `submit` int(0) NOT NULL DEFAULT 0 COMMENT '提交数',
+  `solved` int(0) NOT NULL DEFAULT 0 COMMENT '解答（未用）',
+  `degree` int(0) NOT NULL DEFAULT 1 COMMENT '难度',
+  `ordernum` int(0) NULL DEFAULT 1 COMMENT '顺序',
   `author` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '作者',
-  `video_is_upload` int(0) NULL DEFAULT 0 COMMENT '视频是否上传 (0:未上传 1:已上传)',
-  `video_defunct` int(0) NULL DEFAULT 0 COMMENT '视频是否可用 (0:禁用 1:可用)',
+  `video_is_upload` int(0) NOT NULL DEFAULT 0 COMMENT '视频是否上传 (0:未上传 1:已上传)',
+  `video_defunct` int(0) NOT NULL DEFAULT 0 COMMENT '视频是否可用 (0:禁用 1:可用)',
   PRIMARY KEY (`problem_id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 1016 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of problem
 -- ----------------------------
-INSERT INTO `problem` VALUES (1000, '输出Hello Programming!', '打印输出Hello Programming!', '无', '输出Hello Programming!', '无', 'Hello Programming!', '<input></input><output>Hello Programming!</output>', '0', '', NULL, '2021-12-26 17:00:00', 1.000, 128, 1, 3, 1, 0, 1, 1, 'admin', 0, 0);
-INSERT INTO `problem` VALUES (1001, '输出两个句子', '按下面格式输出以下句子:\r\nThe big bug flies away,\r\nThe big bat cries.', '无', 'The big bug flies away,\r\nThe big bat cries.', '无', 'The big bug flies away,\r\nThe big bat cries.', '<input></input><output>The big bug flies away,\nThe big bat cries.</output>', '0', '', '基础输出', '2021-12-26 17:00:00', 1.000, 128, 1, 1, 1, 0, 2, 1, 'admin', 0, 0);
+INSERT INTO `problem` VALUES (1000, '输出Hello Programming!', '打印输出Hello Programming!', '无', '输出Hello Programming!', '无', 'Hello Programming!', '<input></input><output>Hello Programming!</output>', '0', '', NULL, '2021-12-26 17:00:00', 1.000, 128, 1, 3, 1, 0, 1, 1, 'admin', 1, 1);
+INSERT INTO `problem` VALUES (1001, '输出两个句子', '按下面格式输出以下句子:\r\nThe big bug flies away,\r\nThe big bat cries.', '无', 'The big bug flies away,\r\nThe big bat cries.', '无', 'The big bug flies away,\r\nThe big bat cries.', '<input></input><output>The big bug flies away,\nThe big bat cries.</output>', '0', '', '基础输出', '2021-12-26 17:00:00', 1.000, 128, 1, 1, 1, 0, 2, 1, 'admin', 1, 0);
 INSERT INTO `problem` VALUES (1002, 'a+b=?', '给定$a$和$b$，求出$a+b$的和', '输入两个整数 $a,b$ ( $0<=a,b<=1^{9}$ )', '输出 $a+b$ 的和', '1 2', '3', '<input>1 1</input><output>2</output>', '0', NULL, '基础输入、输出', '2021-12-26 17:00:00', 1.000, 128, 1, 2, 1, 0, 4, 1, 'admin', 0, 0);
 INSERT INTO `problem` VALUES (1003, '背诗1', '过年了，喜欢诗词的老爸对彤彤说，背出《山村咏怀》这首诗中的每一个数字，就给她对应数字张数的百元钞票作为红包，假设彤彤目前的红包里的百元钞票有n张，她背对了第一个数字，试编一个程序，输入n的值，输出背对第一个数字时，彤彤红包中的百元钞票张数。\r\n  山村咏怀\r\n       邵雍\r\n一去二三里，\r\n烟村四五家。\r\n亭台六七座，\r\n八九十枝花。', '输入一个整数n，代表目前红包里的百元钞票张数。', '在一行输出一个整数，表示背对第一个数字后获得百元钞票张数。', '34', '35', '<input>1</input><output>1</output>', '0', NULL, '基础变量', '2021-12-26 17:00:00', 1.000, 128, 1, 1, 1, 0, 5, 1, 'admin', 0, 0);
 INSERT INTO `problem` VALUES (1015, 'a+b', '输入a和b, 问 $a+b$ 的和为多少', '输入两个整数 a和b $(0 <= a,b <= 1^{9})$', '请输出a+b的和', NULL, NULL, '<input>1 1</input><output>2</output>', '0', 'a+b啊', NULL, NULL, 1000.000, 256, 1, 0, 0, 0, 0, 1, NULL, 0, 0);
@@ -150,12 +150,12 @@ CREATE TABLE `solution`  (
 -- ----------------------------
 -- Records of solution
 -- ----------------------------
-INSERT INTO `solution` VALUES (1001, 1000, 'admin', '1231231', 2, 2184, '2022-09-10 17:37:20', 4, 1, '127.0.0.1', 0, 1, -1, 97, '2022-09-10 17:37:22', 1.00, 0, 'admin', 0);
-INSERT INTO `solution` VALUES (1002, 1001, 'admin', '1231231', 0, 2184, '2022-09-10 17:42:31', 4, 1, '127.0.0.1', 0, 1, -1, 141, '2022-09-10 17:42:32', 1.00, 0, 'admin', 0);
-INSERT INTO `solution` VALUES (1003, 1004, 'admin', '1231231', 2, 2184, '2022-09-10 17:59:11', 4, 1, '127.0.0.1', 0, 1, -1, 149, '2022-09-10 17:59:12', 1.00, 0, 'admin', 0);
-INSERT INTO `solution` VALUES (1004, 1002, 'admin', '1231231', 2, 2184, '2022-09-10 17:59:57', 4, 1, '127.0.0.1', 0, 1, -1, 116, '2022-09-10 17:59:58', 1.00, 0, 'admin', 0);
-INSERT INTO `solution` VALUES (1005, 1003, 'admin', '1231231', 2, 2184, '2022-09-10 18:00:16', 4, 1, '127.0.0.1', 0, 1, -1, 113, '2022-09-10 18:00:17', 1.00, 0, 'admin', 0);
-INSERT INTO `solution` VALUES (1006, 1000, 'admin', '1231231', 2, 2184, '2016-05-13 19:24:00', 4, 1, '127.0.0.1', 0, 1, -1, 0, '2022-09-11 13:28:47', 1.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1001, 1000, 'admin', 'admin', 2, 2184, '2022-09-10 17:37:20', 4, 1, '127.0.0.1', 0, 1, -1, 97, '2022-09-10 17:37:22', 1.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1002, 1001, 'admin', 'admin', 0, 2184, '2022-09-10 17:42:31', 4, 1, '127.0.0.1', 0, 1, -1, 141, '2022-09-10 17:42:32', 1.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1003, 1004, 'admin', 'admin', 2, 2184, '2022-09-10 17:59:11', 4, 1, '127.0.0.1', 0, 1, -1, 149, '2022-09-10 17:59:12', 1.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1004, 1002, 'admin', 'admin', 2, 2184, '2022-09-10 17:59:57', 4, 1, '127.0.0.1', 0, 1, -1, 116, '2022-09-10 17:59:58', 1.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1005, 1003, 'admin', 'admin', 2, 2184, '2022-09-10 18:00:16', 4, 1, '127.0.0.1', 0, 1, -1, 113, '2022-09-10 18:00:17', 1.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1006, 1000, 'admin', 'admin', 2, 2184, '2016-05-13 19:24:00', 4, 1, '127.0.0.1', 0, 1, -1, 0, '2022-09-11 13:28:47', 1.00, 0, 'admin', 0);
 INSERT INTO `solution` VALUES (1008, 1001, 'zwj', 'zwj', 2, 2184, '2016-05-13 19:24:00', 6, 1, '', 0, 1, 1, 62, '2022-09-11 15:12:06', 0.00, 0, 'admin', 0);
 INSERT INTO `solution` VALUES (1009, 1001, 'zwj', 'zwj', 0, 0, '2022-09-11 15:14:43', 11, 1, '', 0, 1, 1, 95, '2022-09-11 15:14:44', 0.00, 0, 'admin', 0);
 INSERT INTO `solution` VALUES (1010, 1001, 'zwj', 'zwj', 2, 2184, '2022-09-11 15:15:39', 6, 1, '', 0, 1, 1, 89, '2022-09-11 15:15:40', 0.00, 0, 'admin', 0);
@@ -168,17 +168,21 @@ INSERT INTO `solution` VALUES (1016, 1000, 'admin', 'admin', 4, 2176, '2022-12-2
 INSERT INTO `solution` VALUES (1017, 1001, 'admin', 'admin', 0, 0, '2022-12-29 14:22:04', 3, 1, '', 1, 1, 1, 128, '2022-12-29 14:22:05', 0.00, 0, 'admin', 0);
 INSERT INTO `solution` VALUES (1018, 1003, 'admin', 'admin', 0, 0, '2022-12-30 09:07:48', 3, 1, '', 1, 1, 1, 128, '2022-12-30 09:07:50', 0.00, 0, 'admin', 0);
 INSERT INTO `solution` VALUES (1019, 1000, 'admin', 'admin', 3, 2176, '2022-12-30 09:08:01', 4, 1, '', 1, 1, 1, 128, '2022-12-30 09:08:03', 0.00, 0, 'admin', 0);
-INSERT INTO `solution` VALUES (1020, 1000, 'admin', 'admin', 0, 0, '2023-02-13 17:58:17', 0, 1, '', 0, 1, 1, 128, '2023-02-13 17:58:17', 0.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1020, 1000, 'admin', 'admin', 0, 0, '2023-02-13 17:58:17', 4, 1, '', 0, 1, 1, 128, '2023-02-13 17:58:17', 0.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1021, 1000, 'admin', 'admin', 0, 0, '2023-03-11 17:30:18', 4, 1, '', 0, 1, 1, 128, '2023-03-11 17:30:18', 0.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1022, 1000, 'admin', 'admin', 0, 0, '2023-03-11 17:30:24', 4, 1, '', 0, 1, 1, 128, '2023-03-11 17:30:24', 0.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1023, 1000, 'wang', 'wang', 0, 0, '2023-04-23 10:10:26', 4, 1, '', 0, 1, 1, 128, '2023-04-23 10:10:26', 0.00, 0, 'admin', 0);
+INSERT INTO `solution` VALUES (1024, 1001, 'admin', 'admin', 0, 0, '2023-04-23 10:47:03', 0, 1, '', 0, 1, 1, 128, '2023-04-23 10:47:03', 0.00, 0, 'admin', 0);
 
 -- ----------------------------
 -- Table structure for source_code
 -- ----------------------------
 DROP TABLE IF EXISTS `source_code`;
 CREATE TABLE `source_code`  (
-  `solution_id` int(0) NOT NULL AUTO_INCREMENT,
+  `solution_id` int(0) NOT NULL AUTO_INCREMENT COMMENT '状态ID',
   `source` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`solution_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1021 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1025 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of source_code
@@ -203,6 +207,10 @@ INSERT INTO `source_code` VALUES (1017, '#include <iostream>\n\nusing namespace 
 INSERT INTO `source_code` VALUES (1018, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
 INSERT INTO `source_code` VALUES (1019, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
 INSERT INTO `source_code` VALUES (1020, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
+INSERT INTO `source_code` VALUES (1021, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
+INSERT INTO `source_code` VALUES (1022, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
+INSERT INTO `source_code` VALUES (1023, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
+INSERT INTO `source_code` VALUES (1024, '#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"The big bug flies away, The big bat cries.\";\n    return 0;\n}');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -229,7 +237,7 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1016 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1017 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_menu
@@ -277,7 +285,7 @@ CREATE TABLE `sys_notice`  (
   `state` int(0) NULL DEFAULT 0 COMMENT '状态(0:禁用, 1:启用)',
   `is_set_top` int(0) NULL DEFAULT 0 COMMENT '置顶(0:禁用, 1:启用)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_notice
@@ -293,8 +301,8 @@ INSERT INTO `sys_notice` VALUES (8, '3', '3', '1', '2023-02-19 10:22:13', '1', '
 DROP TABLE IF EXISTS `sys_problem_case`;
 CREATE TABLE `sys_problem_case`  (
   `problem_id` int(0) NULL DEFAULT NULL COMMENT '问题的id',
-  `input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '输入',
-  `output` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '输出'
+  `input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '输入',
+  `output` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '输出'
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -325,7 +333,7 @@ CREATE TABLE `sys_role`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`role_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_role
@@ -456,31 +464,32 @@ INSERT INTO `tags` VALUES (11, '123', NULL);
 -- ----------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
-  `user_id` bigint(0) NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `submit` int(0) NULL DEFAULT 0,
-  `solved` int(0) NULL DEFAULT 0,
-  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'N',
-  `ip` varchar(46) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `accesstime` datetime(0) NULL DEFAULT NULL,
-  `volume` int(0) NOT NULL DEFAULT 1,
-  `user_name` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `language` int(0) NOT NULL DEFAULT 1,
-  `password` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `reg_time` datetime(0) NULL DEFAULT NULL,
-  `nick` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `school` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `avatar` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `introduce` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `user_id` bigint(0) NOT NULL COMMENT '用户id（主键）',
+  `user_name` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户名',
+  `password` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密码（加密）',
+  `nick` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '昵称',
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户E-mail',
+  `submit` int(0) NOT NULL DEFAULT 0 COMMENT '用户提交次数',
+  `solved` int(0) NOT NULL DEFAULT 0 COMMENT '成功次数',
+  `defunct` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'N' COMMENT '是否屏蔽（Y/N）',
+  `ip` varchar(46) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '用户注册ip',
+  `accesstime` datetime(0) NOT NULL COMMENT '用户注册时间',
+  `volume` int(0) NULL DEFAULT 1 COMMENT '页码（表示用户上次看到第几页）',
+  `language` int(0) NOT NULL DEFAULT 1 COMMENT '语言',
+  `reg_time` datetime(0) NOT NULL COMMENT '用户注册时间',
+  `introduce` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '个人介绍',
+  `school` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '学校',
+  `avatar` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '头像',
+  `is_rank` int(0) NOT NULL DEFAULT 0 COMMENT '是否参加排名 (0不参加 1参加)',
   PRIMARY KEY (`user_id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (1, '', 10, 5, '1', '127.0.0.1', '2022-09-10 17:34:23', 1, 'admin', 1, '$2a$10$b5h7MKaqXpQH0DuV/2ubNeuiDLleVcx/6rkGxSc.dj9xtdLnqTKWi', '2021-12-26 16:00:00', '1231231', '机电', '1.jpg', '俩字：有文化！');
-INSERT INTO `users` VALUES (2, '2', 0, 0, '1', '', '2023-01-25 17:27:38', 0, 'wang', 1, '$2a$10$QlTr8d.h9TKzKTe.tEqYX.lddQGJ26grIuGlO1PTbAL.5N/1.npAa', NULL, 'wang', '机电', 'admin.jpg', NULL);
-INSERT INTO `users` VALUES (3, '', 0, 0, '0', '', '2023-01-30 18:26:41', 0, 'k', 1, '$2a$10$MHpBKVk/H3dO5c13CyFhfujpRfp0j53dZLv.dtn4daZOxBUsfUnbi', NULL, '', '', 'mo.jpeg', NULL);
+INSERT INTO `users` VALUES (1, 'admin', '$2a$10$b5h7MKaqXpQH0DuV/2ubNeuiDLleVcx/6rkGxSc.dj9xtdLnqTKWi', '1231231', '', 10, 5, '1', '127.0.0.1', '2022-09-10 17:34:23', 1, 1, '2021-12-26 16:00:00', '俩字：有文化！', '机电', '1.jpg', 1);
+INSERT INTO `users` VALUES (2, 'wang', '$2a$10$QlTr8d.h9TKzKTe.tEqYX.lddQGJ26grIuGlO1PTbAL.5N/1.npAa', 'wang', '2', 1, 1, '1', '', '2023-01-25 17:27:38', 0, 1, '2021-12-26 16:00:00', NULL, '机电', 'admin.jpg', 1);
+INSERT INTO `users` VALUES (3, 'k', '$2a$10$MHpBKVk/H3dO5c13CyFhfujpRfp0j53dZLv.dtn4daZOxBUsfUnbi', '', '', 0, 0, '0', '', '2023-01-30 18:26:41', 0, 1, '2021-12-26 16:00:00', NULL, '', 'mo.jpeg', 1);
 
 -- ----------------------------
 -- Table structure for work
