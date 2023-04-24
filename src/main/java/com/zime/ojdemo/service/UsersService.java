@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zime.ojdemo.modle.vo.*;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.query.UserQuery;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author zime
  * @since 2021-06-08
  */
+@Component
 public interface UsersService extends IService<Users> {
 
 

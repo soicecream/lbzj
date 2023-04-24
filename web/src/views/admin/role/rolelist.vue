@@ -1,14 +1,13 @@
 <template>
   <div>
-    <el-input v-model="listQuery.nick" placeholder="请输入角色昵称" style="width: 200px;margin-left: 40%"></el-input>
+    <el-input v-model="listQuery.username" placeholder="请输入角色昵称" style="width: 200px;margin-left: 40%"></el-input>
     <el-button icon="el-icon-search" circle @click="getList"></el-button>
 
     <div>
       <el-button type="success" size="mini" icon="el-icon-plus"  @click="showdig=true" v-has-perm="['role:add']">添加</el-button>
       <el-button type="danger" size="mini" icon="el-icon-delete"  @click="showdig1=true"
                  :disabled="delrow.length>0?false:true" v-has-permi="['role:del']">删除</el-button>
-      <el-button  size="mini" type="info" icon="el-icon-download">导入</el-button>
-      <el-button  type="warning"  size="mini" icon="el-icon-upload2">导出</el-button>
+
     </div>
     <el-table
         stripe
@@ -167,7 +166,7 @@ export default {
       page:1,
       total:10,
       listQuery:{
-        nick:''
+        username:'',
       },
       showdig:false,
       showdig1:false,

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-input v-model="listQuery.username" placeholder="请输入内容" style="width: 200px;margin-left: 40%"></el-input>
+    <el-input v-model="listQuery.username" placeholder="请输入用户昵称" style="width: 200px;margin-left: 40%"></el-input>
     <el-button icon="el-icon-search" circle @click="getList"></el-button>
 
     <div>
@@ -9,8 +9,6 @@
       <el-button type="danger" size="mini" icon="el-icon-delete" @click="showdig1=true"
                  :disabled="delrow.length>0?false:true" v-has-permi="['user:del']">删除
       </el-button>
-      <el-button size="mini" type="info" icon="el-icon-download">导入</el-button>
-      <el-button type="warning" size="mini" icon="el-icon-upload2">导出</el-button>
     </div>
     <el-table
         stripe
@@ -31,6 +29,11 @@
       <el-table-column label="昵称" min-width="150px" align="center">
         <template slot-scope="{row}">
           <div>{{ row.userName }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column label="昵称" min-width="150px" align="center">
+        <template slot-scope="{row}">
+          <div>{{ row.nick }}</div>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" min-width="150px" align="center">

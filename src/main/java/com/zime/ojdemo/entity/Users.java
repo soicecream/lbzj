@@ -38,10 +38,9 @@ public class Users implements Serializable {
     private Integer solved;
 
     private Boolean defunct;
-    private Boolean isRank;
+//    private Boolean isRank;
 
     private String ip;
-
 
     private Date accesstime;
 

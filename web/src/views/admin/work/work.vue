@@ -6,8 +6,7 @@
       <el-button type="success" size="mini" icon="el-icon-plus" @click="showdig0=true">添加</el-button>
       <el-button type="danger" size="mini" icon="el-icon-delete" @click="showdig1=true"
                  :disabled="delrow.length>0?false:true">删除</el-button>
-      <el-button size="mini" type="info" icon="el-icon-download" v-hasPermi="['11']">导入</el-button>
-      <el-button type="warning" size="mini" icon="el-icon-upload2">导出</el-button>
+
     </div>
     <el-table
         border
@@ -271,6 +270,7 @@ export default {
   },
   methods: {
     getList() {
+      console.log(66)
       getAdminWorkList(this.page, this.limit,this.listQuery).then(res => {
         this.list = res.data.rows;
         this.total = res.data.total;

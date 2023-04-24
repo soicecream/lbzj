@@ -7,6 +7,7 @@ import com.zime.ojdemo.entity.SolutionAndSourceCode;
 import com.zime.ojdemo.modle.vo.PageList;
 import com.zime.ojdemo.modle.vo.base.JsonResult;
 import com.zime.ojdemo.modle.vo.query.SolutionQuery;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author zime
  * @since 2021-10-01
  */
+@Component
 public interface SolutionService extends IService<Solution> {
 
 
