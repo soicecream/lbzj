@@ -135,7 +135,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         String id = problemQuery.getId();
 
         //判断条件值是否为空，如果不为空拼接条件
-//        wrapper.orderByAsc("in_date");
+        String title = problemQuery.getTitle();
+        if (title != null) {
+            wrapper.like("title", title);
+        }
 
         if (degree != null) {
             wrapper.eq("degree", degree);
@@ -149,15 +152,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
         long total = pageProblem.getTotal();
         List<Problem> records = pageProblem.getRecords();
-
         List<ProblemListResult> results = new LinkedList<>();
         for (Problem a : records) {
-            System.err.println(a);
             ProblemListResult problemListResult = new ProblemListResult();
             problemListResult.setProblemId(a.getProblemId());
             problemListResult.setAccepted(a.getAccepted());
             problemListResult.setDegree(a.getDegree());
-//            problemListResult.setOrdernum(a.getOrdernum());
             problemListResult.setSubmit(a.getSubmit());
             problemListResult.setSolved(a.getSolved());
             problemListResult.setTitle(a.getTitle());
@@ -176,7 +176,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
                 problemListResult.setState(-1);
             }
             queryWrapper.eq("result", 4);
-
             queryWrapper.orderByDesc("problem_id");
 
             solution = solutionService.getOne(queryWrapper);
@@ -274,14 +273,10 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             return JsonResult.error(400, "暂无文件，请选择文件");
         }
 
+        String fileDir = samplesPathUrl + "/" + "uploadFileCache"; // 文件夹
+        String filePath = fileDir + "/" + file.getOriginalFilename(); // zip解压路劲
 
-//        文件夹
-        String fileDir = samplesPathUrl + "/" + "uploadFileCache";
-//        zip解压路劲
-        String filePath = fileDir + "/" + file.getOriginalFilename();
-
-//        文件夹若不存在则新建
-        FileUtil.mkdir(fileDir);
+        FileUtil.mkdir(fileDir); // 文件夹若不存在则新建
 
 //        上传
         try {
@@ -290,10 +285,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             return JsonResult.error(400, "服务器异常：评测数据上传失败！");
         }
 
-//        解压到指定文件夹下
-        ZipUtil.unzip(filePath, fileDir);
-//        删除zip
-        FileUtil.del(filePath);
+
+        ZipUtil.unzip(filePath, fileDir); // 解压到指定文件夹下
+        FileUtil.del(filePath); // 删除zip
 
 //        检查文件是否为空
         File textCaseFileList = new File(fileDir);
@@ -407,7 +401,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     //    获取视频
     @Override
     public void getVideo(Integer problemId, HttpServletResponse response) throws IOException {
-        System.err.println("get video");
         if (problemId == null) {
             throw new ServiceException(400, "参数错误");
         }
@@ -417,7 +410,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             throw new ServiceException(400, "文件夹为空, 请确认文件夹");
         }
         Problem problem = getProblemById(problemId);
-        System.err.println(problem.getVideoDefunct() + " " + problem.getVideoIsUpload());
         if (!problem.getVideoDefunct() || !problem.getVideoIsUpload()) {
             throw new ServiceException(400, "获取失败");
         }

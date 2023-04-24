@@ -6,12 +6,9 @@
           <div slot="header" class="clearfix">
             <span><i class="el-icon-data-board"/> 最新公告</span>
           </div>
-
           <el-table :data="notice.list" class="notice-list">
             <el-table-column label="标题" min-width="300" align="center">
-              <template slot-scope="{row}">
-                <span @click="toNotice(row.id)" class="notice-list-to">{{ row.title }}</span>
-              </template>
+              <template slot-scope="{row}"><span @click="toNotice(row.id)" class="notice-list-to">{{ row.title }}</span></template>
             </el-table-column>
             <el-table-column label="创建者" width="200" align="center">
               <template slot-scope="{row}">
@@ -21,28 +18,18 @@
             <el-table-column label="创建时间" prop="createTime" width="200" align="center"/>
           </el-table>
         </el-card>
-
         <el-card class="card-top">
-          <div slot="header" class="clearfix">
-            <span><i class="el-icon-data-line"/> 最近一周提交统计 </span>
-          </div>
-
+          <div slot="header" class="clearfix"><span><i class="el-icon-data-line"/> 最近一周提交统计 </span></div>
           <div id="echarts-card" class="echarts"/>
         </el-card>
       </el-col>
-
       <el-col :md="10" :sm="24" class="phone-margin">
         <el-card :class="contests.length ? 'card-top' : ''">
           <div slot="header" class="clearfix">
             <span><i class="el-icon-s-data"/> 排名 </span>
           </div>
-
           <el-table :data="topTenUser">
-            <el-table-column label="#">
-              <template slot-scope="scope">
-                {{ scope.$index + 1 }}
-              </template>
-            </el-table-column>
+            <el-table-column label="#"><template slot-scope="scope">{{ scope.$index + 1 }}</template></el-table-column>
             <el-table-column label="用户名">
               <template slot-scope="{row}">
                 <span @click="toUser(row.id)" class="notice-list-to">{{ row.userName }}</span>
@@ -50,10 +37,8 @@
             </el-table-column>
             <el-table-column label="个性签名" prop="introduce"></el-table-column>
           </el-table>
-
         </el-card>
       </el-col>
-
     </el-row>
   </div>
 </template>
@@ -183,8 +168,6 @@ export default {
       noticeApi.getHomeNotice().then(res => {
         if (res.status === 200) {
           this.notice.list = Object.assign([], res.data)
-        } else {
-          this.$message.error(res.message)
         }
       })
     },
@@ -192,8 +175,6 @@ export default {
       getTenTopUser().then(res => {
         if (res.status === 200) {
           this.topTenUser = res.data.records
-        } else {
-          this.$message.error(res.message)
         }
       })
     },

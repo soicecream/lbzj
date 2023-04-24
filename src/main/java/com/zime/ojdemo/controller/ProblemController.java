@@ -126,9 +126,6 @@ public class ProblemController {
 
     @GetMapping("get/video/{problemId}")
     public void getVideo(@PathVariable Integer problemId, HttpServletResponse response) throws IOException {
-        System.err.println();
-        System.err.println();
-        System.err.println("ok");
         problemService.getVideo(problemId, response);
     }
 

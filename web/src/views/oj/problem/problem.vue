@@ -465,8 +465,7 @@ export default {
       const _this = this;
       // 鼠标按下事件
       resize.onmousedown = function (e) {
-        //颜色改变提醒
-        resize.style.background = "#818181";
+        resize.style.background = "#818181"; //颜色改变提醒
         var startX = e.clientX;
         // 鼠标拖动事件
         document.onmousemove = function (e) {
@@ -492,8 +491,7 @@ export default {
         };
         // 鼠标松开事件
         document.onmouseup = function (evt) {
-          //颜色恢复
-          resize.style.background = "#d6d6d6";
+          resize.style.background = "#d6d6d6"; //颜色恢复
           document.onmousemove = null;
           document.onmouseup = null;
           resize.releaseCapture && resize.releaseCapture(); //当你不在需要继续获得鼠标消息就要应该调用ReleaseCapture()释放掉

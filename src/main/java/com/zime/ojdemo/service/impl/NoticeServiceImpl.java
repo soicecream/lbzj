@@ -65,7 +65,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
     @Override
     public JsonResult GETHOME() {
-        Page<Notice> noticePage = setListUsername(page(new Page<>(1, 5), new QueryWrapper<Notice>().orderByDesc("create_time").eq("state", 1)));
+        Page<Notice> noticePage = setListUsername(page(new Page<>(1, 5),
+                new QueryWrapper<Notice>().orderByDesc("create_time").eq("state", 1)));
 
         List<NOTICELIST> list = new ArrayList<>();
         for (int i = 0; i < noticePage.getTotal(); i++) {
@@ -91,7 +92,9 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
     @Override
     public JsonResult getPageList(Integer current, Integer limit, NoticeQuery noticeQuery) {
-        QueryWrapper<Notice> queryWrapper = new QueryWrapper<Notice>().orderByDesc("is_set_top").orderByDesc("create_time").eq("state", 1);
+        QueryWrapper<Notice> queryWrapper = new QueryWrapper<Notice>()
+                .orderByDesc("is_set_top").orderByDesc("create_time")
+                .eq("state", 1);
 
         if (noticeQuery.getTitle() != null || !noticeQuery.equals("")) {
             queryWrapper.like("title", noticeQuery.getTitle());

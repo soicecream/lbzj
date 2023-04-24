@@ -2,36 +2,20 @@
   <el-card class="box-card" style="width: 95%;margin: 0.5rem auto;height: 88%">
     <!--    搜索-->
     <div style="padding: 10px 0">
-      <!--      <el-input v-model="listQuery.problemId" placeholder="请输入题目id" clearable style="width: 150px;"/>-->
-      <!--      <el-input v-model="listQuery.title" placeholder="请输入题目标题" clearable style="width: 150px; margin-left: 5px;"/>-->
-      <!---->
-      <!--      <el-select v-model="listQuery.degree" placeholder="请选择题目难度" clearable style="width: 150px; margin-left: 5px;">-->
-      <!--        <el-option v-for="(item, index) in problemDifficulty" :key="item" :label="item" :value="index"/>-->
-      <!--      </el-select>-->
+      <el-input v-model="listQuery.id" placeholder="请输入题目id" clearable style="width: 150px;"/>
+      <el-input v-model="listQuery.title" placeholder="请输入题目标题" clearable
+                style="width: 150px; margin-left: 5px;"/>
 
-      <!--      <el-button type="primary" @click="getList"> 搜索</el-button>-->
-      <!--      <el-button type="warning" @click="reset"> 重置</el-button>-->
+      <el-select v-model="listQuery.degree" placeholder="请选择题目难度" clearable
+                 style="width: 150px; margin-left: 5px; margin-right: 10px">
+        <el-option v-for="(item, index) in problemDifficulty" :key="item" :label="item" :value="index"/>
+      </el-select>
+
+      <el-button type="primary" @click="getList"> 搜索</el-button>
+      <el-button type="warning" @click="reset"> 重置</el-button>
     </div>
 
-    <!--    <div slot="header" class="clearfix">-->
-    <!--      <span style="font-size: 1.4rem">题目列表</span>-->
-
-    <!--      <el-input v-model="listQuery.title" placeholder="请输入标题" size="small"-->
-    <!--                style="float: right;width: 200px;height: 20px" @change="getList">-->
-    <!--      </el-input>-->
-
-    <!--      <el-input v-model="listQuery.problemId" placeholder="请输入问题编号" size="small"-->
-    <!--                style="float: right;width: 150px;height: 20px" @change="getList">-->
-    <!--      </el-input>-->
-
-
-    <!--&lt;!&ndash;      <el-select size="small" v-model="listQuery.degree" placeholder="难度" clearable&ndash;&gt;-->
-    <!--&lt;!&ndash;                 style="width: 90px;margin-right: 1rem;float: right" class="filter-item">&ndash;&gt;-->
-    <!--&lt;!&ndash;        <el-option v-for="(item, index) in degreeOptions" :key="item" :label="item" :value="index + 1"/>&ndash;&gt;-->
-    <!--&lt;!&ndash;      </el-select>&ndash;&gt;-->
-    <!--    </div>-->
-
-    <el-table style="width: 100%;margin-top: -20px" :data="list">
+    <el-table style="width: 100%; margin-top: 20px" :data="list">
       <el-table-column label="#" prop="index" align="center" width="100">
         <template slot-scope="{row}">
           <div @click="ToPage(row.problemId)">{{ row.problemId }}</div>
@@ -84,8 +68,13 @@ export default {
       limit: 10,
       page: 1,
       total: 10,
-      listQuery: {},
+      listQuery: {
+        id: '',
+        title: '',
+        degree: '',
+      },
       degreeColor: DEGREE.color,
+      problemDifficulty: DEGREE.title,
     }
   },
   filters: {
@@ -101,6 +90,12 @@ export default {
         this.list = res.data.rows
         this.total = res.data.total
       })
+    },
+    reset() {
+      this.listQuery.id = ''
+      this.listQuery.title = ''
+      this.listQuery.degree = ''
+      this.getList()
     },
     ToPage(id) {
       this.$router.push('/problem/' + id)

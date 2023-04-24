@@ -21,29 +21,24 @@ public class LoginServie {
     @Resource
     private AuthenticationManager authenticationManager;
 
-    public String login(String username,String password){
-        Authentication authentication=null;
-        try{
-            authentication=authenticationManager.
-                    authenticate(new UsernamePasswordAuthenticationToken(username,password));
-        }
-                catch (Exception e)
-        {
-            if (e instanceof BadCredentialsException)
-            {
-              return "password";
-            }
-            else
-            {
-             return  "name";
+    public String login(String username, String password) {
+        Authentication authentication = null;
+        try {
+            authentication = authenticationManager.
+                    authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (Exception e) {
+            if (e instanceof BadCredentialsException) {
+                return "password";
+            } else {
+                return "name";
             }
         }
 
-        LoginUser loginUser=(LoginUser) authentication.getPrincipal();
+        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         return tokenServie.createToken(loginUser);
     }
 
-    public Boolean logout(HttpServletRequest request){
-      return tokenServie.delToken(request);
+    public Boolean logout(HttpServletRequest request) {
+        return tokenServie.delToken(request);
     }
 }
